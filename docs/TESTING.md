@@ -90,13 +90,17 @@ void addToCart_invalidQuantity_throwsException() { }
 ### Backend (PHP)
 
 ```php
-public function test_methodName_scenario_expectedBehavior(): void { }
+public function test_method_scenario_expected_behavior(): void { }
 
 // Examples:
-public function test_createUser_duplicateEmail_returns409(): void { }
+public function test_create_user_duplicate_email_returns_409(): void { }
 
-public function test_getProducts_withPagination_returnsPagedResults(): void { }
+public function test_get_products_with_pagination_returns_paged_results(): void { }
 ```
+
+Method names are written in `snake_case` because the project style check
+(Laravel Pint, `vendor/bin/pint --test`) enforces it; run `vendor/bin/pint`
+to fix casing and formatting automatically.
 
 ---
 

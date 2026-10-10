@@ -6,7 +6,7 @@
 
 - Git
 - For Android development: Android Studio, JDK 17+
-- For Backend development: a PHP release supported by the selected Laravel stable release, MySQL 8.x, and Composer
+- For Backend development: a PHP release supported by the selected Laravel stable release (PHP 8.4 as selected), MySQL 8.x reachable over the network (hosted, not local), and Composer
 - For Admin development: Node.js LTS and npm
 
 ### Clone and Setup
@@ -21,7 +21,7 @@ cd eshop-verse
 Each component has its own setup process. The source code and actual dependency versions remain authoritative. See:
 
 - `android/` — Java/XML Android application in Android Studio
-- `backend/` — Laravel API; configure local environment from `.env.example` and use migrations against a disposable local database
+- `backend/` — Laravel API; configure the local environment from `.env.example`, migrate the hosted development database, and run tests against a separate disposable test database (see the Backend section)
 - `admin/` — React/TypeScript client; configure its API origin without committing credentials
 
 Before a component is implemented, document its exact setup, build, lint, and test commands here. Do not invent commands in task prompts; copy them from the current project scripts/tooling.
@@ -109,15 +109,90 @@ Android Phase 0 also adds the layers the screen tasks depend on; their prerequis
 
 ### Backend
 
-1. Install PHP dependencies with Composer.
-2. Configure `.env` from `.env.example`.
-3. Set up MySQL database.
-4. Run migrations.
-5. Start the development server.
+**Selected stack (roadmap task FND-002):**
 
-> Exact commands will be documented when the Laravel application and test configuration are initialized.
+| Component | Selected version / choice |
+|-----------|---------------------------|
+| PHP | **8.4.25** CLI (installed via winget `PHP.PHP.8.4`); extensions enabled in `php.ini`: `curl`, `fileinfo`, `mbstring`, `openssl`, `pdo_mysql`, `mysqli`, `zip`, plus the framework defaults (`ctype`, `dom`, `json`, `tokenizer`, `xml`, `PDO`) |
+| Composer | **2.10.3** |
+| Framework | **Laravel 13** — skeleton `laravel/laravel` v13.11.0, locked `laravel/framework` **v13.35.0** in `backend/composer.lock` |
+| Test runner | **PHPUnit 12.5.38** through `php artisan test` |
+| Style/static check | **Laravel Pint 1.32.1** (PSR-12 + Laravel preset), no `pint.json` overrides |
+| Database | **Hosted MySQL** (`utf8mb4`, `utf8mb4_unicode_ci`, strict mode) — no local MySQL. Two databases on the same server: `eshopverse_dev` for development and `eshopverse_test` as the disposable test database |
+| Node.js / Vite | Not required for API work. `package.json` and `vite.config.js` exist in the skeleton but only build frontend assets; no backend command below depends on Node |
 
-> The OpenAPI contract draft lives at [`openapi.yaml`](openapi.yaml). It must be reviewed and accepted by the API owner before any endpoint, client integration, or migration is implemented.
+**Prerequisites:** PHP 8.4 with the extensions above on `PATH`, Composer 2 on `PATH`, and a reachable hosted MySQL server with the two databases below.
+
+```sql
+CREATE DATABASE eshopverse_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE eshopverse_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- grant the application user ALL privileges on both databases only.
+```
+
+**Backend commands** (PowerShell, run from `backend/`):
+
+```powershell
+# Install dependencies (uses the committed composer.lock)
+composer install
+
+# First-time setup
+Copy-Item .env.example .env     # then fill DB_HOST / DB_PORT / DB_DATABASE / DB_USERNAME / DB_PASSWORD / MYSQL_ATTR_SSL_CA
+php artisan key:generate
+
+# Migrations (development database from .env)
+php artisan migrate
+php artisan migrate:fresh --seed    # safe reset of development data
+
+# Style / static check
+vendor\bin\pint --test    # check only (CI-style)
+vendor\bin\pint           # fix in place
+
+# Tests — always run against the disposable eshopverse_test database
+php artisan test
+php artisan test --filter=DatabaseWorkflowTest
+
+# Manual reset of the test database (only when needed)
+$env:DB_DATABASE = 'eshopverse_test'; php artisan migrate:fresh
+
+# Run the API locally
+php artisan serve        # http://127.0.0.1:8000  (health: GET /up)
+```
+
+**Safety rules**
+- `.env` is git-ignored and holds the only real credentials; `.env.example` contains placeholders only. Never commit a `.env`.
+- Tests are hard-wired in `phpunit.xml` to `DB_CONNECTION=mysql` and `DB_DATABASE=eshopverse_test`. Never point them at `eshopverse_dev`.
+- `RefreshDatabase` wraps each test in a transaction after a one-time `migrate:fresh`, so test data never survives a run.
+
+**Verification status (2026-10-11)** — executed on this checkout, output recorded:
+
+| Command | Result |
+|---------|--------|
+| `composer install` | ✔ exit 0 — 79 packages from `composer.lock` |
+| setup (`Copy-Item .env.example .env`, `php artisan key:generate`) | ✔ the skeleton's `post-root-package-install` created `.env` from `.env.example` and `key:generate` reported `Application key set successfully`; no secret is checked in |
+| `composer validate --strict` | ✔ `./composer.json is valid` |
+| `composer audit` | ✔ `No security vulnerability advisories found` |
+| `vendor\bin\pint --test` | ✔ `{"result":"passed"}` |
+| `php artisan migrate` | ✔ 3 migrations ran on the hosted `eshopverse_dev` (MySQL **8.4.11**) |
+| `php artisan migrate:status` | ✔ all 3 `[1] Ran` |
+| `php artisan test` | ✔ 5 tests, 8 assertions, 0 failures (runs on `eshopverse_test`) |
+| `php artisan serve` | ✔ `GET /up` → 200, `GET /api/v1/definitely-not-a-route` → 404 |
+| TLS connection | ✔ TLS 1.3, `TLS_AES_256_GCM_SHA384`, certificate verified against `MYSQL_ATTR_SSL_CA` |
+
+The development database used for this run is a **hosted MySQL service (Aiven Free tier)** —
+remote, no local MySQL. Host and credentials live only in `.env`.
+
+**TLS (verified, 2026-10-11):** `docs/SECURITY.md` requires encrypted database connections, so the
+hosted connection runs over **TLS 1.3** with cipher `TLS_AES_256_GCM_SHA384` and the server
+certificate is **verified** against the provider's project CA:
+
+- Download `ca.pem` from the MySQL service console (the development copy lives outside the repository).
+- Set `MYSQL_ATTR_SSL_CA=<path to ca.pem>` in `.env`; `config/database.php` then enables TLS and
+  sets `MYSQL_ATTR_SSL_VERIFY_SERVER_CERT`, so an unencrypted or unauthenticated connection fails
+  instead of silently falling back to plaintext.
+- Without `MYSQL_ATTR_SSL_CA` the connection is plaintext. That is intentionally loud in this
+  document: never run migrations or tests in that state.
+
+> The OpenAPI contract draft lives at [`openapi.yaml`](openapi.yaml). It must be reviewed and accepted by the API owner before any endpoint, client integration, or business migration is implemented.
 
 ### Admin Dashboard
 
