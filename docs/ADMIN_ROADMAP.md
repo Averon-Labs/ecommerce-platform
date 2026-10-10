@@ -62,6 +62,8 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **BACKEND PORTION:** This task has a backend implementation component (admin auth endpoints, role middleware). Backend colleague must implement that part.
 
+**Demo admin account:** created by a backend database seeder owned by the AUTH-003 backend portion; it is local/demo-only, is documented in the handoff guide (QUAL-004), and must never be a reusable public credential.
+
 **Scope:** secure first-party admin sign-in/session lifecycle, Sanctum CSRF flow, and server-enforced admin role checks.
 
 **Acceptance criteria:**

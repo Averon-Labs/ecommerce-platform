@@ -39,10 +39,10 @@ This roadmap is for explicitly cross-component work and final project/release va
 - Android has a regenerated Java/XML Gradle scaffold: namespace/application ID com.averonlabs.eshopverse, compile SDK 36.1, minSdk 25, targetSdk 36, Java 11 source/target, AGP 9.2.1, Gradle 9.4.1. The complete Phase 0-2 dependency set (Material 1.14.0, AndroidX libraries, Retrofit, OkHttp, Glide, test dependencies) was declared in FND-006. Verified build/lint/test commands are documented in `docs/DEVELOPMENT.md`.
 - Android Phase 0 was expanded by PLAN-005 with six cross-cutting foundation steps (FND-006, UI-002, APP-002, DOM-002, DATA-002, NET-002) that must complete before the Phase 1 screen tasks; `docs/openapi.yaml` now exists as a draft for FND-004 owner review, and contract-derived fixtures plus a local mock server let the Android tasks be verified without a running backend.
 - Android Phase 1 and Phase 2 steps depend only on Android and shared steps. Their backend dependencies are recorded once, in the coordination table in `docs/ANDROID_ROADMAP.md`, with integration deferred to QUAL-001.
-- backend/ and admin/ contain agent guidance but no initialized applications.
+- `backend/` now contains the initialized Laravel 13 application (FND-002, 2026-10-11) with a hosted MySQL workflow; `admin/` still contains agent guidance only (FND-003).
 - .github/workflows/ci.yml is a placeholder. Its active job checks repository structure; component checks are not active.
 - GitHub develop was created from the current pre-policy main baseline. Default branch, auto-delete, and branch protection must be verified under GIT-001.
-- docs/openapi.yaml does not exist. docs/API_CONTRACT.md records shared conventions, but endpoint schemas and per-class rate limits remain open.
+- `docs/openapi.yaml` exists as an OpenAPI 3.1 draft awaiting API-owner acceptance (FND-004). `docs/API_CONTRACT.md` records shared conventions; endpoint schemas and per-class rate limits are drafted in the OpenAPI file and become binding only on acceptance.
 - docs/DATABASE.md is a logical model, not implemented migrations.
 
 This is a repository snapshot, not a promise that the state remains unchanged. Confirm facts again when a Task starts.

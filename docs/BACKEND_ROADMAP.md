@@ -16,7 +16,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 ### Step 1 — FND-002 — Initialize Laravel API and local database workflow
 
-**Status:** `[ ]`
+**Status:** `[~]`
 
 **Depends on:** none
 
@@ -137,7 +137,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 - **AUTH-003 complete** (Admin: admin authentication working - backend portion)
 - CAT-001 complete (catalog read API and schema exist)
 - Admin role authorization middleware ready
-- Category archive/status behavior decided (resolve OPEN-5 mentioned in FND-004)
+- Category archive/status behavior decided (resolve OPEN-2, the category lifecycle decision recorded in FND-004)
 - Inventory update validation rules defined
 
 **Scope:** admin-only create/read/update/archive operations for products and categories, plus validated inventory updates.

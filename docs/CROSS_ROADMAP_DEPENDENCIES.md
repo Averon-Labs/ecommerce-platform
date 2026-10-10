@@ -23,7 +23,7 @@ This document highlights the key cross-component dependencies where work in one 
 
 **Impact:** This is the **single most critical cross-component dependency**. Until the OpenAPI contract is accepted, no API integration work can start in any component. Android can work on Phase 0 tasks that don't need the contract (FND-006, UI-002, APP-002, DATA-002), but Phase 1 and 2 are completely blocked.
 
-**Status:** Not started
+**Status:** Draft exists (`docs/openapi.yaml`, OpenAPI 3.1) and has passed structural validation; awaiting API-owner review and acceptance (criterion g).
 
 ---
 
@@ -44,7 +44,7 @@ This document highlights the key cross-component dependencies where work in one 
 
 | Backend Task | Requires | Notes |
 |--------------|----------|-------|
-| FND-002 | None | Can start immediately |
+| FND-002 | None | **Complete (2026-10-11):** Laravel 13 app + hosted MySQL dev/test workflow; exact commands in `docs/DEVELOPMENT.md` |
 | FND-004 | Product/API/DB/Security docs | Must complete before **anyone** does API work |
 
 ### Admin Dependencies on Other Teams
