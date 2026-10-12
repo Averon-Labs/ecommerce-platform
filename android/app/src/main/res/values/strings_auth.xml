@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Screen Titles & Navigation -->
+    <string name="auth_sign_in_title">Sign in</string>
+    <string name="auth_register_title">Create account</string>
+    <string name="auth_request_reset_title">Forgot password</string>
+    <string name="auth_set_new_password_title">Set new password</string>
+    <string name="auth_account_title">My Account</string>
+
+    <!-- Field Labels & Hints -->
+    <string name="auth_label_email">Email address</string>
+    <string name="auth_hint_email">name@example.com</string>
+    <string name="auth_label_password">Password</string>
+    <string name="auth_hint_password">At least 8 characters</string>
+    <string name="auth_label_confirm_password">Confirm password</string>
+    <string name="auth_hint_confirm_password">Re-enter password</string>
+    <string name="auth_label_first_name">First name</string>
+    <string name="auth_hint_first_name">First name</string>
+    <string name="auth_label_last_name">Last name</string>
+    <string name="auth_hint_last_name">Last name</string>
+    <string name="auth_label_reset_token">Reset token</string>
+    <string name="auth_hint_reset_token">Enter received reset token</string>
+
+    <!-- Actions & Buttons -->
+    <string name="auth_action_sign_in">Sign in</string>
+    <string name="auth_action_register">Create account</string>
+    <string name="auth_action_send_reset">Send instructions</string>
+    <string name="auth_action_set_password">Set new password</string>
+    <string name="auth_action_sign_out">Sign out</string>
+    <string name="auth_action_save_profile">Save changes</string>
+    <string name="auth_action_to_register">Don\'t have an account? Sign up</string>
+    <string name="auth_action_to_sign_in">Already have an account? Sign in</string>
+    <string name="auth_action_forgot_password">Forgot password?</string>
+    <string name="auth_action_back_to_reset">Request a new reset link</string>
+    <string name="auth_action_retry">Retry</string>
+
+    <!-- Validation Errors -->
+    <string name="auth_error_email_required">Email address is required.</string>
+    <string name="auth_error_email_invalid">Enter a valid email address.</string>
+    <string name="auth_error_password_invalid">Password must be 8–72 characters and contain at least one letter and one digit.</string>
+    <string name="auth_error_confirm_password_mismatch">Passwords do not match.</string>
+    <string name="auth_error_first_name_required">First name must be 1–80 characters.</string>
+    <string name="auth_error_last_name_required">Last name must be 1–80 characters.</string>
+    <string name="auth_error_reset_token_required">Reset token must be 16–128 characters.</string>
+
+    <!-- Server & Feedback Messages -->
+    <string name="auth_feedback_reset_requested">If an account exists with this email, password reset instructions have been sent.</string>
+    <string name="auth_feedback_password_changed">Your password has been changed. Please sign in with your new password.</string>
+    <string name="auth_feedback_profile_updated">Profile updated successfully.</string>
+    <string name="auth_error_reset_token_invalid_state">This reset token is invalid or has expired.</string>
+    <string name="auth_error_account_locked">Account temporarily locked. Please try again in %1$d seconds.</string>
+    <string name="auth_error_session_expired">Your session has expired. Please sign in again to continue.</string>
+    <string name="auth_status_signed_in_as">Signed in as %1$s</string>
+    <string name="auth_guest_prompt">Sign in or create an account to view your profile and manage orders.</string>
+</resources>
