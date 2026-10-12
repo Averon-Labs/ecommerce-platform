@@ -85,16 +85,20 @@ public class MainActivity extends AppCompatActivity {
         // Initialize cart badge as hidden
         setCartBadgeCount(0);
 
-        // Hierarchical back navigation:
-        // If the user is on any destination other than Home, Back returns directly to HomeFragment.
-        // A subsequent Back press from HomeFragment exits the application directly, avoiding backstack loops.
+        // Hierarchical back navigation adhering to Material 3 & UX principles:
+        // First pop child/sub-screens in current flow (e.g. Register -> SignIn -> Account).
+        // If at the root of a tab other than Home, Back returns to HomeFragment.
+        // A subsequent Back press from HomeFragment exits the application directly.
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (navController != null && navController.getCurrentDestination() != null) {
-                    int currentId = navController.getCurrentDestination().getId();
-                    if (currentId != R.id.homeFragment) {
-                        navController.popBackStack(R.id.homeFragment, false);
+                if (navController != null) {
+                    if (navController.popBackStack()) {
+                        return;
+                    }
+                    if (navController.getCurrentDestination() != null
+                            && navController.getCurrentDestination().getId() != R.id.homeFragment) {
+                        navController.navigate(R.id.homeFragment);
                         return;
                     }
                 }
