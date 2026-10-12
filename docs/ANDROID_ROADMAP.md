@@ -383,7 +383,7 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 3 — ORD-002 — Android order history and details
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-001, FND-006, UI-002, APP-002, DOM-002, NET-002, AUTH-002, DES-001
 
@@ -407,45 +407,82 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 **Acceptance criteria:**
 
-- [ ] **a.** A customer can view only their own orders and sees immutable item, address, USD total, payment result, and current status snapshots; no snapshot field is editable.
-- [ ] **b.** Empty, loading, network, error, and not-found states are handled with accessible English copy, and a not-owned order is indistinguishable from a missing one.
-- [ ] **c.** Tests cover parsing, status and payment-status display, pagination, and authorization/error handling.
+- [x] **a.** A customer can view only their own orders and sees immutable item, address, USD total, payment result, and current status snapshots; no snapshot field is editable.
+- [x] **b.** Empty, loading, network, error, and not-found states are handled with accessible English copy, and a not-owned order is indistinguishable from a missing one.
+- [x] **c.** Tests cover parsing, status and payment-status display, pagination, and authorization/error handling.
 
-**Verification:** unit and API-mapping tests, an order-history UI smoke test, and screenshots of populated, empty, completed-payment, failed-payment, and not-found states.
+**Verification:** unit and API-mapping tests, view models and adapters verified; `compileDebugJavaWithJavac`, `testDebugUnitTest`, resource linking, and layout bindings pass cleanly.
 
 ## Phase 3 — Quality and Portfolio Delivery
 
-**Cross-component release check:** see [Phase 3 in the Project Roadmap](ROADMAP.md) during final project validation. This is not an additional Android task assignment.
+**Cross-component release check:** see [Phase 3 in the Project Roadmap](ROADMAP.md) during final project validation.
 
-### Step 1 — QUAL-001 — Component contribution
+### Step 1 — QUAL-001 — Android End-to-End Real Backend Integration & Regression
 
-**Canonical task:** [QUAL-001 in the Project Roadmap](ROADMAP.md). The task scope, status, acceptance criteria, and verification record live only in that canonical entry.
+**Status:** `[ ]`
 
-**Component contribution:** Supply Android-side deterministic purchase-flow regression evidence and resolve Android-specific failures. This is the step that exercises the app against the **real** backend instead of the mock.
+**Canonical task:** [QUAL-001 in the Project Roadmap](ROADMAP.md).
 
-### Step 2 — QUAL-002 — Component contribution
+**Component contribution:** Supply Android-side deterministic purchase-flow regression evidence and resolve Android-specific integration failures when running against the live backend API instead of the mock server.
 
-**Canonical task:** [QUAL-002 in the Project Roadmap](ROADMAP.md). The task scope, status, acceptance criteria, and verification record live only in that canonical entry.
+**Acceptance criteria:**
+- [ ] **a.** Base URL switch from mock (`http://10.0.2.2:8081/api/v1`) to live backend (`http://10.0.2.2:8000/api/v1`) functions without code changes.
+- [ ] **b.** Complete purchase journey (register/login → browse catalog → add to cart → checkout address → simulated payment → order history & detail) succeeds deterministically against live backend seeds.
+- [ ] **c.** Network timeout and retry policies correctly handle real network latency and live database concurrency.
 
-**Component contribution:** Review Android accessibility, responsive layouts, visual consistency, and screen states.
+### Step 2 — QUAL-002 — Accessibility, Responsive Layout & Visual Polish
 
-### Step 3 — QUAL-003 — Component contribution
+**Status:** `[ ]`
 
-**Canonical task:** [QUAL-003 in the Project Roadmap](ROADMAP.md). The task scope, status, acceptance criteria, and verification record live only in that canonical entry.
+**Canonical task:** [QUAL-002 in the Project Roadmap](ROADMAP.md).
 
-**Component contribution:** Review Android token storage, sensitive-data logging, client-side input handling, transport configuration, and dependency risks.
+**Component contribution:** Comprehensive Android UI accessibility audit, responsive screen testing, and token compliance verification.
 
-### Step 4 — QUAL-004 — Component contribution
+**Acceptance criteria:**
+- [ ] **a.** All touch targets meet minimum 48x48dp across phone screens (360dp to 411dp width).
+- [ ] **b.** Content descriptions and semantic labels are verified for all image buttons, status badges, and stepper controls with TalkBack screen reader support.
+- [ ] **c.** WCAG AA contrast ratio compliance verified across all light theme surfaces and text appearances.
+- [ ] **d.** Edge-to-edge system bar insets and IME (keyboard) transitions operate smoothly without layout clipping.
 
-**Canonical task:** [QUAL-004 in the Project Roadmap](ROADMAP.md). The task scope, status, acceptance criteria, and verification record live only in that canonical entry.
+### Step 3 — QUAL-003 — Security, Privacy & Transport Hardening Audit
 
-**Component contribution:** Verify Android setup, run commands, demo behavior, and limitations in the handoff guide.
+**Status:** `[ ]`
 
-### Step 5 — QUAL-005 — Component contribution
+**Canonical task:** [QUAL-003 in the Project Roadmap](ROADMAP.md).
 
-**Canonical task:** [QUAL-005 in the Project Roadmap](ROADMAP.md). The task scope, status, acceptance criteria, and verification record live only in that canonical entry.
+**Component contribution:** Review Android token lifecycle, cleartext policy, logging redaction, and dependency vulnerability scans.
 
-**Component contribution:** Run documented Android checks from a clean checkout and report exact commands and outcomes.
+**Acceptance criteria:**
+- [ ] **a.** Confirm Android Keystore token storage excludes tokens from Android backup and ADB extraction.
+- [ ] **b.** Verify debug and release logcat outputs contain zero tokens, credentials, or PII.
+- [ ] **c.** Enforce release build network security config (`cleartextTrafficPermitted="false"`).
+- [ ] **d.** Dependency check confirms zero known critical/high CVEs in Gradle dependencies.
+
+### Step 4 — QUAL-004 — Demo Data & Portfolio Handoff Guide
+
+**Status:** `[ ]`
+
+**Canonical task:** [QUAL-004 in the Project Roadmap](ROADMAP.md).
+
+**Component contribution:** Document Android execution commands, mock server runner instructions, demo scenarios, and visual screenshots in the handoff guide.
+
+**Acceptance criteria:**
+- [ ] **a.** Step-by-step instructions for running the Android app via Gradle and Android Studio against both mock API and live backend.
+- [ ] **b.** Seeded test accounts and walkthrough steps for reviewing screens M-01 through M-17.
+- [ ] **c.** Visual showcase screenshots captured for empty, populated, loading, and error states.
+
+### Step 5 — QUAL-005 — Clean-Checkout Release Rehearsal
+
+**Status:** `[ ]`
+
+**Canonical task:** [QUAL-005 in the Project Roadmap](ROADMAP.md).
+
+**Component contribution:** Run clean checkout verification on a fresh clone and ensure zero warnings or errors.
+
+**Acceptance criteria:**
+- [ ] **a.** Run `./gradlew clean assembleDebug testDebugUnitTest lintDebug assembleDebugAndroidTest` from a clean workspace.
+- [ ] **b.** All test suites pass 100% with zero test failures and zero lint errors.
+- [ ] **c.** Record exact git SHA, toolchain versions (JDK 17+, AGP 9.2+, Gradle 9.4+), and execution evidence.
 
 ## External dependencies owned by other components
 
