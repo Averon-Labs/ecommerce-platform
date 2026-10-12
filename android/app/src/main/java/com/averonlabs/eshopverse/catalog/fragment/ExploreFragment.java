@@ -142,6 +142,11 @@ public class ExploreFragment extends Fragment {
                 renderCategoryChips(state.getData());
             }
         });
+        categoryViewModel.getSelectedCategoryId().observe(getViewLifecycleOwner(), selectedId -> {
+            if (binding.rvCategories.getAdapter() != null) {
+                binding.rvCategories.getAdapter().notifyDataSetChanged();
+            }
+        });
     }
 
     private void renderCategoryChips(List<Category> categories) {
@@ -168,12 +173,17 @@ public class ExploreFragment extends Fragment {
                     Category category = categories.get(position - 1);
                     chip.setText(category.getName());
                     Long currentSelected = categoryViewModel.getSelectedCategoryId().getValue();
-                    chip.setChecked(currentSelected != null && currentSelected == category.getId());
+                    long catId = (long) category.getId();
+                    boolean isSelected = currentSelected != null && currentSelected == catId;
+                    chip.setChecked(isSelected);
                     chip.setOnClickListener(v -> {
-                        Bundle args = new Bundle();
-                        args.putLong("categoryId", category.getId());
-                        args.putString("categoryName", category.getName());
-                        Navigation.findNavController(requireView()).navigate(R.id.categoryProductsFragment, args);
+                        if (isSelected) {
+                            categoryViewModel.selectCategory(null);
+                            catalogViewModel.setCategoryId(null);
+                        } else {
+                            categoryViewModel.selectCategory(catId);
+                            catalogViewModel.setCategoryId(catId);
+                        }
                     });
                 }
             }

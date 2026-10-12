@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.Protocol;
@@ -29,8 +30,7 @@ public class OfflineMockInterceptor implements Interceptor {
             return chain.withConnectTimeout(1, TimeUnit.SECONDS).proceed(request);
         } catch (IOException e) {
             // Server is not running or unreachable -> deliver rich offline mock data
-            String path = request.url().encodedPath();
-            String jsonResponse = getMockResponseFor(request.method(), path);
+            String jsonResponse = getMockResponseFor(request.method(), request.url());
 
             if (jsonResponse != null) {
                 return new Response.Builder()
@@ -46,7 +46,9 @@ public class OfflineMockInterceptor implements Interceptor {
         }
     }
 
-    private String getMockResponseFor(String method, String path) {
+    private String getMockResponseFor(String method, HttpUrl url) {
+        String path = url.encodedPath();
+
         if (path.endsWith("/categories")) {
             return "{\"data\":["
                     + "{\"id\":1,\"name\":\"Footwear\",\"sortOrder\":1,\"status\":\"active\"},"
@@ -57,6 +59,30 @@ public class OfflineMockInterceptor implements Interceptor {
         }
 
         if (path.endsWith("/products")) {
+            String categoryId = url.queryParameter("category_id");
+            if ("1".equals(categoryId)) {
+                return "{\"data\":["
+                        + "{\"id\":101,\"name\":\"Classic Leather Sneaker\",\"price\":\"89.99\",\"currency\":\"USD\",\"categoryId\":1,\"categoryName\":\"Footwear\",\"imageUrl\":\"https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500\",\"inStock\":true,\"status\":\"active\"},"
+                        + "{\"id\":102,\"name\":\"Canvas Low-Top\",\"price\":\"49.50\",\"currency\":\"USD\",\"categoryId\":1,\"categoryName\":\"Footwear\",\"imageUrl\":\"https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=500\",\"inStock\":true,\"status\":\"active\"}"
+                        + "],\"pagination\":{\"currentPage\":1,\"perPage\":20,\"totalItems\":2,\"totalPages\":1}}";
+            }
+            if ("2".equals(categoryId)) {
+                return "{\"data\":["
+                        + "{\"id\":103,\"name\":\"Urban Tech Hoodie\",\"price\":\"75.00\",\"currency\":\"USD\",\"categoryId\":2,\"categoryName\":\"Apparel\",\"imageUrl\":\"https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500\",\"inStock\":true,\"status\":\"active\"}"
+                        + "],\"pagination\":{\"currentPage\":1,\"perPage\":20,\"totalItems\":1,\"totalPages\":1}}";
+            }
+            if ("3".equals(categoryId)) {
+                return "{\"data\":["
+                        + "{\"id\":104,\"name\":\"Minimalist Daypack\",\"price\":\"65.00\",\"currency\":\"USD\",\"categoryId\":3,\"categoryName\":\"Accessories\",\"imageUrl\":\"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500\",\"inStock\":true,\"status\":\"active\"}"
+                        + "],\"pagination\":{\"currentPage\":1,\"perPage\":20,\"totalItems\":1,\"totalPages\":1}}";
+            }
+            if ("4".equals(categoryId)) {
+                return "{\"data\":["
+                        + "{\"id\":105,\"name\":\"Wireless Noise-Cancelling Headphones\",\"price\":\"199.99\",\"currency\":\"USD\",\"categoryId\":4,\"categoryName\":\"Electronics\",\"imageUrl\":\"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500\",\"inStock\":true,\"status\":\"active\"},"
+                        + "{\"id\":106,\"name\":\"Smart Fitness Watch\",\"price\":\"149.00\",\"currency\":\"USD\",\"categoryId\":4,\"categoryName\":\"Electronics\",\"imageUrl\":\"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500\",\"inStock\":true,\"status\":\"active\"}"
+                        + "],\"pagination\":{\"currentPage\":1,\"perPage\":20,\"totalItems\":2,\"totalPages\":1}}";
+            }
+
             return "{\"data\":["
                     + "{\"id\":101,\"name\":\"Classic Leather Sneaker\",\"price\":\"89.99\",\"currency\":\"USD\",\"categoryId\":1,\"categoryName\":\"Footwear\",\"imageUrl\":\"https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500\",\"inStock\":true,\"status\":\"active\"},"
                     + "{\"id\":102,\"name\":\"Canvas Low-Top\",\"price\":\"49.50\",\"currency\":\"USD\",\"categoryId\":1,\"categoryName\":\"Footwear\",\"imageUrl\":\"https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=500\",\"inStock\":true,\"status\":\"active\"},"
@@ -68,15 +94,62 @@ public class OfflineMockInterceptor implements Interceptor {
         }
 
         if (path.contains("/products/")) {
+            long id = 101;
+            try {
+                String idStr = path.substring(path.lastIndexOf('/') + 1);
+                id = Long.parseLong(idStr);
+            } catch (Exception ignored) {}
+
+            String name = "Classic Leather Sneaker";
+            String price = "89.99";
+            String image = "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500";
+            int catId = 1;
+            String catName = "Footwear";
+            String sku = "FTW-SNK-001";
+
+            if (id == 102) {
+                name = "Canvas Low-Top";
+                price = "49.50";
+                image = "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=500";
+                sku = "FTW-CNV-002";
+            } else if (id == 103) {
+                name = "Urban Tech Hoodie";
+                price = "75.00";
+                image = "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=500";
+                catId = 2;
+                catName = "Apparel";
+                sku = "APP-HOD-003";
+            } else if (id == 104) {
+                name = "Minimalist Daypack";
+                price = "65.00";
+                image = "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500";
+                catId = 3;
+                catName = "Accessories";
+                sku = "ACC-BCK-004";
+            } else if (id == 105) {
+                name = "Wireless Noise-Cancelling Headphones";
+                price = "199.99";
+                image = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500";
+                catId = 4;
+                catName = "Electronics";
+                sku = "ELC-HDP-005";
+            } else if (id == 106) {
+                name = "Smart Fitness Watch";
+                price = "149.00";
+                image = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500";
+                catId = 4;
+                catName = "Electronics";
+                sku = "ELC-WTC-006";
+            }
+
             return "{\"data\":{"
-                    + "\"id\":101,\"name\":\"Classic Leather Sneaker\",\"price\":\"89.99\",\"currency\":\"USD\","
-                    + "\"categoryId\":1,\"categoryName\":\"Footwear\",\"imageUrl\":\"https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500\","
+                    + "\"id\":" + id + ",\"name\":\"" + name + "\",\"price\":\"" + price + "\",\"currency\":\"USD\","
+                    + "\"categoryId\":" + catId + ",\"categoryName\":\"" + catName + "\",\"imageUrl\":\"" + image + "\","
                     + "\"inStock\":true,\"status\":\"active\","
-                    + "\"description\":\"Handcrafted from premium full-grain Italian leather with a breathable moisture-wicking lining and an ultra-cushioned memory foam footbed. The durable vulcanized rubber outsole delivers superior grip and all-day comfort.\","
-                    + "\"sku\":\"FTW-SNK-001\",\"stockQuantity\":15,"
+                    + "\"description\":\"Handcrafted with meticulous detail using premium materials. Designed for high durability, effortless style, and maximum daily utility.\","
+                    + "\"sku\":\"" + sku + "\",\"stockQuantity\":15,"
                     + "\"images\":["
-                    + "{\"url\":\"https://images.unsplash.com/photo-1549298916-b41d501d3772?w=500\",\"sortOrder\":1},"
-                    + "{\"url\":\"https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=500\",\"sortOrder\":2}"
+                    + "{\"url\":\"" + image + "\",\"sortOrder\":1}"
                     + "]}}";
         }
 
