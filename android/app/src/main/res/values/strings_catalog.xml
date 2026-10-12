@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Screen Titles & Navigation -->
+    <string name="catalog_explore_title">Explore</string>
+    <string name="catalog_search_title">Search results</string>
+    <string name="catalog_category_title">Category</string>
+    <string name="catalog_product_detail_title">Product details</string>
+
+    <!-- Search Controls & Hints -->
+    <string name="catalog_search_hint">Search products…</string>
+    <string name="catalog_action_search">Search</string>
+    <string name="catalog_action_clear_search">Clear search</string>
+    <string name="catalog_search_results_count">%1$d products found</string>
+
+    <!-- Sort Options -->
+    <string name="catalog_sort_label">Sort</string>
+    <string name="catalog_sort_newest">Newest</string>
+    <string name="catalog_sort_price_asc">Price: Low to High</string>
+    <string name="catalog_sort_price_desc">Price: High to Low</string>
+    <string name="catalog_sort_name_asc">Name: A to Z</string>
+
+    <!-- Categories -->
+    <string name="catalog_category_all">All</string>
+    <string name="catalog_categories_heading">Categories</string>
+
+    <!-- Stock & Availability -->
+    <string name="catalog_in_stock">In stock</string>
+    <string name="catalog_out_of_stock">Out of stock</string>
+    <string name="catalog_stock_quantity">%1$d in stock</string>
+
+    <!-- Product Detail Controls & Actions -->
+    <string name="catalog_label_quantity">Quantity</string>
+    <string name="catalog_action_add_to_cart">Add to cart</string>
+    <string name="catalog_add_to_cart_unavailable">Add to cart will be available in the cart release.</string>
+    <string name="catalog_action_explore">Explore all products</string>
+    <string name="catalog_action_retry">Retry</string>
+
+    <!-- Empty States -->
+    <string name="catalog_empty_title">No products found</string>
+    <string name="catalog_empty_description">There are no products available in the catalog at this time.</string>
+    <string name="catalog_empty_search_description">No products matched your search. Try adjusting your query or filters.</string>
+    <string name="catalog_empty_category_description">No products are currently available in this category.</string>
+    <string name="catalog_category_not_found_description">This category could not be found or has been archived.</string>
+
+    <!-- Error Messages -->
+    <string name="catalog_error_load_products">Unable to load products. Please check your connection and try again.</string>
+    <string name="catalog_error_load_details">Unable to load product details. Please try again.</string>
+    <string name="catalog_error_load_categories">Unable to load categories.</string>
+    <string name="catalog_error_rate_limited">Too many requests. Please wait a moment before retrying.</string>
+
+    <!-- Accessibility Descriptions -->
+    <string name="catalog_cd_product_card">%1$s, %2$s, %3$s</string>
+    <string name="catalog_cd_product_image">Product image %1$d of %2$d</string>
+    <string name="catalog_cd_sort_button">Change sort order</string>
+    <string name="catalog_cd_clear_search">Clear search text</string>
+    <string name="catalog_cd_stepper_decrement">Decrease quantity</string>
+    <string name="catalog_cd_stepper_increment">Increase quantity</string>
+</resources>

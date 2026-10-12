@@ -3,12 +3,56 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_catalog"
-    app:startDestination="@id/catalogPlaceholderFragment">
+    app:startDestination="@id/productDetailFragment">
 
     <fragment
-        android:id="@+id/catalogPlaceholderFragment"
-        android:name="com.averonlabs.eshopverse.shell.PlaceholderFragment"
-        android:label="@string/nav_explore"
-        tools:layout="@layout/fragment_placeholder" />
+        android:id="@+id/productDetailFragment"
+        android:name="com.averonlabs.eshopverse.catalog.fragment.ProductDetailFragment"
+        android:label="@string/catalog_product_detail_title"
+        tools:layout="@layout/fragment_product_detail">
+
+        <argument
+            android:name="productId"
+            app:argType="long" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/searchResultsFragment"
+        android:name="com.averonlabs.eshopverse.catalog.fragment.SearchResultsFragment"
+        android:label="@string/catalog_search_title"
+        tools:layout="@layout/fragment_search_results">
+
+        <argument
+            android:name="query"
+            android:defaultValue=""
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_searchResultsFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/categoryProductsFragment"
+        android:name="com.averonlabs.eshopverse.catalog.fragment.CategoryProductsFragment"
+        android:label="@string/catalog_category_title"
+        tools:layout="@layout/fragment_category_products">
+
+        <argument
+            android:name="categoryId"
+            app:argType="long" />
+
+        <argument
+            android:name="categoryName"
+            android:defaultValue=""
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_categoryProductsFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment" />
+
+    </fragment>
 
 </navigation>

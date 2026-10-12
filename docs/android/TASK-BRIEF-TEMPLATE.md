@@ -41,7 +41,7 @@ Paste this block into the assignment. Keep every field; write `none` rather than
 
 ```text
 TASK: <TASK-ID> — <title>
-BRANCH: <type>/android-pNN-sNN-<task-id>-<slug>
+BRANCH: <type>/android-phase-<N>
 BASE: develop @ <sha>
 READ: <reading set per section 1>
 DEPENDS ON: <task ids, each with current status>

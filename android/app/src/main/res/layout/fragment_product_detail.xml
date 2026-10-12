@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.averonlabs.eshopverse.core.ui.view.StateContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/state_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorSurface">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/content_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="100dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Image Gallery ViewPager2 -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="280dp">
+
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/vp_product_images"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_image_indicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="@dimen/spacing_md"
+                        android:background="@drawable/bg_status_badge"
+                        android:paddingStart="@dimen/spacing_sm"
+                        android:paddingEnd="@dimen/spacing_sm"
+                        android:paddingTop="@dimen/spacing_xs"
+                        android:paddingBottom="@dimen/spacing_xs"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                        android:textColor="@color/text_primary_ink"
+                        android:visibility="gone"
+                        tools:text="1 / 3"
+                        tools:visibility="visible" />
+
+                </FrameLayout>
+
+                <!-- Product Information -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_md">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_product_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
+                        android:textColor="@color/text_primary_ink"
+                        tools:text="Classic Leather Sneaker" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_sm"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
+                            android:id="@+id/tv_product_price"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
+                            tools:text="$89.99" />
+
+                        <com.averonlabs.eshopverse.core.ui.view.StatusBadgeView
+                            android:id="@+id/badge_stock"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/spacing_md"
+                            tools:text="In stock" />
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/spacing_md"
+                        android:layout_marginBottom="@dimen/spacing_md"
+                        android:background="@color/m3_outline_variant" />
+
+                    <!-- Description -->
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Description"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                        android:textColor="@color/text_primary_ink" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_product_description"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:lineSpacingMultiplier="1.2"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                        android:textColor="@color/text_secondary"
+                        tools:text="Premium full-grain leather sneaker with cushioned insole and rubber outsole." />
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/spacing_md"
+                        android:layout_marginBottom="@dimen/spacing_md"
+                        android:background="@color/m3_outline_variant" />
+
+                    <!-- Quantity Stepper Section -->
+                    <LinearLayout
+                        android:id="@+id/layout_quantity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/catalog_label_quantity"
+                            android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                            android:textColor="@color/text_primary_ink" />
+
+                        <com.averonlabs.eshopverse.core.ui.view.QuantityStepperView
+                            android:id="@+id/stepper_quantity"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Sticky Bottom Action Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="?attr/colorSurface"
+            android:elevation="@dimen/elevation_level_3"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/spacing_md"
+            android:paddingEnd="@dimen/spacing_md"
+            android:paddingTop="@dimen/spacing_sm"
+            android:paddingBottom="@dimen/spacing_md">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_add_to_cart_notice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/catalog_add_to_cart_unavailable"
+                android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                android:textColor="@color/text_secondary"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_add_to_cart"
+                style="@style/Widget.EShopVerse.Button.Filled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:text="@string/catalog_action_add_to_cart" />
+
+        </LinearLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</com.averonlabs.eshopverse.core.ui.view.StateContainerView>

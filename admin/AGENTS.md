@@ -6,6 +6,14 @@ The canonical Admin task steps and acceptance criteria are in [`docs/ADMIN_ROADM
 
 ---
 
+## Git Policy and Phase-Based Branches
+
+- **Phase-Based Branches:** Admin work uses feature branches created per phase (`feature/admin-phase-<N>`), housing all steps of that phase together in a single branch created from `develop`.
+- **Sequential Steps as Commits:** Each step within a phase is developed, verified, and committed sequentially as a focused Conventional Commit: `<type>(admin-pNN-sNN-<task-id>): <summary>`.
+- **PR Lifecycle:** When all steps of an Admin phase are completed and verified, a Pull Request targeting `develop` is submitted for review.
+
+---
+
 ## Architecture
 
 | Aspect | Decision | Status |

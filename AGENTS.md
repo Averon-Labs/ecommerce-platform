@@ -4,11 +4,11 @@
 
 This section takes precedence over every other Git, branch, commit, push, and PR instruction in this file.
 
-- **Android tasks:** agents are authorized ONLY to perform staging and commits (`git add`, `git commit`) on the active task branch provided by the owner. All other Git commands (`status`, `diff`, `log`, `branch`, `switch`, `push`, `pull`, `fetch`, `merge`, `reset`, or GitHub PR creation) remain strictly owner-managed. The repository owner handles inspecting Git state, branch management, remotes, push, and PRs.
-- **Backend tasks:** the repository owner performs all Git operations. Agents must not run any Git command, including `status`, `diff`, `log`, `fetch`, `pull`, `branch`, `switch`, `add`, `commit`, `push`, `reset`, or GitHub CLI commands. This applies to builders, testers, debuggers, coordinators, and handoffs. Do not fetch, pull, inspect Git state, create or switch branches, stage, commit, push, or create/update PRs.
-- Sequential Android agents work against the task branch and create focused Conventional Commits for verified units. Backend agents continue to hand off verified working-tree state without commits.
+- **Universal Phase-Based Branching:** Across all components (Android, Backend, Admin, and Project), task branches are maintained **per phase** (`feature/<component>-phase-<N>`), housing all steps of that phase together in a single branch. Individual steps are NOT separate branches; each step is committed sequentially as a focused Conventional Commit (`<type>(<component>-pNN-sNN-<task-id>): <imperative summary>`) directly within the phase branch. When all steps of a phase are completed and verified, the phase branch is reviewed and merged into `develop`.
+- **Android tasks:** agents are authorized to manage Git operations on phase branches (`feature/android-phase-<N>`), including inspecting Git state, branch creation from `develop`, committing steps sequentially, pushing, and preparing PRs into `develop` following the agent Git workflow.
+- **Backend tasks:** the repository owner performs all Git operations. Backend feature branches are maintained per phase (`feature/backend-phase-<N>`), housing all steps of that phase together. Agents must not run any Git command, including `status`, `diff`, `log`, `fetch`, `pull`, `branch`, `switch`, `add`, `commit`, `push`, `reset`, or GitHub CLI commands. Sequential agents hand off verified working-tree state without commits.
+- **Admin tasks:** continue to follow the Git, branch, commit, push, and PR workflow described elsewhere in this file, operating on phase-based branches (`feature/admin-phase-<N>`) where each step is committed sequentially.
 - The owner may authorize additional specific Git operations as an exception for one particular task.
-- **Admin tasks:** continue to follow the Git, branch, commit, push, and PR workflow described elsewhere in this file.
 
 > This file is the **primary instruction set** for all AI coding agents working in this repository.
 > It is provider-neutral and applies equally to Claude Code, OpenAI Codex, Google Gemini/Antigravity, GitHub Copilot, and any other compatible coding agent.
@@ -46,7 +46,7 @@ The platform is developed collaboratively by human developers and AI coding agen
 
 ## Sequential Agent Workflow
 
-Specialist agents work one at a time on the same task branch. Unless the owner narrows the request, assigning a roadmap step or Task ID covers the full workflow through a PR ready for human review. The coordinator assigns each stage its scope, acceptance criteria, and current commit; do not start another stage while an agent is editing. For Admin work, each editing stage creates a focused local commit before handoff so the next stage has a stable snapshot; normal stage transitions do not push. For Android and Backend work, the repository owner handles all Git operations. Agents must not invoke Git commands for those components and must hand off the verified working-tree state sequentially without making commits.
+Specialist agents work one at a time on the same task branch. Unless the owner narrows the request, assigning a roadmap step or Task ID covers the full workflow through a PR ready for human review. The coordinator assigns each stage its scope, acceptance criteria, and current commit; do not start another stage while an agent is editing. For Android and Admin work, each editing stage creates a focused local commit before handoff so the next stage has a stable snapshot; normal stage transitions do not push. For Backend work, the repository owner handles all Git operations; agents must not invoke Git commands for Backend and must hand off the verified working-tree state sequentially without making commits.
 
 Each specialist reads only the workflow guide for its assigned role, in addition to the shared and task-relevant guidance:
 
@@ -55,9 +55,9 @@ Each specialist reads only the workflow guide for its assigned role, in addition
 3. **Debugger:** [`.agents/workflows/debug.md`](.agents/workflows/debug.md) — a third, distinct agent, used only after a failure is reproduced.
 4. **Independent retest:** the tester or another independent tester verifies a debug fix. The coordinator reviews evidence and the final diff before completion.
 
-For Admin work, every agent must inspect the current git status, branch, and recent commits. For Android and Backend work, agents must not run Git commands; the owner manages Git state. Every agent must inspect the assigned Task entry in its canonical component roadmap; for explicitly cross-component work, use `docs/ROADMAP.md`. Read linked supplementary context and relevant component guidance before editing. When assigned Android work, do not execute or report backend/admin tasks. An incomplete external dependency may block the assigned Android task; report only the dependency ID and its blocking effect, then coordinate with its owner. Agents must respect the assigned file/scope boundary and preserve untracked or unrelated work.
+For Android and Admin work, every agent must inspect the current git status, branch, and recent commits. For Backend work, agents must not run Git commands; the owner manages Git state. Every agent must inspect the assigned Task entry in its canonical component roadmap; for explicitly cross-component work, use `docs/ROADMAP.md`. Read linked supplementary context and relevant component guidance before editing. When assigned Android work, do not execute or report backend/admin tasks. An incomplete external dependency may block the assigned Android task; report only the dependency ID and its blocking effect, then coordinate with its owner. Agents must respect the assigned file/scope boundary and preserve untracked or unrelated work.
 
-Debuggers must keep an attempt record and must not repeat a failed approach without new evidence; follow the limits and evidence format in the debug guide. The coordinator passes that record between stages. A tester commits any test-only additions and reports the exact SHA verified; if it makes no changes, it reports the builder's SHA. Normal build → test → debug → retest transitions need no handoff file or intermediate push; use the handoff procedure below only when work is blocked or transferred outside this sequence. After independent verification and coordinator review, the coordinator publishes the task branch and prepares a PR for Admin work; never merge automatically. For Android and Backend work, the owner handles all Git publishing and PR operations, and sequential agents verify the shared working-tree state without commits.
+Debuggers must keep an attempt record and must not repeat a failed approach without new evidence; follow the limits and evidence format in the debug guide. The coordinator passes that record between stages. A tester commits any test-only additions and reports the exact SHA verified; if it makes no changes, it reports the builder's SHA. Normal build → test → debug → retest transitions need no handoff file or intermediate push; use the handoff procedure below only when work is blocked or transferred outside this sequence. After independent verification and coordinator review, the coordinator publishes the task branch and prepares a PR for Android and Admin work; never merge automatically. For Backend work, the owner handles all Git publishing and PR operations, and sequential agents verify the shared working-tree state without commits.
 
 ---
 
@@ -67,7 +67,7 @@ Debuggers must keep an attempt record and must not repeat a failed approach with
 
 1. **Read this file** (`AGENTS.md`) completely.
 2. **Read the relevant component AGENTS.md** (`android/AGENTS.md`, `backend/AGENTS.md`, or `admin/AGENTS.md`).
-3. **Inspect Git state only for Admin tasks** — check for uncommitted changes, current branch, and recent commits. For Android and Backend tasks, do not invoke Git; the owner manages all Git operations and state.
+3. **Inspect Git state for Android and Admin tasks** — check for uncommitted changes, current branch, and recent commits. For Backend tasks, do not invoke Git; the owner manages all Git operations and state.
 4. **Inspect existing code** — understand the current state before modifying.
 5. **Read the assigned Step and canonical Task entry** in the matching component roadmap; use `docs/ROADMAP.md` only when the assignment is explicitly cross-component or for final project/release validation. Inspect any supplementary `.ai/tasks/` file explicitly linked by the entry.
 6. **Follow Ponytail principles** — see [`.agents/skills/ponytail/SKILL.md`](.agents/skills/ponytail/SKILL.md) (minimal code, strict YAGNI, reuse existing libs/code).
@@ -81,7 +81,7 @@ Debuggers must keep an attempt record and must not repeat a failed approach with
 - If scope, acceptance criteria, product behavior, architecture, API/schema/security behavior, or a consequential library/dependency choice is materially missing or contradictory, ask a focused question. State the unresolved decision, give a recommendation and tradeoff when useful, and pause only the dependent work. Once the owner answers, continue the task without asking for another start or plan confirmation.
 - If the task and authoritative evidence fully specify the work, proceed without an approval question or a redundant plan-confirmation turn. For example, Android image loading is already specified as Glide in `android/AGENTS.md`; do not ask whether to use Glide or Picasso.
 - Do not silently guess at material requirements or mark uncertainty as resolved. If dependencies are incomplete, report the exact blocking Task ID and do not expand the assigned scope to bypass it.
-- For Admin tasks, follow the canonical remote synchronization lifecycle in [Git Rules](#remote-synchronization-and-task-branch-lifecycle). For Android and Backend tasks, do not run Git commands at any point unless the owner explicitly authorizes a specific Git operation for that particular task.
+- For Android and Admin tasks, follow the canonical remote synchronization lifecycle in [Git Rules](#remote-synchronization-and-task-branch-lifecycle). For Backend tasks, do not run Git commands at any point unless the owner explicitly authorizes a specific Git operation for that particular task.
 - Never merge a PR automatically.
 
 ### For Non-Trivial Features
@@ -175,9 +175,9 @@ Debuggers must keep an attempt record and must not repeat a failed approach with
 
 ### Remote Synchronization and Task Branch Lifecycle
 
-The Git lifecycle below applies to Admin tasks. For Android tasks, agents are authorized only for staging and local commits (`git add`, `git commit`), while all other Git operations (`status`, `diff`, `branch`, `remote`, `push`, `pull`, and PR creation) remain strictly owner-managed. Backend Git operations remain entirely owner-managed: agents must not run any Git command for Backend.
+The Git lifecycle below applies to Android and Admin tasks. Backend Git operations remain owner-managed: agents must not run any Git command for Backend unless explicitly authorized.
 
-1. **At task start, before creating a branch (Admin only):** run `git fetch --prune origin` and `git remote set-head origin -a`, then inspect `git status --short --branch`, `git branch -vv`, recent commits, and relevant remote refs. Create each new task branch from the latest `origin/develop`. For an existing shared task branch, confirm its upstream state before editing.
+1. **At task start, before creating a branch:** run `git fetch --prune origin` and `git remote set-head origin -a`, then inspect `git status --short --branch`, `git branch -vv`, recent commits, and relevant remote refs. Create each new task branch from the latest `origin/develop`. For an existing shared task branch, confirm its upstream state before editing.
 2. **Keep integration branches current only by fast-forward:** create a missing local `develop` with `git switch --track -c develop origin/develop`; update an existing clean `develop` or `main` with `git pull --ff-only origin <branch>`. Never commit or push directly from them. Never pull/rebase over uncommitted work; preserve it and reconcile deliberately.
 3. **Before staging/committing:** fetch again and check whether the task branch's upstream moved. If it did, preserve the work in progress, integrate the newer commits deliberately, resolve conflicts, then review the diff and stage only task-scoped files. Do not include unrelated user changes.
 4. **Before pushing:** fetch again and confirm the current branch and upstream. If GitHub deleted that task branch, check whether its commits are already in `origin/develop`: if merged, do not recreate or push it; if not merged, stop and ask the coordinator before restoring/recreating the branch. If the remote branch advanced, integrate its commits explicitly before retrying the push.
@@ -190,9 +190,10 @@ If fetch, fast-forward, or push fails, capture the exact output, inspect diverge
 Use this Gitflow-lite model:
 
 - `main` contains only approved, completed releases. Never start a feature/task branch from it or merge a task branch directly into it.
-- `develop` is the integration branch and the default base for task PRs. Create it once from the current `main` baseline; keep it after releases.
-- Create one short-lived branch from `develop` for each assigned Task. Use the work type, component (`android`, `backend`, `admin`, or `project` for shared work), phase, step, Task ID, and a short slug in that order. Use lowercase, hyphens, and two-digit phase/step numbers. The branch pattern is `<type>/<component>-pNN-sNN-<task-id>-<slug>`. Examples: `chore/android-p00-s01-fnd-001-verify-android-scaffold` and `docs/project-p00-s08-plan-004-letter-roadmap-criteria`.
-- All sequential agents for one assigned unit share that branch. After build/test/debug/retest and review pass, merge its PR into `develop`; delete the branch after merge. Do not wait until the phase ends to clean already-merged branches.
+- `develop` is the integration branch and the default base for phase PRs. Create it once from the current `main` baseline; keep it after releases.
+- **Per-phase feature branches:** Create one branch from `develop` for each **Phase** of a component (Android, Backend, Admin, or Project), rather than creating branches per step. Use the work type, component, and phase number: `<type>/<component>-phase-<N>` (e.g. `feature/android-phase-1`, `feature/backend-phase-1`, `feature/admin-phase-1`). All steps within that phase live and evolve together within that single branch.
+- **Steps as commits:** Individual steps within a phase are developed, verified, and committed sequentially as focused Conventional Commits directly within that phase branch: `<type>(<component>-pNN-sNN-<task-id>): <imperative summary>`.
+- All sequential agents for a phase share that branch. After all steps of the phase pass build/test/debug/retest and review, merge its PR into `develop`; delete the phase branch after merge.
 - When a phase/release is complete, run the release checks on `develop`. Promote a release only through a reviewed `develop` → `main` PR; tag the released commit. Never delete `develop`.
 - If the repository has not yet established `develop`, the coordinator creates it once from `main`; do not create competing integration branches.
 
@@ -201,11 +202,11 @@ Branch names:
 ```
 main                                  # Released versions only
 develop                               # Shared integration branch
-feature/<component>-pNN-sNN-<task-id>-<slug>
-fix/<component>-pNN-sNN-<task-id>-<slug>
-refactor/<component>-pNN-sNN-<task-id>-<slug>
-chore/<component>-pNN-sNN-<task-id>-<slug>
-docs/<component>-pNN-sNN-<task-id>-<slug>
+feature/<component>-phase-<N>         # Phase branches housing all steps of phase N
+fix/<component>-phase-<N>
+refactor/<component>-phase-<N>
+chore/<component>-phase-<N>
+docs/<component>-phase-<N>
 ```
 
 ### Commit Conventions
