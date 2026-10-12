@@ -46,7 +46,7 @@ public class OrderListFragment extends Fragment implements OrderAdapter.OnOrderC
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(this, new OrderViewModelFactory()).get(OrderListViewModel.class);
+        viewModel = new ViewModelProvider(this, new OrderViewModelFactory(requireContext())).get(OrderListViewModel.class);
 
         adapter = new OrderAdapter(this);
         binding.rvOrders.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -63,11 +63,13 @@ public class OrderListFragment extends Fragment implements OrderAdapter.OnOrderC
     private void observeViewModel() {
         viewModel.getOrdersState().observe(getViewLifecycleOwner(), this::renderOrdersState);
 
-        viewModel.getAuthRequiredEvent().observe(getViewLifecycleOwner(), v -> {
-            NavController navController = NavHostFragment.findNavController(this);
-            Bundle args = new Bundle();
-            args.putInt("returnToNavId", R.id.nav_orders);
-            navController.navigate(R.id.nav_auth, args);
+        viewModel.getAuthRequiredEvent().observe(getViewLifecycleOwner(), event -> {
+            if (event != null && event.getContentIfNotHandled() != null) {
+                NavController navController = NavHostFragment.findNavController(this);
+                Bundle args = new Bundle();
+                args.putInt("returnToNavId", R.id.nav_orders);
+                navController.navigate(R.id.nav_auth, args);
+            }
         });
     }
 

@@ -56,7 +56,7 @@ public class OrderDetailFragment extends Fragment {
             }
         }
 
-        viewModel = new ViewModelProvider(this, new OrderViewModelFactory()).get(OrderDetailViewModel.class);
+        viewModel = new ViewModelProvider(this, new OrderViewModelFactory(requireContext())).get(OrderDetailViewModel.class);
 
         lineAdapter = new OrderLineAdapter();
         binding.rvDetailItems.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -85,11 +85,13 @@ public class OrderDetailFragment extends Fragment {
     private void observeViewModel() {
         viewModel.getOrderState().observe(getViewLifecycleOwner(), this::renderOrderState);
 
-        viewModel.getAuthRequiredEvent().observe(getViewLifecycleOwner(), v -> {
-            NavController navController = NavHostFragment.findNavController(this);
-            Bundle args = new Bundle();
-            args.putInt("returnToNavId", R.id.nav_orders);
-            navController.navigate(R.id.nav_auth, args);
+        viewModel.getAuthRequiredEvent().observe(getViewLifecycleOwner(), event -> {
+            if (event != null && event.getContentIfNotHandled() != null) {
+                NavController navController = NavHostFragment.findNavController(this);
+                Bundle args = new Bundle();
+                args.putInt("returnToNavId", R.id.nav_orders);
+                navController.navigate(R.id.nav_auth, args);
+            }
         });
     }
 
