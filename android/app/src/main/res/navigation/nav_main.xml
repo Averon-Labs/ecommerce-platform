@@ -15,7 +15,17 @@
         android:id="@+id/exploreFragment"
         android:name="com.averonlabs.eshopverse.shell.ExploreFragment"
         android:label="@string/explore_title"
-        tools:layout="@layout/fragment_explore" />
+        tools:layout="@layout/fragment_explore">
+        <action
+            android:id="@+id/action_exploreFragment_to_searchResultsFragment"
+            app:destination="@id/searchResultsFragment" />
+        <action
+            android:id="@+id/action_exploreFragment_to_productDetailFragment"
+            app:destination="@id/productDetailFragment" />
+        <action
+            android:id="@+id/action_exploreFragment_to_categoryProductsFragment"
+            app:destination="@id/categoryProductsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/cartFragment"

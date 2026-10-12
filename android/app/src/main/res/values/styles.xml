@@ -79,8 +79,13 @@
     </style>
 
     <style name="Widget.EShopVerse.Chip.Filter" parent="Widget.Material3.Chip.Filter">
-        <item name="chipBackgroundColor">?attr/colorSecondaryContainer</item>
-        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
+        <item name="chipBackgroundColor">@color/chip_filter_background</item>
+        <item name="android:textColor">@color/chip_filter_text</item>
+        <item name="chipStrokeColor">@color/chip_filter_stroke</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipCornerRadius">@dimen/corner_pill</item>
+        <item name="checkedIconVisible">true</item>
+        <item name="checkedIconTint">@color/m3_on_primary_container</item>
     </style>
     <style name="Widget.EShopVerse.Badge.Status" parent="">
         <item name="android:background">@drawable/bg_status_badge</item>

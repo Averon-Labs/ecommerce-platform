@@ -11,7 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -30,6 +32,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        if (insetsController != null) {
+            insetsController.setAppearanceLightStatusBars(true);
+            insetsController.setAppearanceLightNavigationBars(true);
+        }
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -78,16 +85,20 @@ public class MainActivity extends AppCompatActivity {
         // Initialize cart badge as hidden
         setCartBadgeCount(0);
 
-        // Hierarchical back navigation:
-        // If the user is on any destination other than Home, Back returns directly to HomeFragment.
-        // A subsequent Back press from HomeFragment exits the application directly, avoiding backstack loops.
+        // Hierarchical back navigation adhering to Material 3 & UX principles:
+        // First pop child/sub-screens in current flow (e.g. Register -> SignIn -> Account).
+        // If at the root of a tab other than Home, Back returns to HomeFragment.
+        // A subsequent Back press from HomeFragment exits the application directly.
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (navController != null && navController.getCurrentDestination() != null) {
-                    int currentId = navController.getCurrentDestination().getId();
-                    if (currentId != R.id.homeFragment) {
-                        navController.popBackStack(R.id.homeFragment, false);
+                if (navController != null) {
+                    if (navController.popBackStack()) {
+                        return;
+                    }
+                    if (navController.getCurrentDestination() != null
+                            && navController.getCurrentDestination().getId() != R.id.homeFragment) {
+                        navController.navigate(R.id.homeFragment);
                         return;
                     }
                 }
