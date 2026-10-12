@@ -4,11 +4,11 @@
 
 This section takes precedence over every other Git, branch, commit, push, and PR instruction in this file.
 
-- **Android tasks:** agents are authorized ONLY to perform staging and commits (`git add`, `git commit`) on the active task branch provided by the owner. Android feature branches are maintained per phase (`feature/android-phase-<N>`), housing all steps of that phase together. All other Git commands (`status`, `diff`, `log`, `branch`, `switch`, `push`, `pull`, `fetch`, `merge`, `reset`, or GitHub PR creation) remain strictly owner-managed. The repository owner handles inspecting Git state, branch management, remotes, push, and PRs.
-- **Backend tasks:** the repository owner performs all Git operations. Agents must not run any Git command, including `status`, `diff`, `log`, `fetch`, `pull`, `branch`, `switch`, `add`, `commit`, `push`, `reset`, or GitHub CLI commands. This applies to builders, testers, debuggers, coordinators, and handoffs. Do not fetch, pull, inspect Git state, create or switch branches, stage, commit, push, or create/update PRs.
-- Sequential Android agents work against the task branch and create focused Conventional Commits for verified units. Backend agents continue to hand off verified working-tree state without commits.
+- **Universal Phase-Based Branching:** Across all components (Android, Backend, Admin, and Project), task branches are maintained **per phase** (`feature/<component>-phase-<N>`), housing all steps of that phase together in a single branch. Individual steps are NOT separate branches; each step is committed sequentially as a focused Conventional Commit (`<type>(<component>-pNN-sNN-<task-id>): <imperative summary>`) directly within the phase branch. When all steps of a phase are completed and verified, the phase branch is reviewed and merged into `develop`.
+- **Android tasks:** agents are authorized ONLY to perform staging and commits (`git add`, `git commit`) on the active phase branch (`feature/android-phase-<N>`) provided by the owner. All other Git commands (`status`, `diff`, `log`, `branch`, `switch`, `push`, `pull`, `fetch`, `merge`, `reset`, or GitHub PR creation) remain strictly owner-managed. The repository owner handles inspecting Git state, branch management, remotes, push, and PRs.
+- **Backend tasks:** the repository owner performs all Git operations. Backend feature branches are maintained per phase (`feature/backend-phase-<N>`), housing all steps of that phase together. Agents must not run any Git command, including `status`, `diff`, `log`, `fetch`, `pull`, `branch`, `switch`, `add`, `commit`, `push`, `reset`, or GitHub CLI commands. Sequential agents hand off verified working-tree state without commits.
+- **Admin tasks:** continue to follow the Git, branch, commit, push, and PR workflow described elsewhere in this file, operating on phase-based branches (`feature/admin-phase-<N>`) where each step is committed sequentially.
 - The owner may authorize additional specific Git operations as an exception for one particular task.
-- **Admin tasks:** continue to follow the Git, branch, commit, push, and PR workflow described elsewhere in this file.
 
 > This file is the **primary instruction set** for all AI coding agents working in this repository.
 > It is provider-neutral and applies equally to Claude Code, OpenAI Codex, Google Gemini/Antigravity, GitHub Copilot, and any other compatible coding agent.
@@ -190,9 +190,10 @@ If fetch, fast-forward, or push fails, capture the exact output, inspect diverge
 Use this Gitflow-lite model:
 
 - `main` contains only approved, completed releases. Never start a feature/task branch from it or merge a task branch directly into it.
-- `develop` is the integration branch and the default base for task PRs. Create it once from the current `main` baseline; keep it after releases.
-- Create one short-lived branch from `develop` for each assigned Task. Use the work type, component (`android`, `backend`, `admin`, or `project` for shared work), phase, step, Task ID, and a short slug in that order. Use lowercase, hyphens, and two-digit phase/step numbers. The branch pattern is `<type>/<component>-pNN-sNN-<task-id>-<slug>`. Examples: `chore/android-p00-s01-fnd-001-verify-android-scaffold` and `docs/project-p00-s08-plan-004-letter-roadmap-criteria`.
-- All sequential agents for one assigned unit share that branch. After build/test/debug/retest and review pass, merge its PR into `develop`; delete the branch after merge. Do not wait until the phase ends to clean already-merged branches.
+- `develop` is the integration branch and the default base for phase PRs. Create it once from the current `main` baseline; keep it after releases.
+- **Per-phase feature branches:** Create one branch from `develop` for each **Phase** of a component (Android, Backend, Admin, or Project), rather than creating branches per step. Use the work type, component, and phase number: `<type>/<component>-phase-<N>` (e.g. `feature/android-phase-1`, `feature/backend-phase-1`, `feature/admin-phase-1`). All steps within that phase live and evolve together within that single branch.
+- **Steps as commits:** Individual steps within a phase are developed, verified, and committed sequentially as focused Conventional Commits directly within that phase branch: `<type>(<component>-pNN-sNN-<task-id>): <imperative summary>`.
+- All sequential agents for a phase share that branch. After all steps of the phase pass build/test/debug/retest and review, merge its PR into `develop`; delete the phase branch after merge.
 - When a phase/release is complete, run the release checks on `develop`. Promote a release only through a reviewed `develop` → `main` PR; tag the released commit. Never delete `develop`.
 - If the repository has not yet established `develop`, the coordinator creates it once from `main`; do not create competing integration branches.
 
@@ -201,11 +202,11 @@ Branch names:
 ```
 main                                  # Released versions only
 develop                               # Shared integration branch
-feature/<component>-pNN-sNN-<task-id>-<slug>
-fix/<component>-pNN-sNN-<task-id>-<slug>
-refactor/<component>-pNN-sNN-<task-id>-<slug>
-chore/<component>-pNN-sNN-<task-id>-<slug>
-docs/<component>-pNN-sNN-<task-id>-<slug>
+feature/<component>-phase-<N>         # Phase branches housing all steps of phase N
+fix/<component>-phase-<N>
+refactor/<component>-phase-<N>
+chore/<component>-phase-<N>
+docs/<component>-phase-<N>
 ```
 
 ### Commit Conventions

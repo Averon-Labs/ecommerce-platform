@@ -1,69 +1,47 @@
 # Git Workflow Rules
 
-## Component-Specific Git Responsibilities
+## Universal Phase-Based Branching Model
 
-### Android Component
+Across the entire repository (Android, Backend, Admin, and Project-wide tasks):
 
-**Human Developer Responsibility:**
-- All git operations for Android work are performed by the human developer
-- This includes:
-  - `git fetch`
-  - `git branch` creation and switching
-  - `git add .`
-  - `git commit`
-  - `git pull`
-  - `git push`
-
-**AI Agent Responsibility:**
-- Implement the assigned Android task
-- Write/modify code and tests
-- Provide commit message text when work is complete
-- Wait for human developer to perform git operations
-
-**Workflow:**
-1. Human developer fetches and creates/switches to the appropriate branch
-2. Human developer assigns the Android task to the AI agent
-3. AI agent implements the task (code, tests, documentation)
-4. AI agent signals completion and provides suggested commit message
-5. Human developer reviews changes
-6. Human developer stages, commits, pulls, and pushes
-
-**Exceptions:**
-- If the human developer explicitly requests the AI agent to perform git operations for a specific Android task, the AI agent may do so
-- The default remains: human handles all Android git operations
-
-### Backend Component
-
-**AI Agent Responsibility:**
-- All git operations for Backend work
-- Full implementation workflow including:
-  - Branch creation
-  - Code implementation
-  - Testing
-  - Staging (`git add`)
-  - Committing (`git commit`)
-  - Pushing (`git push`)
-
-### Admin Component
-
-**AI Agent Responsibility:**
-- All git operations for Admin work
-- Full implementation workflow including:
-  - Branch creation
-  - Code implementation
-  - Testing
-  - Staging (`git add`)
-  - Committing (`git commit`)
-  - Pushing (`git push`)
-
-## Summary
-
-| Component | Code Implementation | Git Operations |
-|-----------|-------------------|----------------|
-| Android   | AI Agent          | Human Developer (default) |
-| Backend   | AI Agent          | AI Agent |
-| Admin     | AI Agent          | AI Agent |
+- **One branch per phase:** Feature branches are created from `develop` **per phase**, not per individual step.
+  - Branch naming: `<type>/<component>-phase-<N>`
+  - Examples:
+    - `feature/android-phase-1`
+    - `feature/backend-phase-1`
+    - `feature/admin-phase-1`
+- **Steps as commits:** All steps within a given phase live and evolve together within that single branch. Each step is developed, verified, and committed sequentially as a focused Conventional Commit directly on the phase branch:
+  - Commit format: `<type>(<component>-pNN-sNN-<task-id>): <imperative summary>`
+  - Example: `feat(android-p01-s01-auth-002): customer authentication and profile`
+- **PR Lifecycle:** When all steps of a phase are completed and verified, the phase branch is reviewed and merged into `develop` via a Pull Request.
 
 ---
 
-*This workflow ensures clear responsibility boundaries and allows the human developer to maintain direct control over Android source control operations while delegating backend and admin operations to AI agents.*
+## Component-Specific Git Responsibilities
+
+### Android Component
+- **Phase Branch:** Maintained per phase (`feature/android-phase-<N>`), created by the owner from `develop`.
+- **AI Agent Authority:** Authorized **ONLY** to stage and commit verified changes (`git add`, `git commit`) on the active task/phase branch.
+- **Owner Responsibility:** Strictly and exclusively manages branch creation, switching, remote synchronization, push, PR creation, review, and merging. Agents never run `git branch`, `git checkout`, `git switch`, `git push`, `git pull`, `git fetch`, or GitHub CLI commands.
+
+### Backend Component
+- **Phase Branch:** Maintained per phase (`feature/backend-phase-<N>`), created by the owner from `develop`.
+- **Git Authority:** Strictly owner-managed. Agents must not run any Git commands (read-only or mutating) unless specifically authorized as a one-off exception by the owner. Agents hand off verified working-tree state without commits.
+
+### Admin Component
+- **Phase Branch:** Maintained per phase (`feature/admin-phase-<N>`), created from `develop`.
+- **Git Authority:** Follows the agent Git workflow (local commits per step, remote synchronization, and PR preparation).
+
+---
+
+## Branch Hierarchy Summary
+
+```
+main                                  # Released versions only
+develop                               # Shared integration branch
+feature/<component>-phase-<N>         # Phase branches housing all steps of phase N
+fix/<component>-phase-<N>
+refactor/<component>-phase-<N>
+chore/<component>-phase-<N>
+docs/<component>-phase-<N>
+```
