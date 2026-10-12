@@ -22,9 +22,9 @@ For GitHub Copilot and other IDE-integrated agents working on Android code.
 - Language: Java
 - UI: XML layouts with Material 3
 - Architecture: MVVM + Repository Pattern
-- All user-visible strings in `strings.xml`; feature screens add their own `values/strings_<feature>.xml`
+- `strings.xml` is shell-owned; feature screens add their own `values/strings_<feature>.xml` (rule from `android/AGENTS.md`)
 - Follow naming conventions in `android/AGENTS.md`
-- API communication only through `docs/openapi.yaml`, the reviewed contract
+- API communication only through `docs/openapi.yaml` (accepted 2026-10-12 — follow it exactly; make contract changes there first)
 - Read only the reading set your task brief names; do not read the whole `docs/` tree
 - Never edit a file owned by another task (shell, Gradle, manifest, theme/colour/dimension/style tokens, or another feature's package)
 - Never parse money into a `double`; use the shared fixed-precision money type and formatter

@@ -8,8 +8,6 @@ This file is the canonical task list for its component. Each task appears once h
 
 A roadmap assignment uses this roadmap name, phase, and step, for example: Admin Roadmap, Phase 1, Step 1; a stable Task ID may also identify the work. Step numbers restart at 1 in every phase. Lowercase letter labels restart at `a` in each acceptance-criteria block and identify individual criteria for discussion or verification, not separate assignments. Check dependencies before starting; a later step is not ready until its listed dependencies are complete. See [the project roadmap](ROADMAP.md) and [repository Git naming conventions](../AGENTS.md).
 
-## Phase steps
-
 ## Phase 0 — Foundation
 
 **Project phase gate:** see [Phase 0 in the Project Roadmap](ROADMAP.md).
@@ -50,7 +48,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 **Depends on:** FND-002, FND-003, FND-004, FND-005, DES-001
 
 **Prerequisites to start:**
-- **FND-002 complete** (Backend: Laravel app with Sanctum configured)
+- **FND-002 complete** (Backend: Laravel app initialized; the Sanctum admin session/CSRF configuration is delivered by the AUTH-003 backend portion)
 - FND-003 complete (Admin: React app initialized)
 - **FND-004 complete** (Backend: OpenAPI contract with admin auth endpoints)
 - **FND-005 complete** (Project: CI and documentation ready)

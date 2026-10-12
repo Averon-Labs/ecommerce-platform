@@ -34,6 +34,6 @@ This directory contains implementation plans created by agents before starting c
 
 ## Guidelines
 
-- Create plans for non-trivial tasks before implementing.
+- Create a plan file only for substantial persistent context that cannot fit in the roadmap entry; otherwise keep the plan in the task discussion (rule from `AGENTS.md`).
 - Keep plans concise and actionable.
 - Update or remove plans as tasks are completed.

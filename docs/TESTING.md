@@ -30,8 +30,8 @@ This document defines the testing strategy and conventions for the EShop Verse p
 ### Integration Testing
 
 **Android:**
-- Test Room database operations.
-- Test API client with mock server responses.
+- Test repositories and API client against mock server responses (there is no local database in
+  the first release — Room is deferred by ADR-004).
 - Use AndroidX Test libraries.
 
 **Backend (PHP):**
@@ -41,7 +41,7 @@ This document defines the testing strategy and conventions for the EShop Verse p
 
 ### API Testing
 
-- Test all API endpoints against the contract in `API_CONTRACT.md`.
+- Test all API endpoints against the contract in `docs/openapi.yaml` (machine-readable endpoint schemas) and the shared conventions in `API_CONTRACT.md`.
 - Verify request validation and error responses.
 - Test authentication and authorization.
 - Test pagination and filtering.
@@ -57,7 +57,7 @@ This document defines the testing strategy and conventions for the EShop Verse p
 ### Regression Testing
 
 - All existing tests must pass before merging.
-- CI pipeline runs the full test suite on every PR.
+- Required checks must run on every PR. Today `.github/workflows/ci.yml` runs the repository-structure check and the Android build/lint/unit-test job; the backend and admin jobs are not active yet (owned by FND-005).
 - No tests should be disabled without documented justification.
 
 ### Test Balance and Priority
@@ -132,6 +132,6 @@ backend/tests/
 - [ ] Test names follow the naming convention.
 - [ ] Tests are deterministic (no flaky tests).
 - [ ] Integration tests use isolated test data.
-- [ ] API contract tests agree with the reviewed OpenAPI description when it is added.
+- [ ] API contract tests agree with `docs/openapi.yaml` (contract accepted 2026-10-12; FND-004 — tests still to be written).
 - [ ] After a fix, a regression test fails before the fix and passes after it.
 - [ ] Required CI checks pass before merge.

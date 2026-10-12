@@ -1,11 +1,6 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+> **EShop Verse — Backend API.** Project commands, verification status, and setup are documented in [`docs/DEVELOPMENT.md`](../docs/DEVELOPMENT.md); tasks live in [`docs/BACKEND_ROADMAP.md`](../docs/BACKEND_ROADMAP.md).
 
 ## About Laravel
 
@@ -31,7 +26,7 @@ You can also watch bite-sized lessons with real-world projects on [Laravel Learn
 
 ## Agentic Development
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Laravel's predictable structure and conventions make it ideal for AI coding agents. [Laravel Boost](https://laravel.com/docs/ai) is an **optional** helper that is not a project dependency; only install it with explicit repository owner approval (dependency additions require justification and human approval per [`AGENTS.md`](../AGENTS.md)):
 
 ```bash
 composer require laravel/boost --dev
@@ -51,7 +46,7 @@ In order to ensure that the Laravel community is welcoming to all, please review
 
 ## Security Vulnerabilities
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability in this project, report it privately to the repository owner (for example through a GitHub Security Advisory) instead of opening a public issue. See [`docs/SECURITY.md`](../docs/SECURITY.md) for the project's security requirements.
 
 ## License
 

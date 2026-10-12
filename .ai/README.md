@@ -11,6 +11,7 @@ This directory provides structured workspace areas for AI coding agents. It is *
 ```
 .ai/
 ├── README.md           # This file
+├── ENVIRONMENT_VERIFICATION_TODO.md
 ├── state/              # High-level project state
 │   └── PROJECT_STATE.md
 ├── tasks/              # Task-specific context and specifications
@@ -34,7 +35,7 @@ This directory provides structured workspace areas for AI coding agents. It is *
 
 ### `tasks/`
 - Task-specific files: `.ai/tasks/<TASK-ID>.md`
-- Contains requirements, acceptance criteria, and context for specific tasks.
+- Contains supplementary requirements and context for specific tasks; acceptance criteria live only in the component roadmaps (do not copy them here).
 - References the corresponding GitHub Issue when one exists.
 - **Not a replacement for GitHub Issues** — use Issues for tracking, use these files for detailed context that helps agents.
 
@@ -51,7 +52,7 @@ This directory provides structured workspace areas for AI coding agents. It is *
 ### `handoffs/`
 - Agent handoff documentation: `.ai/handoffs/<TASK-ID>.md`
 - Created when an agent cannot complete a task and another agent (or human) will continue.
-- Contains: current status, completed work, remaining work, known issues, branch name.
+- Contains: current status, completed work, remaining work, known issues, branch name, relevant file paths.
 
 ---
 

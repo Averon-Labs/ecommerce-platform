@@ -50,7 +50,7 @@ EShop Verse follows a client-server architecture with clearly separated componen
 | Language | PHP | DECIDED |
 | API Style | RESTful | DECIDED |
 | Database | MySQL | DECIDED |
-| Framework | Laravel; use the supported stable release selected when implementation begins | DECIDED |
+| Framework | Laravel 13 on PHP 8.4 (selected and pinned in FND-002, 2026-10-11; see `docs/DEVELOPMENT.md`) | DECIDED |
 | Authentication | Laravel Sanctum: bearer tokens for Android; cookie/session auth for the first-party admin SPA | DECIDED |
 | Schema Changes | Laravel migrations | DECIDED |
 | API Versioning | `/api/v1/` URL prefix | DECIDED |

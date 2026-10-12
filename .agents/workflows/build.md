@@ -13,6 +13,7 @@ Use this guide only when assigned the builder stage for a roadmap task. The shar
 - Implement only the assigned scope on the existing task branch. Do not broaden the task or edit unrelated work.
 - Add or update tests for changed behavior. Use verified commands and task-specific verification expectations; never invent a command or hide a failure.
 - Run the checks appropriate to the task and report any unrun check with its reason. Follow the task-start and pre-commit checkpoints in the [canonical Git synchronization lifecycle](../../AGENTS.md#remote-synchronization-and-task-branch-lifecycle); create a focused local commit on the shared task branch and report its SHA. Do not publish a separate branch or push between normal stages.
+- **Component scope of these Git steps** comes from the Component-Specific Git Ownership Override in AGENTS.md and never widens it: Android and Admin agents run the checkpoints and commit as written, on the phase branch (`<type>/<component>-phase-<N>`); Backend agents run **no Git commands** (owner-managed, unless the owner explicitly authorizes a specific operation for one task) and hand off the verified working tree without committing.
 
 ## Handoff to test
 

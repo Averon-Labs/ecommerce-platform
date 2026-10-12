@@ -18,4 +18,5 @@ Use this guide only when the independent tester has supplied evidence of a repro
 
 - Make the smallest in-scope root-cause fix and add a regression test, following [`../../docs/TESTING.md`](../../docs/TESTING.md). Do not edit unrelated behavior or weaken a check.
 - Follow the pre-commit checkpoint in the [canonical Git synchronization lifecycle](../../AGENTS.md#remote-synchronization-and-task-branch-lifecycle); create a focused local fix commit on the shared task branch and do not push during the normal transition.
+- **Component scope of these Git steps** comes from the Component-Specific Git Ownership Override in AGENTS.md and never widens it: Android and Admin agents create the focused fix commit as written on the phase branch; Backend debuggers run **no Git commands** — they hand off the fixed working tree without committing (unless the owner explicitly authorizes one).
 - Report the fix, changed files, fix commit SHA, regression test, exact commands and outcomes, and the complete attempt record. Hand the branch back to the independent tester for retesting; do not claim success until the required checks pass.

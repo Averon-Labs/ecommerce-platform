@@ -91,11 +91,13 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture docum
 
 This project uses a branch-based workflow:
 
-1. Fetch the latest remote refs and create a task branch from `develop`.
-2. Implement changes with focused commits.
+1. Fetch the latest remote refs and create a phase branch from `develop` (`feature/<component>-phase-<N>`).
+2. Commit each verified step sequentially with focused Conventional Commits.
 3. Open a Pull Request.
 4. Pass CI checks and code review.
-5. Merge task PRs to `develop`; promote a completed release to `main` only through a reviewed release PR.
+5. Merge phase PRs into `develop`; promote a completed release to `main` only through a reviewed release PR.
+
+These steps describe the phase-branch flow. Per the Component-Specific Git Ownership Override in [AGENTS.md](AGENTS.md), Android and Admin agents manage Git on per-phase branches (`feature/<component>-phase-<N>`, with each step committed sequentially), and Backend Git is owner-managed — agents run no Git commands unless the owner explicitly authorizes one for a task.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for full details.
 

@@ -36,4 +36,4 @@ This directory contains handoff files created when an agent cannot complete a ta
 
 ## Guidelines
 
-Create a handoff only when work is blocked or transferred outside the normal build → test → debug → retest sequence. Follow the [handoff rules in `AGENTS.md`](../../AGENTS.md) for required status, commit, and push details. Remove obsolete handoff files when the transfer is complete.
+Create a handoff only when work is blocked or transferred outside the normal build → test → debug → retest sequence. Follow the [handoff rules in `AGENTS.md`](../../AGENTS.md) for required status, commit, and push details; the Component-Specific Git Ownership Override still applies — Backend tasks are committed and pushed by the owner (by an agent only when explicitly authorized), while Android and Admin agents manage their phase-branch Git. Remove obsolete handoff files when the transfer is complete.
