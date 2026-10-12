@@ -293,7 +293,7 @@ public class AuthRepository {
     }
 
     @NonNull
-    private ApiException parseError(@NonNull Response<?> response) {
+    private IOException parseError(@NonNull Response<?> response) {
         String body = null;
         if (response.errorBody() != null) {
             try {

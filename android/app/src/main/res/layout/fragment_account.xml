@@ -1,22 +1,212 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/spacing_md"
-    tools:context=".shell.AccountFragment">
+    android:background="@color/canvas_background">
 
-    <TextView
-        android:id="@+id/tv_account_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/account_title"
-        android:textAppearance="?attr/textAppearanceTitleLarge"
-        android:textColor="@color/text_primary_ink"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <com.averonlabs.eshopverse.core.ui.view.StateContainerView
+        android:id="@+id/state_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <ScrollView
+            android:id="@+id/scroll_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_lg">
+
+                <TextView
+                    android:id="@+id/tv_account_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/spacing_lg"
+                    android:text="@string/auth_account_title"
+                    android:textAppearance="@style/TextAppearance.EShopVerse.LargeTitle"
+                    android:textColor="@color/text_primary_ink" />
+
+                <!-- Signed In Customer Content -->
+                <LinearLayout
+                    android:id="@+id/layout_signed_in"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Customer Info Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_customer_info"
+                        style="@style/Widget.EShopVerse.Card.Panel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/spacing_lg">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="@dimen/spacing_md">
+
+                            <TextView
+                                android:id="@+id/tv_user_name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/spacing_xs"
+                                android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                                android:textColor="@color/text_primary_ink"
+                                tools:text="Jane Doe" />
+
+                            <TextView
+                                android:id="@+id/tv_user_email"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/spacing_sm"
+                                android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                                android:textColor="@color/text_secondary"
+                                tools:text="jane.doe@example.com" />
+
+                            <TextView
+                                android:id="@+id/tv_user_role"
+                                style="@style/Widget.EShopVerse.Badge.Status"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Customer"
+                                android:textColor="@color/status_neutral" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Edit Profile Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_edit_profile"
+                        style="@style/Widget.EShopVerse.Card.Panel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/spacing_lg">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="@dimen/spacing_md">
+
+                            <TextView
+                                android:id="@+id/tv_edit_profile_heading"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/spacing_md"
+                                android:text="Profile Details"
+                                android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                                android:textColor="@color/text_primary_ink" />
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/til_first_name"
+                                style="@style/Widget.EShopVerse.TextInputLayout.Outlined"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/spacing_sm"
+                                android:hint="@string/auth_label_first_name"
+                                app:errorEnabled="true">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/et_first_name"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:imeOptions="actionNext"
+                                    android:inputType="textPersonName|textCapWords"
+                                    android:maxLines="1" />
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/til_last_name"
+                                style="@style/Widget.EShopVerse.TextInputLayout.Outlined"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/spacing_md"
+                                android:hint="@string/auth_label_last_name"
+                                app:errorEnabled="true">
+
+                                <com.google.android.material.textfield.TextInputEditText
+                                    android:id="@+id/et_last_name"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:imeOptions="actionDone"
+                                    android:inputType="textPersonName|textCapWords"
+                                    android:maxLines="1" />
+                            </com.google.android.material.textfield.TextInputLayout>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_save_profile"
+                                style="@style/Widget.EShopVerse.Button.Outlined"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/auth_action_save_profile" />
+
+                            <com.google.android.material.progressindicator.CircularProgressIndicator
+                                android:id="@+id/progress_profile"
+                                style="@style/Widget.EShopVerse.ProgressIndicator.Circular"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:layout_marginTop="@dimen/spacing_sm"
+                                android:indeterminate="true"
+                                android:visibility="gone" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Sign Out Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_sign_out"
+                        style="@style/Widget.EShopVerse.Button.Outlined"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/auth_action_sign_out"
+                        app:strokeColor="@color/m3_error"
+                        android:textColor="@color/m3_error" />
+
+                </LinearLayout>
+
+                <!-- Signed Out / Guest Prompt Layout -->
+                <LinearLayout
+                    android:id="@+id/layout_guest_state"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/tv_guest_prompt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/spacing_lg"
+                        android:text="@string/auth_guest_prompt"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                        android:textColor="@color/text_secondary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_guest_sign_in"
+                        style="@style/Widget.EShopVerse.Button.Filled"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/spacing_md"
+                        android:text="@string/auth_action_sign_in" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_guest_register"
+                        style="@style/Widget.EShopVerse.Button.Outlined"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/auth_action_register" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </com.averonlabs.eshopverse.core.ui.view.StateContainerView>
+</FrameLayout>

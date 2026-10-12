@@ -60,7 +60,10 @@ public class AuthViewModelTest {
 
     @Test
     public void testLoginLoadingAndSuccessTransitions() {
-        User user = new User(1L, "user@example.com", "John", "Doe", "customer", "active", "2026-01-01T00:00:00Z");
+        User user = new User(1, "user@example.com", "John", "Doe",
+                com.averonlabs.eshopverse.core.model.UserRole.CUSTOMER,
+                com.averonlabs.eshopverse.core.model.UserStatus.ACTIVE,
+                "2026-01-01T00:00:00Z");
         AuthSession session = new AuthSession("valid-token", "2099-01-01T00:00:00Z", user);
 
         doAnswer(invocation -> {
@@ -92,9 +95,9 @@ public class AuthViewModelTest {
             AuthCallback<AuthSession> cb = invocation.getArgument(2);
             cb.onError(apiEx);
             return null;
-        }).when(authRepository).loginCustomer(eq("user@example.com"), eq("wrongpass"), any());
+        }).when(authRepository).loginCustomer(eq("user@example.com"), eq("wrongpass1"), any());
 
-        viewModel.login("user@example.com", "wrongpass");
+        viewModel.login("user@example.com", "wrongpass1");
 
         assertFalse(viewModel.isSubmitting());
         UiState<AuthSession> state = viewModel.getLoginState().getValue();

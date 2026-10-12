@@ -239,7 +239,7 @@ Both steps in this phase may run concurrently: they own disjoint packages, graph
 
 ### Step 1 — AUTH-002 — Android customer authentication and profile
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-001, FND-006, UI-002, APP-002, DOM-002, DATA-002, NET-002, DES-001
 
@@ -263,11 +263,11 @@ Both steps in this phase may run concurrently: they own disjoint packages, graph
 
 **Acceptance criteria:**
 
-- [ ] **a.** Forms show field validation, loading, server errors, network errors, and success states in English, and map every documented error code to the specified behaviour rather than a generic message.
-- [ ] **b.** Tokens use platform-protected storage, are never logged, and are cleared on logout or on a rejected/expired session; a failed sign-out still ends the local session.
-- [ ] **c.** Repository/ViewModel behavior is testable without Android framework dependencies where practical; critical UI flow has a focused UI test.
-- [ ] **d.** UI uses XML/Material 3, existing design-system styles, accessibility labels, and correct keyboard/input types; the task adds no new colour, dimension, or style.
-- [ ] **e.** Auth-required navigation returns the customer to the originating destination after a successful sign-in, and no guest cart or guest checkout path is created.
+- [x] **a.** Forms show field validation, loading, server errors, network errors, and success states in English, and map every documented error code to the specified behaviour rather than a generic message.
+- [x] **b.** Tokens use platform-protected storage, are never logged, and are cleared on logout or on a rejected/expired session; a failed sign-out still ends the local session.
+- [x] **c.** Repository/ViewModel behavior is testable without Android framework dependencies where practical; critical UI flow has a focused UI test.
+- [x] **d.** UI uses XML/Material 3, existing design-system styles, accessibility labels, and correct keyboard/input types; the task adds no new colour, dimension, or style.
+- [x] **e.** Auth-required navigation returns the customer to the originating destination after a successful sign-in, and no guest cart or guest checkout path is created.
 
 **Verification:** Android unit tests for state, storage, and error mapping; fixture-driven API-client tests; a focused instrumentation test for the critical auth path; a logcat excerpt showing no credential or token leakage.
 

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_auth"
-    app:startDestination="@id/authPlaceholderFragment">
+    app:startDestination="@id/signInFragment">
 
     <argument
         android:name="returnToNavId"
@@ -11,9 +11,77 @@
         app:argType="reference" />
 
     <fragment
-        android:id="@+id/authPlaceholderFragment"
-        android:name="com.averonlabs.eshopverse.shell.PlaceholderFragment"
-        android:label="@string/action_account"
-        tools:layout="@layout/fragment_placeholder" />
+        android:id="@+id/signInFragment"
+        android:name="com.averonlabs.eshopverse.auth.SignInFragment"
+        android:label="@string/auth_sign_in_title"
+        tools:layout="@layout/fragment_sign_in">
+
+        <argument
+            android:name="returnToNavId"
+            android:defaultValue="@id/homeFragment"
+            app:argType="reference" />
+
+        <action
+            android:id="@+id/action_signInFragment_to_registerFragment"
+            app:destination="@id/registerFragment" />
+
+        <action
+            android:id="@+id/action_signInFragment_to_requestPasswordResetFragment"
+            app:destination="@id/requestPasswordResetFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="com.averonlabs.eshopverse.auth.RegisterFragment"
+        android:label="@string/auth_register_title"
+        tools:layout="@layout/fragment_register">
+
+        <argument
+            android:name="returnToNavId"
+            android:defaultValue="@id/homeFragment"
+            app:argType="reference" />
+
+        <action
+            android:id="@+id/action_registerFragment_to_signInFragment"
+            app:destination="@id/signInFragment"
+            app:popUpTo="@id/signInFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/requestPasswordResetFragment"
+        android:name="com.averonlabs.eshopverse.auth.RequestPasswordResetFragment"
+        android:label="@string/auth_request_reset_title"
+        tools:layout="@layout/fragment_request_password_reset">
+
+        <action
+            android:id="@+id/action_requestPasswordResetFragment_to_setNewPasswordFragment"
+            app:destination="@id/setNewPasswordFragment" />
+
+        <action
+            android:id="@+id/action_requestPasswordResetFragment_to_signInFragment"
+            app:destination="@id/signInFragment"
+            app:popUpTo="@id/signInFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/setNewPasswordFragment"
+        android:name="com.averonlabs.eshopverse.auth.SetNewPasswordFragment"
+        android:label="@string/auth_set_new_password_title"
+        tools:layout="@layout/fragment_set_new_password">
+
+        <action
+            android:id="@+id/action_setNewPasswordFragment_to_signInFragment"
+            app:destination="@id/signInFragment"
+            app:popUpTo="@id/signInFragment"
+            app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_setNewPasswordFragment_to_requestPasswordResetFragment"
+            app:destination="@id/requestPasswordResetFragment"
+            app:popUpTo="@id/requestPasswordResetFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
 </navigation>

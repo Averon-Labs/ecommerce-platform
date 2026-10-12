@@ -65,11 +65,19 @@ public class SessionViewModel extends ViewModel {
         currentUserLiveData.setValue(user);
     }
 
+    public void setSession(@NonNull com.averonlabs.eshopverse.core.model.AuthSession session) {
+        onSessionStarted(session.getUser());
+    }
+
     /**
      * Updates locally cached user profile.
      */
     public void setCurrentUser(@Nullable User user) {
         currentUserLiveData.setValue(user);
+    }
+
+    public void updateCurrentUser(@NonNull User user) {
+        setCurrentUser(user);
     }
 
     /**
@@ -114,6 +122,19 @@ public class SessionViewModel extends ViewModel {
         authRepository.getTokenStore().clear();
         isSignedInLiveData.postValue(false);
         currentUserLiveData.postValue(null);
+    }
+
+    /**
+     * Performs customer sign-out via API and clears local session.
+     */
+    public void signOut() {
+        signOut(new AuthCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {}
+
+            @Override
+            public void onError(Throwable throwable) {}
+        });
     }
 
     /**

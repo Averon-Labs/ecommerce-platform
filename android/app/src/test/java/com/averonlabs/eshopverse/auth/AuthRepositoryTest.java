@@ -61,7 +61,7 @@ public class AuthRepositoryTest {
 
     @Test
     public void testLoginSuccessAndTokenPersistence() throws Exception {
-        String fixture = ApiFixtureLoader.load("loginCustomer/success.json");
+        String fixture = ApiFixtureLoader.load("loginCustomer", "success");
         mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(fixture));
 
         CountDownLatch latch = new CountDownLatch(1);
@@ -96,7 +96,7 @@ public class AuthRepositoryTest {
 
     @Test
     public void testLoginInvalidCredentials401() throws Exception {
-        String fixture = ApiFixtureLoader.load("loginCustomer/invalid-credentials.json");
+        String fixture = ApiFixtureLoader.load("loginCustomer", "invalid-credentials");
         mockWebServer.enqueue(new MockResponse().setResponseCode(401).setBody(fixture));
 
         CountDownLatch latch = new CountDownLatch(1);
@@ -125,7 +125,7 @@ public class AuthRepositoryTest {
 
     @Test
     public void testRegisterSuccessAndTokenPersistence() throws Exception {
-        String fixture = ApiFixtureLoader.load("loginCustomer/success.json");
+        String fixture = ApiFixtureLoader.load("loginCustomer", "success");
         mockWebServer.enqueue(new MockResponse().setResponseCode(201).setBody(fixture));
 
         CountDownLatch latch = new CountDownLatch(1);
