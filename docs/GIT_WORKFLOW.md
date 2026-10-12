@@ -20,9 +20,8 @@ Across the entire repository (Android, Backend, Admin, and Project-wide tasks):
 ## Component-Specific Git Responsibilities
 
 ### Android Component
-- **Phase Branch:** Maintained per phase (`feature/android-phase-<N>`), created by the owner from `develop`.
-- **AI Agent Authority:** Authorized **ONLY** to stage and commit verified changes (`git add`, `git commit`) on the active task/phase branch.
-- **Owner Responsibility:** Strictly and exclusively manages branch creation, switching, remote synchronization, push, PR creation, review, and merging. Agents never run `git branch`, `git checkout`, `git switch`, `git push`, `git pull`, `git fetch`, or GitHub CLI commands.
+- **Phase Branch:** Maintained per phase (`feature/android-phase-<N>`), created from `develop`.
+- **AI Agent Authority:** Follows the agent Git workflow (phase branch management, sequential Conventional Commits per step, remote synchronization, push to origin, and PR preparation into `develop`). Never merge PRs automatically.
 
 ### Backend Component
 - **Phase Branch:** Maintained per phase (`feature/backend-phase-<N>`), created by the owner from `develop`.

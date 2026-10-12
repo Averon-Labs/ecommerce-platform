@@ -2,14 +2,12 @@
 
 > Read the root `AGENTS.md` first. This file contains Android-specific rules.
 
-## Strict Git Permissions for Android Tasks
+## Git Workflow for Android Tasks
 
-Agents working on Android tasks are authorized **ONLY** to perform staging and commits (`git add`, `git commit`) on the active task branch provided by the owner.
-- **NEVER** create branches (`git branch`, `git checkout -b`, `git switch -c`).
-- **NEVER** switch or change branches (`git checkout`, `git switch`).
-- **NEVER** push, pull, fetch, merge, reset, delete branches, or create PRs (`git push`, `git pull`, `git branch -d`, `gh pr`).
-- Branch creation, branch switching, pushing, merging, PR creation, and branch deletion are **STRICTLY AND EXCLUSIVELY** owner-managed. Agents must never touch them without explicit permission.
-- **Phase-based branches:** Android feature branches are maintained per phase (`feature/android-phase-<N>`), and all steps within that phase are developed and committed sequentially on that phase branch.
+Agents working on Android tasks follow the universal phase-based agent Git workflow:
+- **Phase-based branches:** Android feature branches are maintained per phase (`feature/android-phase-<N>`), created from `develop`.
+- **Steps as commits:** All steps within that phase are developed, verified, and committed sequentially as focused Conventional Commits (`<type>(android-pNN-sNN-<task-id>): <imperative summary>`) on that phase branch.
+- **Git Authority:** Agents are authorized to inspect status, branch, commit, push to remote (`origin/feature/android-phase-<N>`), and prepare Pull Requests into `develop` once all steps of the phase are complete and verified. Never merge PRs automatically.
 
 The canonical Android task steps, status, scope, dependencies, acceptance criteria, and verification are in [`docs/ANDROID_ROADMAP.md`](../docs/ANDROID_ROADMAP.md). Android assignments are executed and reported from that roadmap only; do not take on or list backend/admin work. Use [`docs/ROADMAP.md`](../docs/ROADMAP.md) only for explicitly cross-component work and final project/release validation. If an external task is a dependency, report it only as a blocker for the affected Android task.
 
@@ -122,7 +120,7 @@ starting any Android task.
   debug build and only for the documented local development hosts.
 - **Shared files.** Do not edit a file owned by another step (shell, Gradle, manifest, shared tokens,
   or another feature's package). Report the need instead.
-- **Git operations.** Agents are authorized ONLY to stage and create local commits (`git add`, `git commit`) on the active task branch. All other Git operations (`status`, `diff`, `branch`, `switch`, `push`, `pull`, `fetch`, `merge`, `reset`, or PR creation) remain strictly owner-managed.
+- **Git operations.** Agents are authorized to inspect status, branch, commit, push, and prepare PRs following the phase-based agent Git workflow (`feature/android-phase-<N>`).
 
 ---
 
