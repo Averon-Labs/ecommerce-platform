@@ -66,6 +66,10 @@ public final class StateContainerView extends FrameLayout {
     }
 
     public void setContentView(View view) {
+        if (view == null) return;
+        if (view.getParent() instanceof ViewGroup) {
+            ((ViewGroup) view.getParent()).removeView(view);
+        }
         if (contentView != null) contentHost.removeView(contentView);
         contentView = view;
         contentHost.addView(view, new FrameLayout.LayoutParams(
