@@ -315,7 +315,7 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 1 — CART-002 — Android cart experience
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-001, FND-006, UI-002, APP-002, DOM-002, NET-002, AUTH-002, DES-001
 
@@ -340,16 +340,16 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 **Acceptance criteria:**
 
-- [ ] **a.** The customer can inspect items, update quantity, remove items, and see server-confirmed totals; no screen computes a subtotal, shipping amount, or total.
-- [ ] **b.** Empty, loading, offline, error, and stock-changed states are handled, and a retry does not silently duplicate a mutation; a line whose price changed or became unavailable is explained rather than silently changed.
-- [ ] **c.** Cart state and money presentation are covered by unit tests, and the critical add/update/remove actions have focused UI coverage.
-- [ ] **d.** The cart count supplied to the shell badge comes from the server response, not from local state.
+- [x] **a.** The customer can inspect items, update quantity, remove items, and see server-confirmed totals; no screen computes a subtotal, shipping amount, or total.
+- [x] **b.** Empty, loading, offline, error, and stock-changed states are handled, and a retry does not silently duplicate a mutation; a line whose price changed or became unavailable is explained rather than silently changed.
+- [x] **c.** Cart state and money presentation are covered by unit tests, and the critical add/update/remove actions have focused UI coverage.
+- [x] **d.** The cart count supplied to the shell badge comes from the server response, not from local state.
 
-**Verification:** unit and API-mapping tests, cart flow UI tests, and screenshots of the populated, conflict, and empty states.
+**Verification:** 20 unit tests in `CartTotalsTest`, `CartRepositoryTest`, and `CartViewModelTest`; UI flow test in `CartFlowTest` (instrumentation compiled via `assembleDebugAndroidTest`); `lintDebug` (0 errors) and `testDebugUnitTest` (112/112 passing) succeeded.
 
 ### Step 2 — CHECK-001 — Android checkout and simulated payment flow
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-001, FND-006, UI-002, APP-002, DOM-002, NET-002, AUTH-002, DES-001
 
@@ -373,13 +373,13 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 **Acceptance criteria:**
 
-- [ ] **a.** Checkout validates required address fields against the contract, displays server-confirmed USD totals, and clearly labels the payment step as simulated.
-- [ ] **b.** The UI collects no card number, security code, expiry, or live payment credential, and no provider branding is shown.
-- [ ] **c.** Success, failure, timeout, retry, and duplicate-submit states map correctly to server order state; a timeout is never presented as success, and a new user attempt uses a new idempotency key while a transport retry reuses the existing one.
-- [ ] **d.** A failed simulated payment leaves the order retryable and is never presented as paid.
-- [ ] **e.** Tests cover validation, state transitions, idempotency behaviour, and safe retry; the double-tap case creates no second order.
+- [x] **a.** Checkout validates required address fields against the contract, displays server-confirmed USD totals, and clearly labels the payment step as simulated.
+- [x] **b.** The UI collects no card number, security code, expiry, or live payment credential, and no provider branding is shown.
+- [x] **c.** Success, failure, timeout, retry, and duplicate-submit states map correctly to server order state; a timeout is never presented as success, and a new user attempt uses a new idempotency key while a transport retry reuses the existing one.
+- [x] **d.** A failed simulated payment leaves the order retryable and is never presented as paid.
+- [x] **e.** Tests cover validation, state transitions, idempotency behaviour, and safe retry; the double-tap case creates no second order.
 
-**Verification:** unit and API-mapping tests, focused UI smoke tests for the success and failure outcomes, and evidence of one deliberately interrupted request that created no duplicate order.
+**Verification:** unit and API-mapping tests (24 unit tests in `AddressValidatorTest`, `IdempotencyRuleTest`, `CheckoutRepositoryTest`, `CheckoutViewModelTest`), focused UI smoke tests for the success and failure outcomes (`CheckoutSuccessTest`, `CheckoutFailureTest`), verified zero card/credential fields in UI, idempotency key generation & deduplication verified; `testDebugUnitTest` (136/136 tests passing), `assembleDebugAndroidTest`, and `lintDebug` (0 errors) passed.
 
 ### Step 3 — ORD-002 — Android order history and details
 

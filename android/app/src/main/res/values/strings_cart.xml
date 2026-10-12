@@ -1,0 +1,24 @@
+<resources>
+    <string name="cart_screen_title">Your Cart</string>
+    <string name="cart_items_issues_notice">One or more items in your cart need attention before checkout.</string>
+    <string name="cart_item_price_changed">Price changed to %s</string>
+    <string name="cart_item_unavailable">This item is currently unavailable.</string>
+    <string name="cart_item_out_of_stock">Out of stock</string>
+    <string name="cart_item_stock_limit">Only %1$d available in stock.</string>
+    <string name="cart_cd_remove_item">Remove %s from cart</string>
+    <string name="cart_subtotal_label">Subtotal</string>
+    <string name="cart_shipping_label">Sample shipping rate</string>
+    <string name="cart_total_label">Total</string>
+    <string name="cart_action_checkout">Continue to checkout</string>
+    <string name="cart_empty_title">Your cart is empty</string>
+    <string name="cart_empty_description">Browse products and add items to your cart.</string>
+    <string name="cart_action_explore">Explore products</string>
+    <string name="cart_loading">Loading cart…</string>
+    <string name="cart_error_loading">Unable to load your cart.</string>
+    <string name="cart_error_updating">Unable to update item quantity.</string>
+    <string name="cart_error_removing">Unable to remove item.</string>
+    <string name="cart_error_insufficient_stock">Requested quantity exceeds available stock.</string>
+    <string name="cart_error_item_not_found">Item was removed from the cart.</string>
+    <string name="cart_action_retry">Retry</string>
+    <string name="cart_badge_label">%d items in cart</string>
+</resources>

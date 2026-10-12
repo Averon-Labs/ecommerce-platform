@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "CART_ITEM_NOT_FOUND",
+    "message": "The product is not in this customer's cart"
+  }
+}

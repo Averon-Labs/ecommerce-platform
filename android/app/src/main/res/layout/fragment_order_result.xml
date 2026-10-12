@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scroll_order_result"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_md">
+
+        <!-- Result Status Icon & Message Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/iv_result_icon"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_simulated_payment"
+                app:tint="?attr/colorPrimary" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_result_heading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:text="@string/checkout_result_success_heading"
+                android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
+                android:textColor="@color/text_primary_ink" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_result_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:gravity="center"
+                android:text="@string/checkout_result_success_message"
+                android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                android:textColor="@color/text_secondary" />
+
+        </LinearLayout>
+
+        <!-- Order Details Card -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.EShopVerse.Card.Panel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xl"
+            android:layout_marginBottom="@dimen/spacing_xl">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_md">
+
+                <!-- Order Reference Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/checkout_result_order_number_label"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                        android:textColor="@color/text_secondary" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_result_order_reference"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                        android:textColor="@color/text_primary_ink"
+                        tools:text="ESV-005001" />
+
+                </LinearLayout>
+
+                <!-- Status Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/checkout_result_status_label"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                        android:textColor="@color/text_secondary" />
+
+                    <com.averonlabs.eshopverse.core.ui.view.StatusBadgeView
+                        android:id="@+id/badge_result_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <!-- Total Amount Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/checkout_result_total_label"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                        android:textColor="@color/text_secondary" />
+
+                    <com.averonlabs.eshopverse.core.ui.view.PriceTextView
+                        android:id="@+id/tv_result_total"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                        tools:text="$94.99" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Retry Payment (Shown when payment failed) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_retry_payment"
+            style="@style/Widget.EShopVerse.Button.Filled"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/touch_target_min"
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:text="@string/checkout_action_retry_payment"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <!-- Check Status (Shown when ambiguous or network timeout) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_check_status"
+            style="@style/Widget.EShopVerse.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/touch_target_min"
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:text="@string/checkout_action_check_status"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <!-- View Orders -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_view_orders"
+            style="@style/Widget.EShopVerse.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/touch_target_min"
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:text="@string/checkout_action_view_orders" />
+
+        <!-- Continue Shopping -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_continue_shopping"
+            style="@style/Widget.EShopVerse.Button.Filled"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/touch_target_min"
+            android:text="@string/checkout_action_continue_shopping" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

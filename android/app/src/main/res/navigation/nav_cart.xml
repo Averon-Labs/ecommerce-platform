@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_cart"
-    app:startDestination="@id/cartPlaceholderFragment">
+    app:startDestination="@id/cartFragmentDest">
 
     <fragment
-        android:id="@+id/cartPlaceholderFragment"
-        android:name="com.averonlabs.eshopverse.shell.PlaceholderFragment"
-        android:label="@string/nav_cart"
-        tools:layout="@layout/fragment_placeholder" />
+        android:id="@+id/cartFragmentDest"
+        android:name="com.averonlabs.eshopverse.cart.CartFragment"
+        android:label="@string/cart_title"
+        tools:layout="@layout/fragment_cart" />
 
 </navigation>

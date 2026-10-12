@@ -1,22 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.averonlabs.eshopverse.core.ui.view.StateContainerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/state_container_cart"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="@dimen/spacing_md"
-    tools:context=".shell.CartFragment">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/tv_cart_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/cart_title"
-        android:textAppearance="?attr/textAppearanceTitleLarge"
-        android:textColor="@color/text_primary_ink"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_cart_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/spacing_xl">
+
+            <!-- Has Issues Notice Banner (Shown when cart.hasIssues()) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_cart_issues"
+                style="@style/Widget.EShopVerse.Card.Panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_md"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:layout_marginEnd="@dimen/spacing_md"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/m3_error_container"
+                tools:visibility="visible">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_cart_issues_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/spacing_md"
+                    android:text="@string/cart_items_issues_notice"
+                    android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                    android:textColor="@color/m3_on_error_container" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Cart Items RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_cart_items"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:paddingStart="@dimen/spacing_md"
+                android:paddingTop="@dimen/spacing_md"
+                android:paddingEnd="@dimen/spacing_md"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_cart_line" />
+
+            <!-- Order Summary Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_cart_summary"
+                style="@style/Widget.EShopVerse.Card.Panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_md"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:layout_marginEnd="@dimen/spacing_md"
+                android:layout_marginBottom="@dimen/spacing_md">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_md">
+
+                    <!-- Subtotal Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/cart_subtotal_label"
+                            android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                            android:textColor="@color/text_secondary" />
+
+                        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
+                            android:id="@+id/tv_cart_subtotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="$179.98" />
+
+                    </LinearLayout>
+
+                    <!-- Shipping Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_sm"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/cart_shipping_label"
+                            android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                            android:textColor="@color/text_secondary" />
+
+                        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
+                            android:id="@+id/tv_cart_shipping"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="$5.00" />
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/spacing_md"
+                        android:layout_marginBottom="@dimen/spacing_md"
+                        android:background="@color/m3_outline_variant" />
+
+                    <!-- Total Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/cart_total_label"
+                            android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
+                            android:textColor="@color/text_primary_ink" />
+
+                        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
+                            android:id="@+id/tv_cart_total"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
+                            tools:text="$184.98" />
+
+                    </LinearLayout>
+
+                    <!-- Continue to Checkout Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_cart_checkout"
+                        style="@style/Widget.EShopVerse.Button.Filled"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/touch_target_min"
+                        android:layout_marginTop="@dimen/spacing_lg"
+                        android:text="@string/cart_action_checkout" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</com.averonlabs.eshopverse.core.ui.view.StateContainerView>

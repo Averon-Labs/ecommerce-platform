@@ -1,0 +1,33 @@
+{
+  "data": {
+    "items": [
+      {
+        "productId": 101,
+        "name": "Classic Leather Sneaker",
+        "imageUrl": "https://images.example.com/products/sneaker.jpg",
+        "unitPrice": "89.99",
+        "currency": "USD",
+        "quantity": 1,
+        "lineTotal": "89.99",
+        "inStock": true,
+        "availableQuantity": 10,
+        "priceChanged": false,
+        "unavailable": false
+      }
+    ],
+    "subtotal": "89.99",
+    "shipping": "5.00",
+    "total": "94.99",
+    "currency": "USD",
+    "shippingAddress": {
+      "recipientName": "John Doe",
+      "line1": "123 Main St",
+      "line2": "Apt 4B",
+      "city": "Metropolis",
+      "region": "NY",
+      "postalCode": "10001",
+      "country": "US"
+    },
+    "shippingAddressId": "addr_fingerprint_12345"
+  }
+}

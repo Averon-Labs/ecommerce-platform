@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.averonlabs.eshopverse.core.ui.view.StateContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/state_container_review"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_review_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_md">
+
+            <!-- Title -->
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/checkout_review_title"
+                android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
+                android:textColor="@color/text_primary_ink" />
+
+            <!-- Shipping Destination Card -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.EShopVerse.Card.Panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_md">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/checkout_review_shipping_heading"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                        android:textColor="@color/text_primary_ink" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_review_shipping_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                        android:textColor="@color/text_secondary"
+                        tools:text="John Doe\n123 Main St, Apt 4B\nMetropolis, NY 10001, US" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Order Items Card -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.EShopVerse.Card.Panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_md">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/checkout_review_items_heading"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                        android:textColor="@color/text_primary_ink" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_review_items"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:nestedScrollingEnabled="false"
+                        tools:itemCount="2"
+                        tools:listitem="@layout/item_review_line" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Order Summary Card -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.EShopVerse.Card.Panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:layout_marginBottom="@dimen/spacing_lg">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_md">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/checkout_review_summary_heading"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                        android:textColor="@color/text_primary_ink" />
+
+                    <!-- Subtotal Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_sm"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/checkout_subtotal_label"
+                            android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                            android:textColor="@color/text_secondary" />
+
+                        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
+                            android:id="@+id/tv_review_subtotal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="$89.99" />
+
+                    </LinearLayout>
+
+                    <!-- Shipping Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xs"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/checkout_shipping_label"
+                            android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                            android:textColor="@color/text_secondary" />
+
+                        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
+                            android:id="@+id/tv_review_shipping"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="$5.00" />
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/spacing_sm"
+                        android:layout_marginBottom="@dimen/spacing_sm"
+                        android:background="@color/m3_outline_variant" />
+
+                    <!-- Total Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.textview.MaterialTextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/checkout_total_label"
+                            android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
+                            android:textColor="@color/text_primary_ink" />
+
+                        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
+                            android:id="@+id/tv_review_total"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
+                            tools:text="$94.99" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Proceed Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_proceed_to_payment"
+                style="@style/Widget.EShopVerse.Button.Filled"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/touch_target_min"
+                android:text="@string/checkout_action_proceed_to_payment" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</com.averonlabs.eshopverse.core.ui.view.StateContainerView>
