@@ -1,6 +1,6 @@
 # Project State
 
-> Last updated: 2026-10-11
+> Last updated: 2026-10-12
 
 ## Current Phase
 
@@ -15,7 +15,7 @@
 | Android app | 🟡 Phase 2 In Progress | Java/XML Material 3 app. Phase 0 Foundation complete (FND-001, FND-006, UI-002, APP-002, DOM-002, DATA-002, NET-002). Phase 1 complete (AUTH-002, CAT-002). Phase 2 Step 1 complete (CART-002). Phase 2 Step 2 complete (CHECK-001 — checkout and simulated payment flow, Screens M-11..M-14, zero credential capture, idempotent order placement, safe retry). 136 unit tests passing, instrumentation test suite verified, 0 lint errors. |
 | Backend API | 🟡 Initialized — FND-002 implemented, awaiting independent verification | Laravel 13 (`laravel/framework` 13.35.0) on PHP 8.4.25, Composer 2.10.3, PHPUnit 12.5.38, Pint 1.32.1 (PSR-12). Database is a **hosted** MySQL 8.4.11 (Aiven Free tier) with `eshopverse_dev` + `eshopverse_test`, reached over TLS 1.3 with certificate verification (`MYSQL_ATTR_SSL_CA`). Verified 2026-10-11: `composer install`, `composer validate --strict`, `composer audit`, `pint --test`, `migrate`, `test` (5 tests / 8 assertions), `serve` (`/up` 200). `routes/api.php` is empty and mounted at `/api/v1`; no business endpoint exists before FND-004 acceptance. |
 | Admin dashboard | ⬜ Not initialized | `admin/` has guidance only; React/TypeScript setup is FND-003 |
-| API contract | ⚠️ Draft awaiting review | `docs/openapi.yaml` exists as an OpenAPI 3.1 draft resolving the recorded open contract decisions, including category lifecycle; it passes a structural check (no duplicate keys, no unresolved `$ref`) but API-owner acceptance is still required before endpoint or client work (FND-004) |
+| API contract | ✅ Accepted (2026-10-12) | `docs/openapi.yaml` is the accepted OpenAPI 3.1 contract (FND-004 complete): decisions OPEN-1..4 closed 2026-10-11, Redocly lint reports 0 errors/2 warnings, and the API owner accepted it on 2026-10-12; endpoint and client work is unblocked, and contract changes go through the contract-change process first |
 | CI/CD | ⚠️ Placeholder | `.github/workflows/ci.yml` only validates repository structure; Android FND-006 adds the Android build/lint/test job and FND-005 owns component-check consolidation |
 | Database | ⬜ Not implemented | Logical model documented; migrations and isolated test database are part of backend/component Tasks |
 
@@ -32,6 +32,7 @@
 - **Backend database (2026-10-11, owner decision):** no local MySQL — a hosted MySQL service is used instead. The chosen provider is Aiven Free tier (MySQL 8.4.11, remote host/port, project `ca.pem`); two databases `eshopverse_dev` and `eshopverse_test` were created on it. Connections run over TLS 1.3 and are verified against the CA file, as `docs/SECURITY.md` requires. Credentials and `MYSQL_ATTR_SSL_CA` live only in the git-ignored `backend/.env`.
 - **Backend test naming (2026-10-11):** PHP test methods use `snake_case` because Laravel Pint enforces `php_unit_method_casing`; the `docs/TESTING.md` PHP example was aligned with the enforced style.
 - **Backend API mounting (2026-10-11):** `routes/api.php` exists and is registered with the `api/v1` prefix from `ARCHITECTURE.md`, but stays empty until the OpenAPI contract is accepted (FND-004).
+- **FND-004 contract accepted (2026-10-12, owner):** the API owner reviewed and accepted `docs/openapi.yaml` (`info.version` 1.0.0, lint 0 errors), completing criterion g; endpoint implementation and client integration are unblocked, and any contract change is made in the contract file first.
 
 - First-release portfolio scope and stack recorded in ADR-001
 - Sequential build/test/debug workflow documented
@@ -47,7 +48,7 @@
 ## Next Steps
 
 1. Independent verification of Backend **FND-002** (roadmap status is `[~]`): tester repeats the commands in `docs/DEVELOPMENT.md`, then the owner commits `backend/` (`composer.lock`, `.env.example`, config, tests) — backend agents run no Git commands.
-2. Owner review of `docs/openapi.yaml` and of the open decisions OPEN-1..OPEN-11 (contract, token storage, contrast token, Lato weight, backup policy, Room scope, mock runner). This unblocks Backend FND-004 acceptance and therefore every Phase 1 endpoint task.
+2. ~~Owner review of `docs/openapi.yaml`~~ — **completed 2026-10-12:** FND-004 accepted (OPEN-1..4 closed 2026-10-11; OPEN-5/6/9/10 already closed by ADR-003/004/005). OPEN-7/8/11 still lack canonical decision records — owner to confirm.
 3. Complete Phase 0 tasks in their canonical roadmaps, respecting the waves in `docs/ANDROID_ROADMAP.md` and the shared phase gate.
 4. Android FND-006 first: it unblocks the parallel wave (UI-002, DOM-002, DATA-002) and produces the build/test evidence that is currently missing.
 5. Begin Phase 1 only after Phase 0 exit criteria are verified.

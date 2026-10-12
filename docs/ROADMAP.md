@@ -22,27 +22,27 @@ Deliver a polished, end-to-end, single-store shopping demo for an international 
 
 ## Branch and release model
 
-- develop is the shared integration branch. Each assigned Task gets one short-lived branch from develop and a PR targeting develop; builder, tester, and debugger use that branch sequentially.
-- Delete a task branch after its PR is accepted and merged. Keep develop permanently.
+- develop is the shared integration branch. Each component phase gets one branch from develop (`feature/<component>-phase-<N>`); builder, tester, and debugger commit each step sequentially on that phase branch, and the completed phase PR targets develop.
+- Delete a phase branch after its PR is accepted and merged. Keep develop permanently.
 - At a phase/release boundary, complete phase exit criteria and run release checks on develop. Promote a release only through a reviewed develop-to-main PR; tag the released commit.
 - The current main contains earlier merged bootstrap/documentation work and has no formal release tag. Preserve that history as the one-time pre-policy baseline; do not reset or rewrite main.
 - See [AGENTS.md](../AGENTS.md) for branch naming, PR, review, and cleanup rules. Markdown does not change GitHub settings; verify actual remote configuration.
 
 ## Verified starting point
 
-Last reviewed: 2026-10-09. Recheck source and Git state before starting each Task.
+Last reviewed: 2026-10-12. Recheck source and Git state before starting each Task.
 
 ## Authority and component scope
 
 This roadmap is for explicitly cross-component work and final project/release validation. It does not replace or extend a component's execution backlog. When an owner assigns Android work, use `ANDROID_ROADMAP.md` as the sole source for Android tasks, statuses, scopes, acceptance criteria, and progress reports; similarly, use `BACKEND_ROADMAP.md` or `ADMIN_ROADMAP.md` for those components. Do not report another component's open tasks as work remaining in the assigned component. A dependency owned by another component can block a task; report only that dependency and its effect on the assigned task. Review this project roadmap when coordinating cross-component work or deciding whether the full project/release gate is met.
 
 - Android has a regenerated Java/XML Gradle scaffold: namespace/application ID com.averonlabs.eshopverse, compile SDK 36.1, minSdk 25, targetSdk 36, Java 11 source/target, AGP 9.2.1, Gradle 9.4.1. The complete Phase 0-2 dependency set (Material 1.14.0, AndroidX libraries, Retrofit, OkHttp, Glide, test dependencies) was declared in FND-006. Verified build/lint/test commands are documented in `docs/DEVELOPMENT.md`.
-- Android Phase 0 was expanded by PLAN-005 with six cross-cutting foundation steps (FND-006, UI-002, APP-002, DOM-002, DATA-002, NET-002) that must complete before the Phase 1 screen tasks; `docs/openapi.yaml` now exists as a draft for FND-004 owner review, and contract-derived fixtures plus a local mock server let the Android tasks be verified without a running backend.
-- Android Phase 1 and Phase 2 steps depend only on Android and shared steps. Their backend dependencies are recorded once, in the coordination table in `docs/ANDROID_ROADMAP.md`, with integration deferred to QUAL-001.
+- Android Phase 0 was expanded by PLAN-005 with six cross-cutting foundation steps (FND-006, UI-002, APP-002, DOM-002, DATA-002, NET-002) that must complete before the Phase 1 screen tasks; `docs/openapi.yaml` is the accepted contract (FND-004, accepted 2026-10-12), and contract-derived fixtures plus a local mock server let the Android tasks be verified without a running backend.
+- Android Phase 1 and Phase 2 steps list only Android and shared steps in their Depends-on fields. Their one blocking external dependency (FND-004 contract acceptance) and the deferred backend integrations (recorded once in the coordination table in `docs/ANDROID_ROADMAP.md`) are tracked there, with end-to-end integration deferred to QUAL-001.
 - `backend/` now contains the initialized Laravel 13 application (FND-002, 2026-10-11) with a hosted MySQL workflow; `admin/` still contains agent guidance only (FND-003).
-- .github/workflows/ci.yml is a placeholder. Its active job checks repository structure; component checks are not active.
+- `.github/workflows/ci.yml` runs the repository-structure check and the Android build/lint/unit-test job (declared; a hosted run has not been observed yet). Backend and admin jobs are commented out until those components' checks are configured under FND-005.
 - GitHub develop was created from the current pre-policy main baseline. Default branch, auto-delete, and branch protection must be verified under GIT-001.
-- `docs/openapi.yaml` exists as an OpenAPI 3.1 draft awaiting API-owner acceptance (FND-004). `docs/API_CONTRACT.md` records shared conventions; endpoint schemas and per-class rate limits are drafted in the OpenAPI file and become binding only on acceptance.
+- `docs/openapi.yaml` was accepted by the API owner on 2026-10-12 (FND-004 complete). `docs/API_CONTRACT.md` records shared conventions; endpoint schemas and per-class rate limits are binding as accepted in the OpenAPI file.
 - docs/DATABASE.md is a logical model, not implemented migrations.
 
 This is a repository snapshot, not a promise that the state remains unchanged. Confirm facts again when a Task starts.
@@ -53,7 +53,7 @@ This is a repository snapshot, not a promise that the state remains unchanged. C
 - Acceptance checkboxes are checked only after implementation and verification evidence are reviewed.
 - A task is complete when every criterion passes, required checks are green, and the reviewer has exact commands, outcomes, and the commit tested. Follow the Definition of Done in [AGENTS.md](../AGENTS.md).
 - If a task exposes a missing product or architecture decision, ask the owner and stop dependent work; do not silently broaden scope or contradict an accepted ADR.
-- OpenAPI must be reviewed and accepted before implementing API endpoints or client integrations. The owner can review the draft as a concrete artifact; no additional product choice is needed to prepare it from accepted scope.
+- OpenAPI must be reviewed and accepted before implementing API endpoints or client integrations; the contract was accepted on 2026-10-12 (FND-004). Any contract change is made in `docs/openapi.yaml` first and re-accepted.
 
 ## How to assign and execute a task
 
@@ -265,7 +265,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 **Status:** `[ ]`
 
-**Depends on:** AUTH-002, CAT-002, CART-002, CHECK-001, ORD-002
+**Depends on:** AUTH-002, CAT-002, CART-002, CHECK-001, ORD-002 (the backend counterparts AUTH-001, CAT-001, CART-001, ORD-001 plus FND-002/FND-004 are implied prerequisites, recorded in the component roadmaps)
 
 **Scope:** a small number of deterministic end-to-end/smoke checks across Android, API, and database for the core customer journey.
 
@@ -389,7 +389,7 @@ Each Task ID has exactly one canonical task entry. Status, dependencies, accepta
 | QUAL-005 | [Project Roadmap — Phase 3 — Step 5](ROADMAP.md) | Clean-checkout release rehearsal |
 | PLAN-001 | [Project Roadmap — Phase 0 — Step 3](ROADMAP.md) | Split component roadmaps and define task execution and clarification workflow |
 | PLAN-002 | [Project Roadmap — Phase 0 — Step 5](ROADMAP.md) | Separate agent role workflows and remove duplicated process guidance |
-| PLAN-003 | [Project Roadmap — Phase 0 — Step 6](ROADMAP.md) | Define assignable sub-steps and component-aware Git naming |
+| PLAN-003 | [Project Roadmap — Phase 0 — Step 6](ROADMAP.md) | Define assignable sub-steps and component-aware Git naming (superseded) |
 | CI-001 | [Project Roadmap — Phase 0 — Step 7](ROADMAP.md) | Refresh GitHub Actions runtimes and least-privilege permissions |
 | PLAN-004 | [Project Roadmap — Phase 0 — Step 8](ROADMAP.md) | Label roadmap acceptance criteria and remove Sub-step assignment rules |
 | PLAN-005 | [Project Roadmap — Phase 0 — Step 9](ROADMAP.md) | Plan the Android execution structure and phase specifications |

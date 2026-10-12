@@ -96,8 +96,8 @@ assembleDebug`, `./gradlew --no-daemon lintDebug`, and `./gradlew --no-daemon te
 on JDK 17, but a hosted CI run has not been observed yet. Instrumentation tests still require a
 connected device/emulator and were not run. Gradle reports deprecated features that will be
 incompatible with Gradle 10; the current Gradle 9.4.1 tasks pass. The executable bit of
-`android/gradlew` in the Git index must be confirmed by the repository owner because Android-task
-agents do not run Git commands.
+`android/gradlew` in the Git index must be confirmed (`git ls-files -s android/gradlew` shows
+mode 100755); Android agents manage Git on phase branches per `AGENTS.md`.
 
 All Android UI is Java/XML using the shared Material 3 design system in [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md). Use the common app theme and shared resource tokens for each screen.
 
@@ -192,7 +192,40 @@ certificate is **verified** against the provider's project CA:
 - Without `MYSQL_ATTR_SSL_CA` the connection is plaintext. That is intentionally loud in this
   document: never run migrations or tests in that state.
 
-> The OpenAPI contract draft lives at [`openapi.yaml`](openapi.yaml). It must be reviewed and accepted by the API owner before any endpoint, client integration, or business migration is implemented.
+> The OpenAPI contract lives at [`openapi.yaml`](openapi.yaml); it was reviewed and accepted by the API owner on 2026-10-12 (FND-004). Implement endpoints, client integration, and business migrations only as it describes, and change it first through the contract-change process.
+
+### OpenAPI contract lint (FND-004)
+
+The contract is validated with the pinned Redocly CLI (the toolchain decision for FND-004; Node.js 24 is already required for the Android toolchain):
+
+```bash
+npx --yes "@redocly/cli@2.62.1" lint docs/openapi.yaml
+```
+
+Verified output (2026-10-12, exit code 0):
+
+```text
+No configurations were provided -- using built in recommended configuration by default.
+
+validating docs\openapi.yaml...
+docs\openapi.yaml:
+  46:10  warning  no-server-example.com  Server `url` should not point to example.com or localhost.
+  48:10  warning  no-server-example.com  Server `url` should not point to example.com or localhost.
+
+docs\openapi.yaml: validated in 400ms
+
+Woohoo! Your API description is valid. 🎉
+You have 2 warnings.
+```
+
+Result: **0 errors, 2 warnings, exit 0.** Both warnings are intentional, understood, and accepted:
+
+- `46:10` — `http://localhost:8000/api/v1`, the local Laravel development server.
+- `48:10` — `http://localhost:8081/api/v1`, the local contract mock used by Android development before the API exists.
+
+They document local development servers on purpose; the production-like origin is the separately labelled `https://api.example.test/api/v1` placeholder whose replacement is recorded as decision OPEN-1 (closed 2026-10-11). These two warnings are the complete accepted baseline: any new warning or error is a regression and must be fixed.
+
+**Do not add a `redocly.yaml` (or any Redocly configuration file) to silence, downgrade, or exclude rules.** The warnings stay visible as living documentation of the accepted state.
 
 ### Admin Dashboard
 

@@ -23,7 +23,7 @@ This document highlights the key cross-component dependencies where work in one 
 
 **Impact:** This is the **single most critical cross-component dependency**. Until the OpenAPI contract is accepted, no API integration work can start in any component. Android can work on Phase 0 tasks that don't need the contract (FND-006, UI-002, APP-002, DATA-002), but Phase 1 and 2 are completely blocked.
 
-**Status:** Draft exists (`docs/openapi.yaml`, OpenAPI 3.1) and has passed structural validation; awaiting API-owner review and acceptance (criterion g).
+**Status:** ✅ Accepted by the API owner on 2026-10-12 (`docs/openapi.yaml`, OpenAPI 3.1; Redocly lint: 0 errors). Criterion g is satisfied and the gate is lifted.
 
 ---
 
@@ -44,7 +44,7 @@ This document highlights the key cross-component dependencies where work in one 
 
 | Backend Task | Requires | Notes |
 |--------------|----------|-------|
-| FND-002 | None | **Complete (2026-10-11):** Laravel 13 app + hosted MySQL dev/test workflow; exact commands in `docs/DEVELOPMENT.md` |
+| FND-002 | None | **Implemented and verified 2026-10-11; status `[~]`, awaiting independent verification:** Laravel 13 app + hosted MySQL dev/test workflow; exact commands in `docs/DEVELOPMENT.md` |
 | FND-004 | Product/API/DB/Security docs | Must complete before **anyone** does API work |
 
 ### Admin Dependencies on Other Teams
@@ -145,7 +145,7 @@ Backend FND-004 (OpenAPI Contract)
 
 ### For Backend Developer (Your Colleague)
 
-1. **Phase 0:** Start FND-002 immediately. Complete FND-004 ASAP — it blocks everyone.
+1. **Phase 0:** FND-002 is implemented (awaiting independent verification). FND-004 is complete — the contract was accepted on 2026-10-12, so endpoint work is unblocked.
 2. **Phase 1:** After FND-004, implement AUTH-001 and CAT-001. Then coordinate with Admin dev on AUTH-003 backend portion before doing CAT-003.
 3. **Phase 2:** Complete CART-001, then ORD-001. These unlock Admin ORD-003.
 
@@ -163,14 +163,14 @@ These decisions are listed in Android roadmap but may need input from Backend/Ad
 
 | ID | Question | Who Decides | Blocks |
 |----|----------|-------------|--------|
-| OPEN-1 to OPEN-4 | Contract decisions in openapi.yaml | Backend + Product Owner | FND-004 acceptance |
-| OPEN-5 | Local mock server runner | Android + Backend | NET-002 |
-| OPEN-6 | Token storage mechanism | Android | DATA-002 |
-| OPEN-7 | Supporting-text token value | Android + Design | UI-002 |
-| OPEN-8 | Lato weight for "600" | Android + Design | UI-002 |
-| OPEN-9 | allowBackup for demo app | Android + Security | DATA-002 |
-| OPEN-10 | Room deferred? | Android + Product Owner | DATA-002 |
-| OPEN-11 | Lato font files placement | Android | UI-002 start |
+| OPEN-1 to OPEN-4 | Contract decisions in openapi.yaml | Backend + Product Owner | **Closed 2026-10-11** (recorded in `x-open-decisions`); FND-004 acceptance still gates everyone |
+| OPEN-5 | Local mock server runner | Android + Backend | **Closed by ADR-005** (ACCEPTED 2026-10-10) |
+| OPEN-6 | Token storage mechanism | Android | **Closed by ADR-003** (ACCEPTED 2026-10-10) |
+| OPEN-7 | Supporting-text token value | Android + Design | ⚠️ No canonical decision record found anywhere in the repo; UI-002 already `[x]` — owner to confirm |
+| OPEN-8 | Lato weight for "600" | Android + Design | ⚠️ No canonical decision record found anywhere in the repo; UI-002 already `[x]` — owner to confirm |
+| OPEN-9 | allowBackup for demo app | Android + Security | **Closed by ADR-003** (`android:allowBackup="false"`, ACCEPTED 2026-10-10) |
+| OPEN-10 | Room deferred? | Android + Product Owner | **Closed by ADR-004** (ACCEPTED 2026-10-10) |
+| OPEN-11 | Lato font files placement | Android | ⚠️ No canonical decision record found anywhere in the repo; UI-002 already `[x]` — owner to confirm |
 
 ---
 
@@ -198,8 +198,8 @@ These decisions are listed in Android roadmap but may need input from Backend/Ad
 ### What Backend Colleague Should Focus On
 
 **Right now (Phase 0):**
-- 🔨 FND-002 — Laravel initialization (start immediately)
-- 🚨 **FND-004 — OpenAPI contract** (HIGHEST PRIORITY — blocks everyone)
+- ✅ FND-002 — Laravel initialization (implemented; awaiting independent verification)
+- ✅ **FND-004 — OpenAPI contract** (accepted 2026-10-12; lint 0 errors — endpoint work unblocked)
 
 **Phase 1:**
 - 🔨 AUTH-001, CAT-001 (can run in parallel after FND-004)
