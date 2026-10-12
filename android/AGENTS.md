@@ -9,6 +9,7 @@ Agents working on Android tasks are authorized **ONLY** to perform staging and c
 - **NEVER** switch or change branches (`git checkout`, `git switch`).
 - **NEVER** push, pull, fetch, merge, reset, delete branches, or create PRs (`git push`, `git pull`, `git branch -d`, `gh pr`).
 - Branch creation, branch switching, pushing, merging, PR creation, and branch deletion are **STRICTLY AND EXCLUSIVELY** owner-managed. Agents must never touch them without explicit permission.
+- **Phase-based branches:** Android feature branches are maintained per phase (`feature/android-phase-<N>`), and all steps within that phase are developed and committed sequentially on that phase branch.
 
 The canonical Android task steps, status, scope, dependencies, acceptance criteria, and verification are in [`docs/ANDROID_ROADMAP.md`](../docs/ANDROID_ROADMAP.md). Android assignments are executed and reported from that roadmap only; do not take on or list backend/admin work. Use [`docs/ROADMAP.md`](../docs/ROADMAP.md) only for explicitly cross-component work and final project/release validation. If an external task is a dependency, report it only as a blocker for the affected Android task.
 
