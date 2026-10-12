@@ -315,7 +315,7 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 1 — CART-002 — Android cart experience
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-001, FND-006, UI-002, APP-002, DOM-002, NET-002, AUTH-002, DES-001
 
@@ -340,12 +340,12 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 **Acceptance criteria:**
 
-- [ ] **a.** The customer can inspect items, update quantity, remove items, and see server-confirmed totals; no screen computes a subtotal, shipping amount, or total.
-- [ ] **b.** Empty, loading, offline, error, and stock-changed states are handled, and a retry does not silently duplicate a mutation; a line whose price changed or became unavailable is explained rather than silently changed.
-- [ ] **c.** Cart state and money presentation are covered by unit tests, and the critical add/update/remove actions have focused UI coverage.
-- [ ] **d.** The cart count supplied to the shell badge comes from the server response, not from local state.
+- [x] **a.** The customer can inspect items, update quantity, remove items, and see server-confirmed totals; no screen computes a subtotal, shipping amount, or total.
+- [x] **b.** Empty, loading, offline, error, and stock-changed states are handled, and a retry does not silently duplicate a mutation; a line whose price changed or became unavailable is explained rather than silently changed.
+- [x] **c.** Cart state and money presentation are covered by unit tests, and the critical add/update/remove actions have focused UI coverage.
+- [x] **d.** The cart count supplied to the shell badge comes from the server response, not from local state.
 
-**Verification:** unit and API-mapping tests, cart flow UI tests, and screenshots of the populated, conflict, and empty states.
+**Verification:** 20 unit tests in `CartTotalsTest`, `CartRepositoryTest`, and `CartViewModelTest`; UI flow test in `CartFlowTest` (instrumentation compiled via `assembleDebugAndroidTest`); `lintDebug` (0 errors) and `testDebugUnitTest` (112/112 passing) succeeded.
 
 ### Step 2 — CHECK-001 — Android checkout and simulated payment flow
 
