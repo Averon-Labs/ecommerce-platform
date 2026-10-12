@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<com.averonlabs.eshopverse.core.ui.view.StateContainerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/state_container_orders"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/surface_container_low">
@@ -22,15 +22,4 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <com.averonlabs.eshopverse.core.ui.view.StateContainerView
-        android:id="@+id/state_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        app:emptyActionText="@string/orders_empty_action"
-        app:emptyIcon="@drawable/ic_empty_orders"
-        app:emptyMessage="@string/orders_empty_message"
-        app:emptyTitle="@string/orders_empty_heading"
-        app:errorTitle="@string/orders_error_heading" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.averonlabs.eshopverse.core.ui.view.StateContainerView>

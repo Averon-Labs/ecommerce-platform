@@ -62,8 +62,6 @@ public final class OrderStatusFormatter {
                 return R.string.payment_status_completed;
             case FAILED:
                 return R.string.payment_status_failed;
-            case REFUNDED:
-                return R.string.payment_status_refunded;
             default:
                 return R.string.payment_status_pending;
         }
@@ -78,7 +76,6 @@ public final class OrderStatusFormatter {
                 return StatusBadgeView.Status.SUCCESS;
             case FAILED:
                 return StatusBadgeView.Status.ERROR;
-            case REFUNDED:
             default:
                 return StatusBadgeView.Status.NEUTRAL;
         }

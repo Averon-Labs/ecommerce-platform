@@ -40,7 +40,7 @@ public class OrderDetailViewModel extends ViewModel {
         repository.getOrder(orderId, new OrderRepository.OrderCallback<Order>() {
             @Override
             public void onSuccess(@NonNull Order order) {
-                orderState.setValue(UiState.success(order));
+                orderState.setValue(UiState.content(order));
             }
 
             @Override

@@ -65,14 +65,12 @@
             app:layout_constraintTop_toBottomOf="@id/tv_order_date"
             tools:text="3 items" />
 
-        <com.averonlabs.eshopverse.core.ui.view.PriceView
+        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
             android:id="@+id/tv_order_total"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:priceColor="@color/text_primary_ink"
-            app:priceTextSize="16sp" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
