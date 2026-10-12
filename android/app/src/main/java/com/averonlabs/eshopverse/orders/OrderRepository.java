@@ -5,21 +5,16 @@ import androidx.annotation.Nullable;
 
 import com.averonlabs.eshopverse.core.model.Order;
 import com.averonlabs.eshopverse.core.model.OrderSummary;
-import com.averonlabs.eshopverse.core.net.ApiClient;
 import com.averonlabs.eshopverse.core.net.ApiResponse;
 import com.averonlabs.eshopverse.core.net.ApiRoutes;
 import com.averonlabs.eshopverse.core.net.PagedResponse;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-/**
- * Repository for customer-owned order listing and detail retrieval.
- * Respects OpenAPI contract for GET /orders and GET /orders/{orderId}.
- */
 public class OrderRepository {
 
     public interface OrderCallback<T> {
@@ -29,12 +24,10 @@ public class OrderRepository {
 
     private final ApiRoutes routes;
 
-    public OrderRepository() {
-        this(ApiClient.getRoutes());
-    }
+
 
     public OrderRepository(@NonNull ApiRoutes routes) {
-        this.routes = routes;
+        this.routes = Objects.requireNonNull(routes, "routes cannot be null");
     }
 
     public void listOrders(

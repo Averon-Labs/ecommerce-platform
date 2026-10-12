@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.averonlabs.eshopverse.R;
 import com.averonlabs.eshopverse.core.model.OrderSummary;
 import com.averonlabs.eshopverse.core.state.UiState;
+import com.averonlabs.eshopverse.core.ui.view.StateContainerView;
 import com.averonlabs.eshopverse.databinding.FragmentOrderListBinding;
 
 import java.util.List;
@@ -45,20 +46,15 @@ public class OrderListFragment extends Fragment implements OrderAdapter.OnOrderC
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(this, new OrderViewModelFactory()).get(OrderListViewModel.class);
+        viewModel = new ViewModelProvider(this, new OrderViewModelFactory(requireContext())).get(OrderListViewModel.class);
 
         adapter = new OrderAdapter(this);
         binding.rvOrders.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvOrders.setAdapter(adapter);
 
+        binding.stateContainerOrders.setContentView(binding.swipeRefresh);
+
         binding.swipeRefresh.setOnRefreshListener(() -> viewModel.refresh());
-
-        binding.stateContainer.setOnEmptyActionListener(() -> {
-            NavController navController = NavHostFragment.findNavController(this);
-            navController.navigate(R.id.exploreFragment);
-        });
-
-        binding.stateContainer.setOnRetryClickListener(() -> viewModel.loadOrders());
 
         observeViewModel();
         viewModel.loadOrders();
@@ -67,11 +63,13 @@ public class OrderListFragment extends Fragment implements OrderAdapter.OnOrderC
     private void observeViewModel() {
         viewModel.getOrdersState().observe(getViewLifecycleOwner(), this::renderOrdersState);
 
-        viewModel.getAuthRequiredEvent().observe(getViewLifecycleOwner(), v -> {
-            NavController navController = NavHostFragment.findNavController(this);
-            Bundle args = new Bundle();
-            args.putInt("returnToNavId", R.id.nav_orders);
-            navController.navigate(R.id.nav_auth, args);
+        viewModel.getAuthRequiredEvent().observe(getViewLifecycleOwner(), event -> {
+            if (event != null && event.getContentIfNotHandled() != null) {
+                NavController navController = NavHostFragment.findNavController(this);
+                Bundle args = new Bundle();
+                args.putInt("returnToNavId", R.id.nav_orders);
+                navController.navigate(R.id.nav_auth, args);
+            }
         });
     }
 
@@ -80,23 +78,33 @@ public class OrderListFragment extends Fragment implements OrderAdapter.OnOrderC
 
         binding.swipeRefresh.setRefreshing(false);
 
-        if (state.isLoading()) {
-            binding.stateContainer.setVisibility(View.VISIBLE);
-            binding.stateContainer.showLoading();
-            binding.rvOrders.setVisibility(View.GONE);
-        } else if (state.isEmpty()) {
-            binding.stateContainer.setVisibility(View.VISIBLE);
-            binding.stateContainer.showEmpty();
-            binding.rvOrders.setVisibility(View.GONE);
-        } else if (state.isError()) {
-            binding.stateContainer.setVisibility(View.VISIBLE);
-            int msgRes = state.getErrorMessageRes() != 0 ? state.getErrorMessageRes() : R.string.orders_error_heading;
-            binding.stateContainer.showError(getString(msgRes));
-            binding.rvOrders.setVisibility(View.GONE);
-        } else if (state.isSuccess() && state.getData() != null) {
-            binding.stateContainer.setVisibility(View.GONE);
-            binding.rvOrders.setVisibility(View.VISIBLE);
-            adapter.submitList(state.getData());
+        switch (state.getStatus()) {
+            case LOADING:
+                binding.stateContainerOrders.setState(StateContainerView.State.LOADING, null, null, null);
+                break;
+            case CONTENT:
+                binding.stateContainerOrders.setState(StateContainerView.State.CONTENT, null, null, null);
+                if (state.getData() != null) {
+                    adapter.submitList(state.getData());
+                }
+                break;
+            case EMPTY:
+                binding.stateContainerOrders.setState(
+                        StateContainerView.State.EMPTY,
+                        getString(R.string.orders_empty_heading),
+                        getString(R.string.orders_empty_action),
+                        () -> NavHostFragment.findNavController(this).navigate(R.id.exploreFragment)
+                );
+                break;
+            case ERROR:
+                int msgRes = state.getMessageRes() != 0 ? state.getMessageRes() : R.string.orders_error_heading;
+                binding.stateContainerOrders.setState(
+                        StateContainerView.State.ERROR,
+                        getString(msgRes),
+                        state.isRetryable() ? getString(R.string.order_retry_button) : null,
+                        state.isRetryable() ? () -> viewModel.loadOrders() : null
+                );
+                break;
         }
     }
 

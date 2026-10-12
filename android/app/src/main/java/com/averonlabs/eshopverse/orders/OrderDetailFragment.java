@@ -18,6 +18,7 @@ import com.averonlabs.eshopverse.core.model.Order;
 import com.averonlabs.eshopverse.core.model.ShippingAddress;
 import com.averonlabs.eshopverse.core.money.MoneyFormat;
 import com.averonlabs.eshopverse.core.state.UiState;
+import com.averonlabs.eshopverse.core.ui.view.StateContainerView;
 import com.averonlabs.eshopverse.databinding.FragmentOrderDetailBinding;
 
 /**
@@ -55,7 +56,7 @@ public class OrderDetailFragment extends Fragment {
             }
         }
 
-        viewModel = new ViewModelProvider(this, new OrderViewModelFactory()).get(OrderDetailViewModel.class);
+        viewModel = new ViewModelProvider(this, new OrderViewModelFactory(requireContext())).get(OrderDetailViewModel.class);
 
         lineAdapter = new OrderLineAdapter();
         binding.rvDetailItems.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -65,55 +66,66 @@ public class OrderDetailFragment extends Fragment {
         binding.rvDetailTimeline.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvDetailTimeline.setAdapter(timelineAdapter);
 
-        binding.stateContainer.setOnRetryClickListener(() -> {
-            if (orderId > 0) {
-                viewModel.loadOrder(orderId);
-            }
-        });
+        binding.stateContainerOrderDetail.setContentView(binding.scrollOrderDetailContent);
 
         observeViewModel();
 
         if (orderId > 0) {
             viewModel.loadOrder(orderId);
         } else {
-            binding.scrollContent.setVisibility(View.GONE);
-            binding.stateContainer.setVisibility(View.VISIBLE);
-            binding.stateContainer.showEmpty();
+            binding.stateContainerOrderDetail.setState(
+                    StateContainerView.State.EMPTY,
+                    getString(R.string.orders_not_found_message),
+                    null,
+                    null
+            );
         }
     }
 
     private void observeViewModel() {
         viewModel.getOrderState().observe(getViewLifecycleOwner(), this::renderOrderState);
 
-        viewModel.getAuthRequiredEvent().observe(getViewLifecycleOwner(), v -> {
-            NavController navController = NavHostFragment.findNavController(this);
-            Bundle args = new Bundle();
-            args.putInt("returnToNavId", R.id.nav_orders);
-            navController.navigate(R.id.nav_auth, args);
+        viewModel.getAuthRequiredEvent().observe(getViewLifecycleOwner(), event -> {
+            if (event != null && event.getContentIfNotHandled() != null) {
+                NavController navController = NavHostFragment.findNavController(this);
+                Bundle args = new Bundle();
+                args.putInt("returnToNavId", R.id.nav_orders);
+                navController.navigate(R.id.nav_auth, args);
+            }
         });
     }
 
     private void renderOrderState(@Nullable UiState<Order> state) {
         if (state == null) return;
 
-        if (state.isLoading()) {
-            binding.scrollContent.setVisibility(View.GONE);
-            binding.stateContainer.setVisibility(View.VISIBLE);
-            binding.stateContainer.showLoading();
-        } else if (state.isEmpty()) {
-            // Not-found or not-owned order state
-            binding.scrollContent.setVisibility(View.GONE);
-            binding.stateContainer.setVisibility(View.VISIBLE);
-            binding.stateContainer.showEmpty();
-        } else if (state.isError()) {
-            binding.scrollContent.setVisibility(View.GONE);
-            binding.stateContainer.setVisibility(View.VISIBLE);
-            int msgRes = state.getErrorMessageRes() != 0 ? state.getErrorMessageRes() : R.string.orders_error_heading;
-            binding.stateContainer.showError(getString(msgRes));
-        } else if (state.isSuccess() && state.getData() != null) {
-            binding.stateContainer.setVisibility(View.GONE);
-            binding.scrollContent.setVisibility(View.VISIBLE);
-            bindOrderDetails(state.getData());
+        switch (state.getStatus()) {
+            case LOADING:
+                binding.stateContainerOrderDetail.setState(StateContainerView.State.LOADING, null, null, null);
+                break;
+            case EMPTY:
+                // Not-found or not-owned order state
+                binding.stateContainerOrderDetail.setState(
+                        StateContainerView.State.EMPTY,
+                        getString(R.string.orders_not_found_message),
+                        null,
+                        null
+                );
+                break;
+            case ERROR:
+                int msgRes = state.getMessageRes() != 0 ? state.getMessageRes() : R.string.orders_error_heading;
+                binding.stateContainerOrderDetail.setState(
+                        StateContainerView.State.ERROR,
+                        getString(msgRes),
+                        state.isRetryable() ? getString(R.string.order_retry_button) : null,
+                        state.isRetryable() ? () -> viewModel.loadOrder(orderId) : null
+                );
+                break;
+            case CONTENT:
+                binding.stateContainerOrderDetail.setState(StateContainerView.State.CONTENT, null, null, null);
+                if (state.getData() != null) {
+                    bindOrderDetails(state.getData());
+                }
+                break;
         }
     }
 
@@ -139,12 +151,12 @@ public class OrderDetailFragment extends Fragment {
         // Shipping address
         ShippingAddress address = order.getShippingAddress();
         if (address != null) {
-            binding.tvDetailShippingName.setText(address.getFullName());
+            binding.tvDetailShippingName.setText(address.getRecipientName());
             String addrText = address.getLine1();
             if (address.getLine2() != null && !address.getLine2().trim().isEmpty()) {
                 addrText += ", " + address.getLine2();
             }
-            addrText += "\n" + address.getCity() + ", " + address.getState() + " " + address.getPostalCode() + ", " + address.getCountry();
+            addrText += "\n" + address.getCity() + ", " + address.getRegion() + " " + address.getPostalCode() + ", " + address.getCountry();
             binding.tvDetailShippingAddress.setText(addrText);
         }
 

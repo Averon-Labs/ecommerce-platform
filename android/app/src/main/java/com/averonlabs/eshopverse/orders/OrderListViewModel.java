@@ -10,7 +10,7 @@ import com.averonlabs.eshopverse.R;
 import com.averonlabs.eshopverse.core.model.OrderSummary;
 import com.averonlabs.eshopverse.core.model.Pagination;
 import com.averonlabs.eshopverse.core.net.PagedResponse;
-import com.averonlabs.eshopverse.core.state.SingleLiveEvent;
+import com.averonlabs.eshopverse.core.state.Event;
 import com.averonlabs.eshopverse.core.state.UiState;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class OrderListViewModel extends ViewModel {
     private final OrderRepository repository;
 
     private final MutableLiveData<UiState<List<OrderSummary>>> ordersState = new MutableLiveData<>();
-    private final SingleLiveEvent<Void> authRequiredEvent = new SingleLiveEvent<>();
+    private final MutableLiveData<Event<Boolean>> authRequiredEvent = new MutableLiveData<>();
 
     private final List<OrderSummary> currentOrders = new ArrayList<>();
     private int currentPage = 1;
@@ -40,7 +40,7 @@ public class OrderListViewModel extends ViewModel {
         return ordersState;
     }
 
-    public LiveData<Void> getAuthRequiredEvent() {
+    public LiveData<Event<Boolean>> getAuthRequiredEvent() {
         return authRequiredEvent;
     }
 
@@ -83,7 +83,7 @@ public class OrderListViewModel extends ViewModel {
                 if (currentOrders.isEmpty()) {
                     ordersState.setValue(UiState.empty());
                 } else {
-                    ordersState.setValue(UiState.success(new ArrayList<>(currentOrders)));
+                    ordersState.setValue(UiState.content(new ArrayList<>(currentOrders)));
                 }
             }
 
@@ -91,8 +91,8 @@ public class OrderListViewModel extends ViewModel {
             public void onError(int httpCode, @Nullable String errorCode, @NonNull String message) {
                 isLoading = false;
                 if (httpCode == 401 || "UNAUTHENTICATED".equals(errorCode)) {
-                    authRequiredEvent.call();
-                    ordersState.setValue(UiState.error(R.string.error_unauthorized, false));
+                    authRequiredEvent.setValue(new Event<>(true));
+                    ordersState.setValue(UiState.error(R.string.error_unauthenticated, false));
                 } else {
                     ordersState.setValue(UiState.error(R.string.orders_error_heading, true));
                 }

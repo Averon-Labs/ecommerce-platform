@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.averonlabs.eshopverse.R;
 import com.averonlabs.eshopverse.core.model.Order;
-import com.averonlabs.eshopverse.core.state.SingleLiveEvent;
+import com.averonlabs.eshopverse.core.state.Event;
 import com.averonlabs.eshopverse.core.state.UiState;
 
 /**
@@ -20,7 +20,7 @@ public class OrderDetailViewModel extends ViewModel {
     private final OrderRepository repository;
 
     private final MutableLiveData<UiState<Order>> orderState = new MutableLiveData<>();
-    private final SingleLiveEvent<Void> authRequiredEvent = new SingleLiveEvent<>();
+    private final MutableLiveData<Event<Boolean>> authRequiredEvent = new MutableLiveData<>();
 
     public OrderDetailViewModel(@NonNull OrderRepository repository) {
         this.repository = repository;
@@ -30,7 +30,7 @@ public class OrderDetailViewModel extends ViewModel {
         return orderState;
     }
 
-    public LiveData<Void> getAuthRequiredEvent() {
+    public LiveData<Event<Boolean>> getAuthRequiredEvent() {
         return authRequiredEvent;
     }
 
@@ -40,7 +40,7 @@ public class OrderDetailViewModel extends ViewModel {
         repository.getOrder(orderId, new OrderRepository.OrderCallback<Order>() {
             @Override
             public void onSuccess(@NonNull Order order) {
-                orderState.setValue(UiState.success(order));
+                orderState.setValue(UiState.content(order));
             }
 
             @Override
@@ -49,8 +49,8 @@ public class OrderDetailViewModel extends ViewModel {
                     // Deliberately renders not-found state without distinguishing missing from not-owned
                     orderState.setValue(UiState.empty());
                 } else if (httpCode == 401 || "UNAUTHENTICATED".equals(errorCode)) {
-                    authRequiredEvent.call();
-                    orderState.setValue(UiState.error(R.string.error_unauthorized, false));
+                    authRequiredEvent.setValue(new Event<>(true));
+                    orderState.setValue(UiState.error(R.string.error_unauthenticated, false));
                 } else {
                     orderState.setValue(UiState.error(R.string.orders_error_heading, true));
                 }

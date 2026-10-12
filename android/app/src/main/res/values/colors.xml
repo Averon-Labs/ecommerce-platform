@@ -69,4 +69,10 @@
     <color name="success_color">#256B4B</color>
     <color name="warning_color">#8A5300</color>
     <color name="error_color">#B3261E</color>
+
+    <!-- Semantic aliases matching Design System tokens -->
+    <color name="surface_container_low">#FAFAFB</color>
+    <color name="border_hairline">#D8D8DE</color>
+    <color name="surface_white">#FFFFFF</color>
+    <color name="text_secondary_muted">#6B6B6B</color>
 </resources>

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.averonlabs.eshopverse.core.ui.view.StateContainerView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/state_container_order_detail"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/surface_container_low">
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/scroll_content"
+        android:id="@+id/scroll_order_detail_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true">
@@ -215,12 +216,10 @@
                             android:textAppearance="?attr/textAppearanceBodyMedium"
                             android:textColor="@color/text_secondary_muted" />
 
-                        <com.averonlabs.eshopverse.core.ui.view.PriceView
+                        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
                             android:id="@+id/tv_detail_subtotal"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:priceColor="@color/text_primary_ink"
-                            app:priceTextSize="14sp" />
+                            android:layout_height="wrap_content" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -237,12 +236,10 @@
                             android:textAppearance="?attr/textAppearanceBodyMedium"
                             android:textColor="@color/text_secondary_muted" />
 
-                        <com.averonlabs.eshopverse.core.ui.view.PriceView
+                        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
                             android:id="@+id/tv_detail_shipping"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:priceColor="@color/text_primary_ink"
-                            app:priceTextSize="14sp" />
+                            android:layout_height="wrap_content" />
                     </LinearLayout>
 
                     <View
@@ -265,12 +262,10 @@
                             android:textColor="@color/text_primary_ink"
                             android:textStyle="bold" />
 
-                        <com.averonlabs.eshopverse.core.ui.view.PriceView
+                        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
                             android:id="@+id/tv_detail_total"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:priceColor="@color/text_primary_ink"
-                            app:priceTextSize="18sp" />
+                            android:layout_height="wrap_content" />
                     </LinearLayout>
 
                 </LinearLayout>
@@ -318,14 +313,4 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.averonlabs.eshopverse.core.ui.view.StateContainerView
-        android:id="@+id/state_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        app:emptyIcon="@drawable/ic_empty_orders"
-        app:emptyMessage="@string/orders_not_found_message"
-        app:emptyTitle="@string/orders_not_found_heading"
-        app:errorTitle="@string/orders_error_heading" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.averonlabs.eshopverse.core.ui.view.StateContainerView>

@@ -81,8 +81,8 @@ public class OrderAdapter extends ListAdapter<OrderSummary, OrderAdapter.OrderVi
         @Override
         public boolean areContentsTheSame(@NonNull OrderSummary oldItem, @NonNull OrderSummary newItem) {
             return oldItem.getReference().equals(newItem.getReference())
-                    && oldItem.getStatus() == newItem.getStatus()
-                    && oldItem.getPaymentStatus() == newItem.getPaymentStatus()
+                    && oldItem.getStatus().equals(newItem.getStatus())
+                    && oldItem.getPaymentStatus().equals(newItem.getPaymentStatus())
                     && oldItem.getTotal().equals(newItem.getTotal());
         }
     };

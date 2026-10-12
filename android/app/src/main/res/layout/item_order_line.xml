@@ -30,14 +30,12 @@
         app:layout_constraintTop_toBottomOf="@id/tv_line_product_name"
         tools:text="Qty: 1 × $89.99" />
 
-    <com.averonlabs.eshopverse.core.ui.view.PriceView
+    <com.averonlabs.eshopverse.core.ui.view.PriceTextView
         android:id="@+id/tv_line_total"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:priceColor="@color/text_primary_ink"
-        app:priceTextSize="14sp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
