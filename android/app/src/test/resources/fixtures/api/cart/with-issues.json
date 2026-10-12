@@ -1,0 +1,38 @@
+{
+  "data": {
+    "items": [
+      {
+        "productId": 1,
+        "name": "Classic Leather Sneaker",
+        "imageUrl": "https://images.example.com/products/sneaker-1.jpg",
+        "unitPrice": "99.99",
+        "currency": "USD",
+        "quantity": 2,
+        "lineTotal": "199.98",
+        "inStock": true,
+        "availableQuantity": 10,
+        "priceChanged": true,
+        "unavailable": false
+      },
+      {
+        "productId": 3,
+        "name": "Vintage Denim Jacket",
+        "imageUrl": "https://images.example.com/products/jacket-1.jpg",
+        "unitPrice": "120.00",
+        "currency": "USD",
+        "quantity": 1,
+        "lineTotal": "120.00",
+        "inStock": false,
+        "availableQuantity": 0,
+        "priceChanged": false,
+        "unavailable": true
+      }
+    ],
+    "itemCount": 3,
+    "subtotal": "319.98",
+    "shipping": "5.00",
+    "total": "324.98",
+    "currency": "USD",
+    "hasIssues": true
+  }
+}

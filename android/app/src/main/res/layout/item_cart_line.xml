@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_cart_item"
+    style="@style/Widget.EShopVerse.Card.Product"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/spacing_sm">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/spacing_md">
+
+        <!-- Product Thumbnail -->
+        <ImageView
+            android:id="@+id/iv_cart_item_image"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_image_placeholder"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Product Name -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_cart_item_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_md"
+            android:layout_marginEnd="@dimen/spacing_xs"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+            android:textColor="@color/text_primary_ink"
+            app:layout_constraintEnd_toStartOf="@id/btn_cart_remove"
+            app:layout_constraintStart_toEndOf="@id/iv_cart_item_image"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Classic Leather Sneaker in Midnight Blue" />
+
+        <!-- Remove Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cart_remove"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="@dimen/touch_target_min"
+            android:layout_height="@dimen/touch_target_min"
+            android:contentDescription="@string/cart_cd_remove_item"
+            app:icon="@drawable/ic_remove_item"
+            app:iconTint="@color/text_secondary"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Unit Price -->
+        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
+            android:id="@+id/tv_cart_item_unit_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_md"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+            android:textColor="@color/text_secondary"
+            app:layout_constraintStart_toEndOf="@id/iv_cart_item_image"
+            app:layout_constraintTop_toBottomOf="@id/tv_cart_item_name"
+            tools:text="$89.99" />
+
+        <!-- Warnings Container -->
+        <LinearLayout
+            android:id="@+id/layout_cart_item_warnings"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_md"
+            android:layout_marginTop="@dimen/spacing_xs"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_cart_item_image"
+            app:layout_constraintTop_toBottomOf="@id/tv_cart_item_unit_price">
+
+            <!-- Price changed warning -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_cart_price_changed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                android:textColor="@color/m3_error"
+                android:visibility="gone"
+                tools:text="Price changed to $89.99"
+                tools:visibility="visible" />
+
+            <!-- Unavailable warning -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_cart_unavailable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                android:textColor="@color/m3_error"
+                android:visibility="gone"
+                tools:text="This item is currently unavailable."
+                tools:visibility="visible" />
+
+            <!-- Insufficient stock / limits notice -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tv_cart_stock_notice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                android:textColor="@color/m3_error"
+                android:visibility="gone"
+                tools:text="Only 2 available in stock." />
+
+        </LinearLayout>
+
+        <!-- Quantity Stepper -->
+        <com.averonlabs.eshopverse.core.ui.view.QuantityStepperView
+            android:id="@+id/stepper_cart_quantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/spacing_md"
+            android:layout_marginTop="@dimen/spacing_sm"
+            app:layout_constraintStart_toEndOf="@id/iv_cart_item_image"
+            app:layout_constraintTop_toBottomOf="@id/layout_cart_item_warnings" />
+
+        <!-- Line Total -->
+        <com.averonlabs.eshopverse.core.ui.view.PriceTextView
+            android:id="@+id/tv_cart_line_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+            android:textColor="@color/text_primary_ink"
+            app:layout_constraintBottom_toBottomOf="@id/stepper_cart_quantity"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/stepper_cart_quantity"
+            tools:text="$179.98" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

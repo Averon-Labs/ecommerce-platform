@@ -1,0 +1,12 @@
+{
+  "error": {
+    "code": "INSUFFICIENT_STOCK",
+    "message": "Requested quantity exceeds available stock",
+    "details": [
+      {
+        "field": "quantity",
+        "message": "Only 2 items remain in stock"
+      }
+    ]
+  }
+}

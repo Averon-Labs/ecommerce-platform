@@ -1,0 +1,38 @@
+{
+  "data": {
+    "items": [
+      {
+        "productId": 1,
+        "name": "Classic Leather Sneaker",
+        "imageUrl": "https://images.example.com/products/sneaker-1.jpg",
+        "unitPrice": "89.99",
+        "currency": "USD",
+        "quantity": 2,
+        "lineTotal": "179.98",
+        "inStock": true,
+        "availableQuantity": 10,
+        "priceChanged": false,
+        "unavailable": false
+      },
+      {
+        "productId": 2,
+        "name": "Canvas Tote Bag",
+        "imageUrl": "https://images.example.com/products/tote-1.jpg",
+        "unitPrice": "24.50",
+        "currency": "USD",
+        "quantity": 1,
+        "lineTotal": "24.50",
+        "inStock": true,
+        "availableQuantity": 5,
+        "priceChanged": false,
+        "unavailable": false
+      }
+    ],
+    "itemCount": 3,
+    "subtotal": "204.48",
+    "shipping": "5.00",
+    "total": "209.48",
+    "currency": "USD",
+    "hasIssues": false
+  }
+}
