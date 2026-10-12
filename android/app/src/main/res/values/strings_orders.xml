@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="orders_title">My Orders</string>
+    <string name="order_detail_title">Order Details</string>
+    <string name="orders_empty_heading">No orders yet</string>
+    <string name="orders_empty_message">When you place an order, it will show up here.</string>
+    <string name="orders_empty_action">Explore Products</string>
+    <string name="orders_error_heading">Unable to load orders</string>
+    <string name="orders_not_found_heading">Order not found</string>
+    <string name="orders_not_found_message">We could not find the requested order.</string>
+    <string name="order_reference_label">Order Reference</string>
+    <string name="order_date_label">Placed on</string>
+    <string name="order_status_label">Status</string>
+    <string name="order_payment_status_label">Payment Status</string>
+    <string name="order_items_heading">Items</string>
+    <string name="order_shipping_address_heading">Shipping Address</string>
+    <string name="order_summary_heading">Summary</string>
+    <string name="order_subtotal_label">Subtotal</string>
+    <string name="order_shipping_label">Shipping</string>
+    <string name="order_total_label">Total</string>
+    <string name="order_timeline_heading">Timeline</string>
+    <string name="order_retry_button">Try Again</string>
+
+    <!-- Status labels -->
+    <string name="order_status_pending_payment">Pending Payment</string>
+    <string name="order_status_confirmed">Confirmed</string>
+    <string name="order_status_processing">Processing</string>
+    <string name="order_status_shipped">Shipped</string>
+    <string name="order_status_delivered">Delivered</string>
+    <string name="order_status_cancelled">Cancelled</string>
+
+    <string name="payment_status_pending">Pending</string>
+    <string name="payment_status_completed">Completed</string>
+    <string name="payment_status_failed">Failed</string>
+    <string name="payment_status_refunded">Refunded</string>
+</resources>

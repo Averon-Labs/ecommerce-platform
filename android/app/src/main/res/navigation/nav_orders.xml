@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_orders"
-    app:startDestination="@id/ordersPlaceholderFragment">
+    app:startDestination="@id/orderListFragment">
 
     <argument
         android:name="orderId"
@@ -11,9 +11,24 @@
         app:argType="integer" />
 
     <fragment
-        android:id="@+id/ordersPlaceholderFragment"
-        android:name="com.averonlabs.eshopverse.shell.PlaceholderFragment"
-        android:label="@string/account_title"
-        tools:layout="@layout/fragment_placeholder" />
+        android:id="@+id/orderListFragment"
+        android:name="com.averonlabs.eshopverse.orders.OrderListFragment"
+        android:label="@string/orders_title"
+        tools:layout="@layout/fragment_order_list">
+        <action
+            android:id="@+id/action_orderList_to_orderDetail"
+            app:destination="@id/orderDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderDetailFragment"
+        android:name="com.averonlabs.eshopverse.orders.OrderDetailFragment"
+        android:label="@string/order_detail_title"
+        tools:layout="@layout/fragment_order_detail">
+        <argument
+            android:name="orderId"
+            android:defaultValue="-1"
+            app:argType="integer" />
+    </fragment>
 
 </navigation>
