@@ -5,6 +5,12 @@
     android:id="@+id/nav_checkout"
     app:startDestination="@id/shippingAddressFragment">
 
+    <argument
+        android:name="shippingAddressId"
+        android:defaultValue="@null"
+        app:argType="string"
+        app:nullable="true" />
+
     <fragment
         android:id="@+id/shippingAddressFragment"
         android:name="com.averonlabs.eshopverse.checkout.ShippingAddressFragment"
