@@ -1,33 +1,8 @@
 package com.averonlabs.eshopverse.shell;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
-import com.averonlabs.eshopverse.databinding.FragmentExploreBinding;
-
-public class ExploreFragment extends Fragment {
-
-    private FragmentExploreBinding binding;
-
-    @Override
-    public View onCreateView(
-            @NonNull LayoutInflater inflater,
-            @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState
-    ) {
-        binding = FragmentExploreBinding.inflate(inflater, container, false);
-        return binding.getRoot();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
+/**
+ * Shell adapter for the catalog explore destination defined in nav_main.xml.
+ * Delegates entirely to {@link com.averonlabs.eshopverse.catalog.fragment.ExploreFragment}.
+ */
+public class ExploreFragment extends com.averonlabs.eshopverse.catalog.fragment.ExploreFragment {
 }

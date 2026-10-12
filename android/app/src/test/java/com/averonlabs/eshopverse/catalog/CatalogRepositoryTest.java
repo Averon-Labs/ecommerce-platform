@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -101,7 +102,7 @@ public class CatalogRepositoryTest {
         // Verification of strict decimal money representation (no binary float/double)
         Money money = p1.getPriceMoney();
         assertEquals("89.99", money.toString());
-        assertEquals(8999L, money.getAmountInCents());
+        assertEquals(new BigDecimal("89.99"), money.getAmount());
 
         // Pagination metadata
         assertNotNull(response.getPagination());
@@ -196,8 +197,10 @@ public class CatalogRepositoryTest {
     @Test
     public void testCategoryNotFound422Mapping() throws Exception {
         String errorJson = "{\n" +
-                "  \"code\": \"CATEGORY_NOT_FOUND\",\n" +
-                "  \"message\": \"Category not found or archived\"\n" +
+                "  \"error\": {\n" +
+                "    \"code\": \"CATEGORY_NOT_FOUND\",\n" +
+                "    \"message\": \"Category not found or archived\"\n" +
+                "  }\n" +
                 "}";
 
         mockWebServer.enqueue(new MockResponse()
@@ -232,8 +235,10 @@ public class CatalogRepositoryTest {
     @Test
     public void testProductNotFound404Mapping() throws Exception {
         String errorJson = "{\n" +
-                "  \"code\": \"RESOURCE_NOT_FOUND\",\n" +
-                "  \"message\": \"Product not found\"\n" +
+                "  \"error\": {\n" +
+                "    \"code\": \"NOT_FOUND\",\n" +
+                "    \"message\": \"Product not found\"\n" +
+                "  }\n" +
                 "}";
 
         mockWebServer.enqueue(new MockResponse()
@@ -261,7 +266,7 @@ public class CatalogRepositoryTest {
         assertTrue(errorRef.get() instanceof ApiException);
         ApiException apiException = (ApiException) errorRef.get();
         assertEquals(404, apiException.getHttpStatus());
-        assertEquals(ApiErrorCodes.RESOURCE_NOT_FOUND, apiException.getCode());
+        assertEquals(ApiErrorCodes.NOT_FOUND, apiException.getCode());
     }
 
     @Test

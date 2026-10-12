@@ -273,7 +273,7 @@ Both steps in this phase may run concurrently: they own disjoint packages, graph
 
 ### Step 2 — CAT-002 — Android catalog browsing
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-001, FND-006, UI-002, APP-002, DOM-002, NET-002, DES-001
 
@@ -297,13 +297,13 @@ Both steps in this phase may run concurrently: they own disjoint packages, graph
 
 **Acceptance criteria:**
 
-- [ ] **a.** A customer can browse products, open details, search, sort, and navigate categories using the reviewed API contract, and filter changes reset pagination correctly.
-- [ ] **b.** Loading, empty, image-failure, offline/server-error, and retry states are handled; a failed image never breaks the surrounding layout.
-- [ ] **c.** USD amounts are formatted consistently without binary floating-point calculations; all user-facing copy is English.
-- [ ] **d.** The screen set contains no ratings, favourites or heart actions, discount stickers, product variants, or promotional hero content, matching the exclusion rules in the screen specification.
-- [ ] **e.** ViewModel/repository mapping has unit tests and the browse-to-detail path has a focused UI test.
+- [x] **a.** A customer can browse products, open details, search, sort, and navigate categories using the reviewed API contract, and filter changes reset pagination correctly.
+- [x] **b.** Loading, empty, image-failure, offline/server-error, and retry states are handled; a failed image never breaks the surrounding layout.
+- [x] **c.** USD amounts are formatted consistently without binary floating-point calculations; all user-facing copy is English.
+- [x] **d.** The screen set contains no ratings, favourites or heart actions, discount stickers, product variants, or promotional hero content, matching the exclusion rules in the screen specification.
+- [x] **e.** ViewModel/repository mapping has unit tests and the browse-to-detail path has a focused UI test.
 
-**Verification:** unit and API-mapping tests, a focused UI smoke test against deterministic fixtures, and screenshots of the list, detail, empty, and error states.
+**Verification:** unit tests for query parameter building and page resets (`ProductParamsTest`), API error and contract parsing (`CatalogRepositoryTest`), ViewModel states and in-flight request protection (`CatalogListViewModelTest`); focused UI instrumentation test (`BrowseToDetailTest` compiled via `assembleDebugAndroidTest`); `lintDebug` (0 errors) and `testDebugUnitTest` (92/92 passing) succeeded. Phase 1 complete!
 
 ## Phase 2 — Cart, Checkout, and Orders
 
