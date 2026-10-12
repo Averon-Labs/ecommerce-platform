@@ -250,11 +250,12 @@ public class AuthRepository {
      * On success, local session is cleared since server invalidates existing tokens.
      */
     public void confirmPasswordReset(
+            @NonNull String email,
             @NonNull String token,
             @NonNull String newPassword,
             @NonNull AuthCallback<Void> callback
     ) {
-        PasswordResetConfirmRequest request = new PasswordResetConfirmRequest(token, newPassword);
+        PasswordResetConfirmRequest request = new PasswordResetConfirmRequest(email, token, newPassword);
         apiRoutes.confirmPasswordReset(request).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(
@@ -277,6 +278,14 @@ public class AuthRepository {
                 callback.onError(t);
             }
         });
+    }
+
+    public void confirmPasswordReset(
+            @NonNull String token,
+            @NonNull String newPassword,
+            @NonNull AuthCallback<Void> callback
+    ) {
+        confirmPasswordReset("", token, newPassword, callback);
     }
 
     public TokenStore getTokenStore() {
