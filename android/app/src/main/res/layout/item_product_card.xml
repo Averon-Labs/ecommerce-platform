@@ -18,7 +18,7 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="140dp">
+            android:layout_height="148dp">
 
             <ImageView
                 android:id="@+id/iv_product_image"
@@ -43,7 +43,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="@dimen/spacing_sm">
+            android:paddingHorizontal="@dimen/spacing_sm"
+            android:paddingVertical="@dimen/spacing_sm">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_product_name"
@@ -52,7 +53,7 @@
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:minLines="2"
-                android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
                 android:textColor="@color/text_primary_ink"
                 tools:text="Classic Leather Sneaker" />
 

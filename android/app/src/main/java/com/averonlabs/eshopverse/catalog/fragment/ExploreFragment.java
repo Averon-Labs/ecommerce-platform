@@ -149,10 +149,9 @@ public class ExploreFragment extends Fragment {
             @NonNull
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                Chip chip = new Chip(parent.getContext());
-                chip.setCheckable(true);
-                chip.setMinHeight(getResources().getDimensionPixelSize(R.dimen.touch_target_min));
-                return new RecyclerView.ViewHolder(chip) {};
+                View chipView = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.item_category_chip, parent, false);
+                return new RecyclerView.ViewHolder(chipView) {};
             }
 
             @Override

@@ -4,6 +4,8 @@
     style="@style/Widget.EShopVerse.Chip.Filter"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="@dimen/spacing_xs"
+    android:layout_marginEnd="@dimen/spacing_sm"
+    android:layout_marginTop="@dimen/spacing_xs"
+    android:layout_marginBottom="@dimen/spacing_xs"
     android:checkable="true"
     android:minHeight="@dimen/touch_target_min" />
