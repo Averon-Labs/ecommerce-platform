@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/spacing_xs"
+    android:paddingBottom="@dimen/spacing_xs">
+
+    <ImageView
+        android:id="@+id/iv_review_item_image"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_image_placeholder" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/spacing_sm"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_review_item_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+            android:textColor="@color/text_primary_ink"
+            tools:text="Classic Leather Sneaker" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_review_item_qty_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+            android:textColor="@color/text_secondary"
+            tools:text="Qty: 2 × $89.99" />
+
+    </LinearLayout>
+
+    <com.averonlabs.eshopverse.core.ui.view.PriceTextView
+        android:id="@+id/tv_review_item_line_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+        android:textColor="@color/text_primary_ink"
+        tools:text="$179.98" />
+
+</LinearLayout>

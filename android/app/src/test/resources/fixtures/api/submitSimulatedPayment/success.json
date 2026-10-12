@@ -1,9 +1,17 @@
 {
   "data": {
     "orderId": 5001,
-    "paymentId": 9001,
-    "status": "completed",
+    "orderReference": "ESV-005001",
     "orderStatus": "confirmed",
-    "message": "Demo payment simulation approved"
+    "paymentStatus": "completed",
+    "simulated": true,
+    "payment": {
+      "method": "demo",
+      "status": "completed",
+      "amount": "94.99",
+      "currency": "USD",
+      "transactionId": "DEMO-ABCD1234EF56",
+      "createdAt": "2026-10-10T12:05:00Z"
+    }
   }
 }

@@ -3,18 +3,42 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_checkout"
-    app:startDestination="@id/checkoutPlaceholderFragment">
-
-    <argument
-        android:name="shippingAddressId"
-        android:defaultValue="@null"
-        app:argType="string"
-        app:nullable="true" />
+    app:startDestination="@id/shippingAddressFragment">
 
     <fragment
-        android:id="@+id/checkoutPlaceholderFragment"
-        android:name="com.averonlabs.eshopverse.shell.PlaceholderFragment"
-        android:label="@string/cart_title"
-        tools:layout="@layout/fragment_placeholder" />
+        android:id="@+id/shippingAddressFragment"
+        android:name="com.averonlabs.eshopverse.checkout.ShippingAddressFragment"
+        android:label="@string/checkout_shipping_address_title"
+        tools:layout="@layout/fragment_shipping_address">
+        <action
+            android:id="@+id/action_shipping_to_review"
+            app:destination="@id/orderReviewFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderReviewFragment"
+        android:name="com.averonlabs.eshopverse.checkout.OrderReviewFragment"
+        android:label="@string/checkout_review_title"
+        tools:layout="@layout/fragment_order_review">
+        <action
+            android:id="@+id/action_review_to_payment"
+            app:destination="@id/paymentChoiceFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/paymentChoiceFragment"
+        android:name="com.averonlabs.eshopverse.checkout.PaymentChoiceFragment"
+        android:label="@string/checkout_payment_title"
+        tools:layout="@layout/fragment_payment_choice">
+        <action
+            android:id="@+id/action_payment_to_result"
+            app:destination="@id/orderResultFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderResultFragment"
+        android:name="com.averonlabs.eshopverse.checkout.OrderResultFragment"
+        android:label="@string/checkout_result_title"
+        tools:layout="@layout/fragment_order_result" />
 
 </navigation>

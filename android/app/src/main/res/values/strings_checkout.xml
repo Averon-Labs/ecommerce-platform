@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Checkout Flow Titles -->
+    <string name="checkout_title">Checkout</string>
+    <string name="checkout_shipping_address_title">Shipping Address</string>
+    <string name="checkout_review_title">Review Order</string>
+    <string name="checkout_payment_title">Simulated Payment</string>
+    <string name="checkout_result_title">Order Confirmation</string>
+
+    <!-- Address Form (M-11) -->
+    <string name="checkout_address_notice">Your address is used only for this order. Saved addresses are not stored.</string>
+    <string name="checkout_label_recipient_name">Full Name</string>
+    <string name="checkout_hint_recipient_name">e.g. John Doe</string>
+    <string name="checkout_label_line1">Address Line 1</string>
+    <string name="checkout_hint_line1">Street address, P.O. box</string>
+    <string name="checkout_label_line2">Address Line 2 (Optional)</string>
+    <string name="checkout_hint_line2">Apartment, suite, unit, building</string>
+    <string name="checkout_label_city">City</string>
+    <string name="checkout_hint_city">e.g. New York</string>
+    <string name="checkout_label_region">State / Province / Region</string>
+    <string name="checkout_hint_region">e.g. NY</string>
+    <string name="checkout_label_postal_code">Postal Code</string>
+    <string name="checkout_hint_postal_code">e.g. 10001</string>
+    <string name="checkout_label_country">Country Code (2 Letters)</string>
+    <string name="checkout_hint_country">e.g. US</string>
+    <string name="checkout_action_continue_to_review">Continue to Review</string>
+
+    <!-- Address Validation Errors -->
+    <string name="checkout_error_recipient_name_required">Full name is required (max 100 characters).</string>
+    <string name="checkout_error_line1_required">Address line 1 is required (max 150 characters).</string>
+    <string name="checkout_error_line2_too_long">Address line 2 must not exceed 150 characters.</string>
+    <string name="checkout_error_city_required">City is required (max 60 characters).</string>
+    <string name="checkout_error_region_required">State / Region is required (max 60 characters).</string>
+    <string name="checkout_error_postal_code_required">Postal code is required (max 20 characters).</string>
+    <string name="checkout_error_country_invalid">Country must be a 2-letter uppercase ISO code (e.g. US).</string>
+
+    <!-- Review Screen (M-12) -->
+    <string name="checkout_review_items_heading">Order Items</string>
+    <string name="checkout_review_shipping_heading">Shipping To</string>
+    <string name="checkout_review_summary_heading">Order Summary</string>
+    <string name="checkout_subtotal_label">Subtotal</string>
+    <string name="checkout_shipping_label">Shipping</string>
+    <string name="checkout_total_label">Total</string>
+    <string name="checkout_action_proceed_to_payment">Proceed to Payment</string>
+    <string name="checkout_error_loading_quote">Unable to calculate order quote. Please try again.</string>
+
+    <!-- Payment Choice Screen (M-13) -->
+    <string name="checkout_payment_disclaimer">This is a simulated demo payment. No real credit card, bank, or payment credential will ever be collected or charged.</string>
+    <string name="checkout_payment_amount_due">Amount Due:</string>
+    <string name="checkout_action_simulate_success">Simulate Payment Success</string>
+    <string name="checkout_action_simulate_failure">Simulate Payment Failure</string>
+
+    <!-- Order Result Screen (M-14) -->
+    <string name="checkout_result_success_heading">Thank you for your order!</string>
+    <string name="checkout_result_success_message">Your order has been placed and confirmed.</string>
+    <string name="checkout_result_order_number_label">Order Reference:</string>
+    <string name="checkout_result_status_label">Order Status:</string>
+    <string name="checkout_result_total_label">Total Paid:</string>
+    <string name="checkout_result_failure_heading">Payment Declined</string>
+    <string name="checkout_result_failure_message">The simulated payment was declined by the issuer. Your order is pending payment.</string>
+    <string name="checkout_result_ambiguous_heading">Order Status Pending</string>
+    <string name="checkout_result_ambiguous_message">A network timeout occurred while confirming payment. Checking latest status from server…</string>
+    <string name="checkout_action_retry_payment">Try Payment Again</string>
+    <string name="checkout_action_check_status">Check Order Status</string>
+    <string name="checkout_action_continue_shopping">Continue Shopping</string>
+    <string name="checkout_action_view_orders">View My Orders</string>
+
+    <!-- Conflict & Error Messages -->
+    <string name="checkout_error_cart_empty">Your cart is empty. Please add items before checking out.</string>
+    <string name="checkout_error_insufficient_stock">One or more items in your cart exceed available stock.</string>
+    <string name="checkout_error_product_unavailable">One or more items in your cart are no longer available.</string>
+    <string name="checkout_error_idempotency_conflict">This payment attempt was already submitted. Starting a new attempt.</string>
+    <string name="checkout_error_generic">An unexpected error occurred during checkout. Please try again.</string>
+</resources>
