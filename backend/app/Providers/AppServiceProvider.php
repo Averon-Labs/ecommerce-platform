@@ -63,5 +63,11 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('public-read', function (Request $request) {
             return Limit::perMinute(120)->by($request->ip());
         });
+
+        // x-rate-limit-classes: admin-login { limit: 10, window: 1m, key: ip }.
+        RateLimiter::for('admin-login', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip());
+        });
+
     }
 }

@@ -13,21 +13,10 @@
 |
 */
 
+use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PasswordResetController;
-use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
-
-// --------------------------------------------------------------- Catalog (public)
-
-Route::get('categories', [CategoryController::class, 'index'])
-    ->middleware('throttle:public-read');
-Route::get('products', [ProductController::class, 'index'])
-    ->middleware('throttle:public-read');
-Route::get('products/{productId}', [ProductController::class, 'show'])
-    ->whereNumber('productId')
-    ->middleware('throttle:public-read');
 
 // ------------------------------------------------------------- Customer auth
 
@@ -47,3 +36,15 @@ Route::prefix('auth')->group(function (): void {
     });
 });
 
+// ----------------------------------------------------------- Admin session (AUTH-003)
+
+Route::prefix('admin')->group(function (): void {
+    Route::get('auth/csrf', [AdminAuthController::class, 'csrf']);
+    Route::post('auth/login', [AdminAuthController::class, 'login'])
+        ->middleware('throttle:admin-login');
+
+    Route::middleware('auth:sanctum')->group(function (): void {
+        Route::get('auth/session', [AdminAuthController::class, 'session']);
+        Route::post('auth/logout', [AdminAuthController::class, 'logout']);
+    });
+});

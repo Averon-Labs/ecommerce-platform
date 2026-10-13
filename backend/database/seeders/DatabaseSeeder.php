@@ -17,7 +17,8 @@ use Illuminate\Database\Seeder;
  * data appears anywhere in this data set.
  *
  * Seeding is idempotent (keyed on category name / product SKU), so it is
- * safe to re-run against an existing development database.
+ * safe to re-run against an existing development database. AUTH-003 adds
+ * the local/demo-only administrator via AdminUserSeeder.
  */
 class DatabaseSeeder extends Seeder
 {
@@ -30,6 +31,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->seedCatalog();
         $this->seedTestCustomer();
+        $this->call(AdminUserSeeder::class);
     }
 
     /**
