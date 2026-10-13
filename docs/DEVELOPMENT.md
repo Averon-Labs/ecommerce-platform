@@ -118,16 +118,30 @@ Android Phase 0 also adds the layers the screen tasks depend on; their prerequis
 | Framework | **Laravel 13** — skeleton `laravel/laravel` v13.11.0, locked `laravel/framework` **v13.35.0** in `backend/composer.lock` |
 | Test runner | **PHPUnit 12.5.38** through `php artisan test` |
 | Style/static check | **Laravel Pint 1.32.1** (PSR-12 + Laravel preset), no `pint.json` overrides |
-| Database | **Hosted MySQL** (`utf8mb4`, `utf8mb4_unicode_ci`, strict mode) — no local MySQL. Two databases on the same server: `eshopverse_dev` for development and `eshopverse_test` as the disposable test database |
+| Database | **MySQL 8.4** (`utf8mb4`, `utf8mb4_unicode_ci`, strict mode) — local zip-based MySQL 8.4.0 on `127.0.0.1:3306` (no admin rights, no Windows service). Two databases on the same server: `eshopverse_dev` for development and `eshopverse_test` as the disposable test database. A hosted MySQL 8+ service over TLS replaces it by filling the same `DB_*` values in `.env` |
 | Node.js / Vite | Not required for API work. `package.json` and `vite.config.js` exist in the skeleton but only build frontend assets; no backend command below depends on Node |
 
-**Prerequisites:** PHP 8.4 with the extensions above on `PATH`, Composer 2 on `PATH`, and a reachable hosted MySQL server with the two databases below.
+**Prerequisites:** PHP 8.4 with the extensions above on `PATH`, Composer 2 on `PATH`, and a reachable MySQL 8.0+ server with the two databases below. The verified workflow is the local zip-based MySQL 8.4 described under *Local MySQL setup* below.
 
 ```sql
 CREATE DATABASE eshopverse_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE eshopverse_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 -- grant the application user ALL privileges on both databases only.
 ```
+
+**Local MySQL setup (verified 2026-10-12):** the documented development database is a local
+zip-based MySQL 8.4 — it needs no admin rights and no Windows service:
+
+1. Download the MySQL 8.x community archive (`mysql-8.x-winx64.zip`) and extract it anywhere
+   (example: `C:\tools\mysql-8.4`).
+2. `bin\mysqld.exe --no-defaults --initialize-insecure --basedir=<dir> --datadir=<dir>\data`
+3. Start it: `bin\mysqld.exe --no-defaults --basedir=<dir> --datadir=<dir>\data --port=3306 --bind-address=127.0.0.1`
+4. Create the two databases and one application user granted on both databases only (SQL above);
+   store the generated password only in the git-ignored `.env`.
+5. Point `.env` at `DB_HOST=127.0.0.1`, `DB_PORT=3306`, `DB_DATABASE=eshopverse_dev`.
+
+A hosted MySQL 8+ service is a drop-in replacement: fill the same `DB_*` values in `.env` and add
+`MYSQL_ATTR_SSL_CA` (see *TLS* below). Do not use a hosted service older than MySQL 8.0.
 
 **Backend commands** (PowerShell, run from `backend/`):
 
@@ -136,7 +150,7 @@ CREATE DATABASE eshopverse_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
 composer install
 
 # First-time setup
-Copy-Item .env.example .env     # then fill DB_HOST / DB_PORT / DB_DATABASE / DB_USERNAME / DB_PASSWORD / MYSQL_ATTR_SSL_CA
+Copy-Item .env.example .env     # then fill DB_HOST / DB_PORT / DB_DATABASE / DB_USERNAME / DB_PASSWORD (MYSQL_ATTR_SSL_CA only for hosted TLS)
 php artisan key:generate
 
 # Migrations (development database from .env)
@@ -163,36 +177,69 @@ php artisan serve        # http://127.0.0.1:8000  (health: GET /up)
 - Tests are hard-wired in `phpunit.xml` to `DB_CONNECTION=mysql` and `DB_DATABASE=eshopverse_test`. Never point them at `eshopverse_dev`.
 - `RefreshDatabase` wraps each test in a transaction after a one-time `migrate:fresh`, so test data never survives a run.
 
-**Verification status (2026-10-11)** — executed on this checkout, output recorded:
+**Verification status (re-verified 2026-10-12)** — executed on this checkout, output recorded:
 
 | Command | Result |
 |---------|--------|
-| `composer install` | ✔ exit 0 — 79 packages from `composer.lock` |
+| `composer install` | ✔ exit 0 — 79 packages from `composer.lock` (2026-10-11; `vendor/` unchanged) |
 | setup (`Copy-Item .env.example .env`, `php artisan key:generate`) | ✔ the skeleton's `post-root-package-install` created `.env` from `.env.example` and `key:generate` reported `Application key set successfully`; no secret is checked in |
 | `composer validate --strict` | ✔ `./composer.json is valid` |
 | `composer audit` | ✔ `No security vulnerability advisories found` |
-| `vendor\bin\pint --test` | ✔ `{"result":"passed"}` |
-| `php artisan migrate` | ✔ 3 migrations ran on the hosted `eshopverse_dev` (MySQL **8.4.11**) |
+| `php artisan migrate` | ✔ 3 migrations ran on `eshopverse_dev` (local MySQL **8.4.0**, 2026-10-12) |
 | `php artisan migrate:status` | ✔ all 3 `[1] Ran` |
 | `php artisan test` | ✔ 5 tests, 8 assertions, 0 failures (runs on `eshopverse_test`) |
+| `vendor\bin\pint --test` | ✔ `{"result":"passed"}` |
 | `php artisan serve` | ✔ `GET /up` → 200, `GET /api/v1/definitely-not-a-route` → 404 |
-| TLS connection | ✔ TLS 1.3, `TLS_AES_256_GCM_SHA384`, certificate verified against `MYSQL_ATTR_SSL_CA` |
 
-The development database used for this run is a **hosted MySQL service (Aiven Free tier)** —
-remote, no local MySQL. Host and credentials live only in `.env`.
+The development database for this run is the **local zip-based MySQL 8.4** workflow described
+above. The original 2026-10-11 run used a hosted MySQL 8.4.11 service over verified TLS 1.3, but
+the free tier was deleted by the provider after inactivity, so every database-dependent command
+was re-verified locally on 2026-10-12. Host and credentials live only in `.env`.
 
-**TLS (verified, 2026-10-11):** `docs/SECURITY.md` requires encrypted database connections, so the
-hosted connection runs over **TLS 1.3** with cipher `TLS_AES_256_GCM_SHA384` and the server
-certificate is **verified** against the provider's project CA:
+**TLS:** `docs/SECURITY.md` requires encrypted database connections where the hosting provider
+supports it. The local workflow binds to `127.0.0.1` loopback only — traffic never leaves the
+machine, so no TLS is involved. When a hosted MySQL 8+ service replaces it:
 
 - Download `ca.pem` from the MySQL service console (the development copy lives outside the repository).
 - Set `MYSQL_ATTR_SSL_CA=<path to ca.pem>` in `.env`; `config/database.php` then enables TLS and
-  sets `MYSQL_ATTR_SSL_VERIFY_SERVER_CERT`, so an unencrypted or unauthenticated connection fails
-  instead of silently falling back to plaintext.
-- Without `MYSQL_ATTR_SSL_CA` the connection is plaintext. That is intentionally loud in this
-  document: never run migrations or tests in that state.
+  sets `MYSQL_ATTR_SSL_VERIFY_SERVER_CERT`, so an unauthenticated connection fails instead of
+  silently falling back to plaintext.
+- Never use a hosted MySQL older than 8.0, or one that offers no TLS, for development credentials.
 
-> The OpenAPI contract draft lives at [`openapi.yaml`](openapi.yaml). It must be reviewed and accepted by the API owner before any endpoint, client integration, or business migration is implemented.
+> The OpenAPI contract lives at [`openapi.yaml`](openapi.yaml); it was reviewed and accepted by the API owner on 2026-10-12 (FND-004). Implement endpoints, client integration, and business migrations only as it describes, and change it first through the contract-change process.
+
+### OpenAPI contract lint (FND-004)
+
+The contract is validated with the pinned Redocly CLI (the toolchain decision for FND-004; Node.js 24 is already required for the Android toolchain):
+
+```bash
+npx --yes "@redocly/cli@2.62.1" lint docs/openapi.yaml
+```
+
+Verified output (2026-10-12, exit code 0):
+
+```text
+No configurations were provided -- using built in recommended configuration by default.
+
+validating docs\openapi.yaml...
+docs\openapi.yaml:
+  46:10  warning  no-server-example.com  Server `url` should not point to example.com or localhost.
+  48:10  warning  no-server-example.com  Server `url` should not point to example.com or localhost.
+
+docs\openapi.yaml: validated in 400ms
+
+Woohoo! Your API description is valid. 🎉
+You have 2 warnings.
+```
+
+Result: **0 errors, 2 warnings, exit 0.** Both warnings are intentional, understood, and accepted:
+
+- `46:10` — `http://localhost:8000/api/v1`, the local Laravel development server.
+- `48:10` — `http://localhost:8081/api/v1`, the local contract mock used by Android development before the API exists.
+
+They document local development servers on purpose; the production-like origin is the separately labelled `https://api.example.test/api/v1` placeholder whose replacement is recorded as decision OPEN-1 (closed 2026-10-11). These two warnings are the complete accepted baseline: any new warning or error is a regression and must be fixed.
+
+**Do not add a `redocly.yaml` (or any Redocly configuration file) to silence, downgrade, or exclude rules.** The warnings stay visible as living documentation of the accepted state.
 
 ### Admin Dashboard
 

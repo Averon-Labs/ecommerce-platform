@@ -30,19 +30,19 @@ Deliver a polished, end-to-end, single-store shopping demo for an international 
 
 ## Verified starting point
 
-Last reviewed: 2026-10-09. Recheck source and Git state before starting each Task.
+Last reviewed: 2026-10-13. Recheck source and Git state before starting each Task.
 
 ## Authority and component scope
 
 This roadmap is for explicitly cross-component work and final project/release validation. It does not replace or extend a component's execution backlog. When an owner assigns Android work, use `ANDROID_ROADMAP.md` as the sole source for Android tasks, statuses, scopes, acceptance criteria, and progress reports; similarly, use `BACKEND_ROADMAP.md` or `ADMIN_ROADMAP.md` for those components. Do not report another component's open tasks as work remaining in the assigned component. A dependency owned by another component can block a task; report only that dependency and its effect on the assigned task. Review this project roadmap when coordinating cross-component work or deciding whether the full project/release gate is met.
 
 - Android has a regenerated Java/XML Gradle scaffold: namespace/application ID com.averonlabs.eshopverse, compile SDK 36.1, minSdk 25, targetSdk 36, Java 11 source/target, AGP 9.2.1, Gradle 9.4.1. The complete Phase 0-2 dependency set (Material 1.14.0, AndroidX libraries, Retrofit, OkHttp, Glide, test dependencies) was declared in FND-006. Verified build/lint/test commands are documented in `docs/DEVELOPMENT.md`.
-- Android Phase 0 was expanded by PLAN-005 with six cross-cutting foundation steps (FND-006, UI-002, APP-002, DOM-002, DATA-002, NET-002) that must complete before the Phase 1 screen tasks; `docs/openapi.yaml` now exists as a draft for FND-004 owner review, and contract-derived fixtures plus a local mock server let the Android tasks be verified without a running backend.
+- Android Phase 0 was expanded by PLAN-005 with six cross-cutting foundation steps (FND-006, UI-002, APP-002, DOM-002, DATA-002, NET-002) that must complete before the Phase 1 screen tasks; `docs/openapi.yaml` is the accepted contract (FND-004, accepted 2026-10-12), and contract-derived fixtures plus a local mock server let the Android tasks be verified without a running backend.
 - Android Phase 1 and Phase 2 steps depend only on Android and shared steps. Their backend dependencies are recorded once, in the coordination table in `docs/ANDROID_ROADMAP.md`, with integration deferred to QUAL-001.
-- `backend/` now contains the initialized Laravel 13 application (FND-002, 2026-10-11) with a hosted MySQL workflow; `admin/` still contains agent guidance only (FND-003).
+- `backend/` now contains the initialized Laravel 13 application (FND-002 complete, re-verified 2026-10-12) with a local MySQL 8.4 development workflow; a hosted MySQL 8 service over TLS is a documented drop-in replacement when one is available. `admin/` still contains agent guidance only (FND-003).
 - .github/workflows/ci.yml is a placeholder. Its active job checks repository structure; component checks are not active.
 - GitHub develop was created from the current pre-policy main baseline. Default branch, auto-delete, and branch protection must be verified under GIT-001.
-- `docs/openapi.yaml` exists as an OpenAPI 3.1 draft awaiting API-owner acceptance (FND-004). `docs/API_CONTRACT.md` records shared conventions; endpoint schemas and per-class rate limits are drafted in the OpenAPI file and become binding only on acceptance.
+- `docs/openapi.yaml` was accepted by the API owner on 2026-10-12 (FND-004 complete). `docs/API_CONTRACT.md` records shared conventions; endpoint schemas and per-class rate limits are binding as accepted in the OpenAPI file.
 - docs/DATABASE.md is a logical model, not implemented migrations.
 
 This is a repository snapshot, not a promise that the state remains unchanged. Confirm facts again when a Task starts.
@@ -53,7 +53,7 @@ This is a repository snapshot, not a promise that the state remains unchanged. C
 - Acceptance checkboxes are checked only after implementation and verification evidence are reviewed.
 - A task is complete when every criterion passes, required checks are green, and the reviewer has exact commands, outcomes, and the commit tested. Follow the Definition of Done in [AGENTS.md](../AGENTS.md).
 - If a task exposes a missing product or architecture decision, ask the owner and stop dependent work; do not silently broaden scope or contradict an accepted ADR.
-- OpenAPI must be reviewed and accepted before implementing API endpoints or client integrations. The owner can review the draft as a concrete artifact; no additional product choice is needed to prepare it from accepted scope.
+- OpenAPI must be reviewed and accepted before implementing API endpoints or client integrations; the contract was accepted on 2026-10-12 (FND-004). Any contract change is made in `docs/openapi.yaml` first and re-accepted.
 
 ## How to assign and execute a task
 
