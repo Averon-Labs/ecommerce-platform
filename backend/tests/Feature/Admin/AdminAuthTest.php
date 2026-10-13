@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\Category;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -138,6 +140,12 @@ class AdminAuthTest extends TestCase
         $this->adminJson('GET', '/api/v1/admin/auth/session')
             ->assertStatus(403)
             ->assertJsonPath('error.code', 'FORBIDDEN');
+
+        // Admin catalog routes answer the same demoted session with 401
+        // ("not a valid administrator session").
+        $this->adminJson('GET', '/api/v1/admin/products')
+            ->assertStatus(401)
+            ->assertJsonPath('error.code', 'UNAUTHENTICATED');
     }
 
     public function test_logout_destroys_the_admin_session(): void
@@ -201,6 +209,29 @@ class AdminAuthTest extends TestCase
         $valid->assertOk()->assertJsonPath('data.user.role', 'admin');
     }
 
+    public function test_admin_catalog_mutation_rejects_missing_xsrf_header_when_csrf_runs(): void
+    {
+        $category = Category::factory()->create();
+        $this->actingAsAdmin();
+
+        $this->app->instance('env', 'local');
+
+        $response = $this->json('POST', '/api/v1/admin/products', [
+            'name' => 'No Token Lamp',
+            'description' => null,
+            'price' => '10.00',
+            'sku' => null,
+            'categoryId' => $category->id,
+            'status' => 'active',
+            'imageUrls' => [],
+        ], ['Origin' => $this->statefulOrigin()]);
+
+        $this->app->instance('env', 'testing');
+
+        $this->assertApiError($response, 403, 'CSRF_TOKEN_MISMATCH');
+        $this->assertDatabaseMissing('products', ['name' => 'No Token Lamp']);
+    }
+
     public function test_admin_login_is_rate_limited_after_ten_requests_per_minute(): void
     {
         $blocked = null;
@@ -220,5 +251,40 @@ class AdminAuthTest extends TestCase
 
         $this->assertApiError($blocked, 429, 'RATE_LIMITED');
         $this->assertTrue($blocked->headers->has('Retry-After'));
+    }
+
+    public function test_every_admin_endpoint_rejects_guest_and_customer_credentials(): void
+    {
+        [, $token] = $this->registerCustomer();
+        $id = Product::factory()->create()->id;
+
+        $endpoints = [
+            ['GET', '/api/v1/admin/auth/session'],
+            ['POST', '/api/v1/admin/auth/logout'],
+            ['GET', '/api/v1/admin/products'],
+            ['POST', '/api/v1/admin/products'],
+            ['GET', "/api/v1/admin/products/{$id}"],
+            ['PUT', "/api/v1/admin/products/{$id}"],
+            ['POST', "/api/v1/admin/products/{$id}/archive"],
+            ['GET', '/api/v1/admin/categories'],
+            ['POST', '/api/v1/admin/categories'],
+            ['PUT', "/api/v1/admin/categories/{$id}"],
+            ['POST', "/api/v1/admin/categories/{$id}/archive"],
+            ['POST', "/api/v1/admin/categories/{$id}/restore"],
+            ['GET', '/api/v1/admin/inventory'],
+            ['PATCH', "/api/v1/admin/inventory/{$id}"],
+        ];
+
+        // Guests are rejected before any payload validation runs.
+        foreach ($endpoints as [$method, $uri]) {
+            $response = $this->json($method, $uri, []);
+            $this->assertApiError($response, 401, 'UNAUTHENTICATED');
+        }
+
+        // A customer's bearer token is not an administrator session.
+        foreach ($endpoints as [$method, $uri]) {
+            $response = $this->withToken($token)->json($method, $uri, []);
+            $this->assertApiError($response, 401, 'UNAUTHENTICATED');
+        }
     }
 }

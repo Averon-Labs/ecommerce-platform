@@ -128,7 +128,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 ### Step 3 — CAT-003 — Admin catalog and inventory API
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-002, FND-004, AUTH-003, CAT-001
 
@@ -144,12 +144,12 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Acceptance criteria:**
 
-- [ ] **a.** CRUD and inventory operations follow OpenAPI, validation, and database constraints.
-- [ ] **b.** Guest/customer access is rejected; tests cover role enforcement, invalid values, missing resources, and inventory boundaries.
-- [ ] **c.** Public catalog changes reflect persisted admin updates; deleted/archived data follows the documented status behavior.
-- [ ] **d.** No client-supplied total or stock value bypasses server-side validation.
+- [x] **a.** CRUD and inventory operations follow OpenAPI, validation, and database constraints.
+- [x] **b.** Guest/customer access is rejected; tests cover role enforcement, invalid values, missing resources, and inventory boundaries.
+- [x] **c.** Public catalog changes reflect persisted admin updates; deleted/archived data follows the documented status behavior.
+- [x] **d.** No client-supplied total or stock value bypasses server-side validation.
 
-**Verification:** backend feature tests with database state assertions and authorization tests for each protected operation.
+**Verification (2026-10-13):** Implemented with the AUTH-003 backend portion against `docs/openapi.yaml`. Framework: `$middleware->statefulApi()` gives stateful first-party requests cookie sessions + CSRF verification (bearer flows untouched); the `admin` middleware alias (`EnsureUserIsAdmin`) guards all catalog routes — guests and every non-admin credential (customer bearer, demoted, suspended) answer 401 `UNAUTHENTICATED` per the contract's "not a valid administrator session", while `GET /admin/auth/session` answers a demoted session 403 `FORBIDDEN`; the framework's 419 TokenMismatch is rendered as a 403 `CSRF_TOKEN_MISMATCH` envelope. Admin session lifecycle: `GET /admin/auth/csrf` (204 + readable XSRF cookie), `POST /admin/auth/login` (stateful origin required, identical 401 `INVALID_CREDENTIALS` for wrong password/customer/suspended, session-id regeneration, `admin-login` 10/min/IP), `GET /admin/auth/session`, `POST /admin/auth/logout` (204, session destroyed and CSRF token rotated). Catalog: 16 admin routes under `auth:sanctum` + `admin` with `admin-write` 120/min/session on mutations — products list/store/show/full-replace update/archive (409 `SKU_TAKEN`, `INVALID_PRODUCT_STATE`; creation never fabricates an inventory row), categories list/create/update/archive/restore (409 `CATEGORY_NAME_TAKEN`, `CATEGORY_NOT_EMPTY` with the blocking count in `error.details`, `INVALID_CATEGORY_STATE`; OPEN-2 resolved as implemented), inventory list/absolute-quantity PATCH (0–1,000,000 integers only, `updateOrCreate`, missing row reported as 0/out of stock). `products.price` widened to decimal(11,2) so the column accepts the full contract Money pattern (the CAT-001 record below is corrected accordingly); dev database rebuilt via `migrate:fresh --seed`. `AdminUserSeeder` creates the local/demo-only admin (`demo-admin@eshopverse.test`, password from the git-ignored `DEMO_ADMIN_PASSWORD` env var or random per install — never committed or logged). `php artisan test` = 87 tests, 1080 assertions, 0 failures (60 prior + 27 new admin tests); `vendor\bin\pint --test` passed; `migrate:fresh --seed` verified (5 categories, 12 products, 25 images, 12 inventories, 1 demo admin). Re-audit (2026-10-13): boolean query spellings `inStock=1|0` are normalized on both the public and admin lists (regression-tested), and a concurrent SKU collision on PUT now answers 409 `SKU_TAKEN` like POST.
 
 ## Phase 2 — Cart, Checkout, and Orders
 

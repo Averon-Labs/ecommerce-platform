@@ -69,5 +69,9 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(10)->by($request->ip());
         });
 
+        // x-rate-limit-classes: admin-write { limit: 120, window: 1m, key: session }.
+        RateLimiter::for('admin-write', function (Request $request) {
+            return Limit::perMinute(120)->by('admin-write:'.$request->user()?->getAuthIdentifier());
+        });
     }
 }
