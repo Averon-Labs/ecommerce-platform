@@ -75,6 +75,8 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **Verification:** backend authentication/authorization feature tests and admin UI tests for login, logout, CSRF/session expiry, and rejected access.
 
+**Backend portion (2026-10-13):** implemented and independently verified on the backend — admin auth endpoints (`/admin/auth/csrf|login|session|logout`), Sanctum stateful cookie sessions + CSRF enforcement, `EnsureUserIsAdmin` role middleware, `admin-login`/`admin-write` rate limiters, and the demo-admin seeder (see Backend Roadmap — Phase 1 — Step 3 — CAT-003 verification record). Server-side behavior for criteria **a**/**b**/**c** is covered; this task stays `[ ]` until the admin SPA work (FND-003/CAT-004) completes criteria **c**/**d** and the admin UI tests.
+
 ### Step 2 — CAT-004 — Admin catalog and inventory screens
 
 **Status:** `[ ]`

@@ -75,7 +75,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 ### Step 1 — AUTH-001 — Customer account API
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-002, FND-004, FND-005
 
@@ -93,16 +93,16 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Acceptance criteria:**
 
-- [ ] **a.** Valid registration/login/profile/logout/reset flows match the reviewed OpenAPI schemas and security rules.
-- [ ] **b.** Invalid input, duplicate email, invalid credentials, reset-token failure/expiry, rate limits, and logout revocation return documented outcomes without leaking secrets.
-- [ ] **c.** Tests prove passwords are hashed, token lifetime/revocation rules and account lockout after repeated failures are enforced, and reset email can be safely exercised through a local mail sink.
-- [ ] **d.** Tests cover relevant validation, authentication, and abuse boundaries; no real email or external provider is required for local tests.
+- [x] **a.** Valid registration/login/profile/logout/reset flows match the reviewed OpenAPI schemas and security rules.
+- [x] **b.** Invalid input, duplicate email, invalid credentials, reset-token failure/expiry, rate limits, and logout revocation return documented outcomes without leaking secrets.
+- [x] **c.** Tests prove passwords are hashed, token lifetime/revocation rules and account lockout after repeated failures are enforced, and reset email can be safely exercised through a local mail sink.
+- [x] **d.** Tests cover relevant validation, authentication, and abuse boundaries; no real email or external provider is required for local tests.
 
-**Verification:** backend unit and API feature/security tests for every listed success and failure path.
+**Verification (2026-10-12):** implemented per accepted `docs/openapi.yaml` operations (register, login, logout, profile GET/PATCH, password-reset request/confirm). Sanctum `laravel/sanctum` ^4.3 added (pinned in `composer.lock`); bearer tokens expire after 30 days (`SANCTUM_TOKEN_EXPIRATION=43200`), logout revokes only the presented token, and a successful reset revokes every token. Passwords hashed with bcrypt; login answers a deliberately vague `401 INVALID_CREDENTIALS`, locks the account for 15 minutes after 5 consecutive failures (`429 ACCOUNT_LOCKED` + `Retry-After`), and resets the counter on success. Password-reset request always answers `202` with no account disclosure; the token is delivered only through the configured mail flow (local sink in tests, `ResetPassword::toMailUsing` without any web route). Rate limits per contract: login 10/min/IP, register 5/h/IP, reset 3/h/email + 10/h/IP. `php artisan test` = 38 tests, 322 assertions, 0 failures (5 baseline + 33 new AUTH-001 feature tests); `vendor\bin\pint --test` passed; migrations green on `eshopverse_dev` and disposable `eshopverse_test`.
 
 ### Step 2 — CAT-001 — Catalog read API and fictional seed data
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-002, FND-004, FND-005
 
@@ -119,16 +119,16 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Acceptance criteria:**
 
-- [ ] **a.** Migrations enforce documented relationships, valid prices, product status, and image ordering; use fixed-precision USD money.
-- [ ] **b.** Seed/reset creates useful fictional categories/products/images reproducibly and never contains real personal data.
-- [ ] **c.** Listing, detail, category, search, sort, pagination, and empty-result behavior match OpenAPI.
-- [ ] **d.** Invalid filters and pagination boundaries return documented errors; inactive/unavailable products do not leak into customer results.
+- [x] **a.** Migrations enforce documented relationships, valid prices, product status, and image ordering; use fixed-precision USD money.
+- [x] **b.** Seed/reset creates useful fictional categories/products/images reproducibly and never contains real personal data.
+- [x] **c.** Listing, detail, category, search, sort, pagination, and empty-result behavior match OpenAPI.
+- [x] **d.** Invalid filters and pagination boundaries return documented errors; inactive/unavailable products do not leak into customer results.
 
-**Verification:** migration/seed checks and API feature tests for results, filters, pagination, validation, and public access.
+**Verification (2026-10-12):** four migrations (`categories`, `products`, `product_images`, `inventories`) enforce FK relationships, unsigned fixed-precision `price` decimal(11,2) (widened from decimal(10,2) during Step 3 — CAT-003 — so the column accepts the full contract Money pattern `^\d{1,9}\.\d{2}$`)/`quantity`, product/category status enums, unique SKU, one inventory row per product (unique `product_id`), and image ordering (`sort_order` + `id`). `DatabaseSeeder` seeds a deterministic fictional catalog (5 categories — 1 archived; 12 products — 1 inactive, 1 archived, 1 out-of-stock; 25 images; placeholder URLs via `picsum.photos` seed strings; no real personal data) idempotently via `updateOrCreate`. Endpoints: `GET /categories` (active only, `sortOrder` then `name`), `GET /products` (`q` case-insensitive name/description search with escaped LIKE wildcards, `categoryId` → 422 `CATEGORY_NOT_FOUND` for unknown/archived, `inStock`, four sort orders, `page`/`perPage` 1–100, pagination meta with 0-page empty results), `GET /products/{productId}` (ordered images, exact `stockQuantity`, 404 for missing/inactive/archived/non-numeric). Money serialized as a two-fraction-digit decimal string plus `USD`; listings expose only the boolean `inStock`. Rate limited `public-read` 120/min/IP. `php artisan test` = 60 tests, 502 assertions, 0 failures (38 AUTH-001 + 22 new CAT-001); `vendor\bin\pint --test` passed; live smoke of all five read paths against seeded `eshopverse_dev` verified.
 
 ### Step 3 — CAT-003 — Admin catalog and inventory API
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-002, FND-004, AUTH-003, CAT-001
 
@@ -144,12 +144,12 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Acceptance criteria:**
 
-- [ ] **a.** CRUD and inventory operations follow OpenAPI, validation, and database constraints.
-- [ ] **b.** Guest/customer access is rejected; tests cover role enforcement, invalid values, missing resources, and inventory boundaries.
-- [ ] **c.** Public catalog changes reflect persisted admin updates; deleted/archived data follows the documented status behavior.
-- [ ] **d.** No client-supplied total or stock value bypasses server-side validation.
+- [x] **a.** CRUD and inventory operations follow OpenAPI, validation, and database constraints.
+- [x] **b.** Guest/customer access is rejected; tests cover role enforcement, invalid values, missing resources, and inventory boundaries.
+- [x] **c.** Public catalog changes reflect persisted admin updates; deleted/archived data follows the documented status behavior.
+- [x] **d.** No client-supplied total or stock value bypasses server-side validation.
 
-**Verification:** backend feature tests with database state assertions and authorization tests for each protected operation.
+**Verification (2026-10-13):** Implemented with the AUTH-003 backend portion against `docs/openapi.yaml`. Framework: `$middleware->statefulApi()` gives stateful first-party requests cookie sessions + CSRF verification (bearer flows untouched); the `admin` middleware alias (`EnsureUserIsAdmin`) guards all catalog routes — guests and every non-admin credential (customer bearer, demoted, suspended) answer 401 `UNAUTHENTICATED` per the contract's "not a valid administrator session", while `GET /admin/auth/session` answers a demoted session 403 `FORBIDDEN`; the framework's 419 TokenMismatch is rendered as a 403 `CSRF_TOKEN_MISMATCH` envelope. Admin session lifecycle: `GET /admin/auth/csrf` (204 + readable XSRF cookie), `POST /admin/auth/login` (stateful origin required, identical 401 `INVALID_CREDENTIALS` for wrong password/customer/suspended, session-id regeneration, `admin-login` 10/min/IP), `GET /admin/auth/session`, `POST /admin/auth/logout` (204, session destroyed and CSRF token rotated). Catalog: 16 admin routes under `auth:sanctum` + `admin` with `admin-write` 120/min/session on mutations — products list/store/show/full-replace update/archive (409 `SKU_TAKEN`, `INVALID_PRODUCT_STATE`; creation never fabricates an inventory row), categories list/create/update/archive/restore (409 `CATEGORY_NAME_TAKEN`, `CATEGORY_NOT_EMPTY` with the blocking count in `error.details`, `INVALID_CATEGORY_STATE`; OPEN-2 resolved as implemented), inventory list/absolute-quantity PATCH (0–1,000,000 integers only, `updateOrCreate`, missing row reported as 0/out of stock). `products.price` widened to decimal(11,2) so the column accepts the full contract Money pattern (the CAT-001 record below is corrected accordingly); dev database rebuilt via `migrate:fresh --seed`. `AdminUserSeeder` creates the local/demo-only admin (`demo-admin@eshopverse.test`, password from the git-ignored `DEMO_ADMIN_PASSWORD` env var or random per install — never committed or logged). `php artisan test` = 87 tests, 1080 assertions, 0 failures (60 prior + 27 new admin tests); `vendor\bin\pint --test` passed; `migrate:fresh --seed` verified (5 categories, 12 products, 25 images, 12 inventories, 1 demo admin). Re-audit (2026-10-13): boolean query spellings `inStock=1|0` are normalized on both the public and admin lists (regression-tested), and a concurrent SKU collision on PUT now answers 409 `SKU_TAKEN` like POST.
 
 ## Phase 2 — Cart, Checkout, and Orders
 
