@@ -16,7 +16,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 ### Step 1 — FND-002 — Initialize Laravel API and local database workflow
 
-**Status:** `[~]`
+**Status:** `[x]`
 
 **Depends on:** none
 
@@ -30,14 +30,14 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Acceptance criteria:**
 
-- [ ] **a.** Select supported stable framework/runtime versions and commit the dependency lockfile; document the selected versions.
-- [ ] **b.** Provide safe local configuration instructions and `.env.example` placeholders; no real secrets are checked in.
-- [ ] **c.** Configure migrations and a disposable isolated test database workflow; document how a developer creates and resets local data safely.
-- [ ] **d.** Configure the backend unit/feature test runner and a minimal passing baseline test.
-- [ ] **e.** Record and verify exact install, setup, migration, style/static-check, and test commands in `docs/DEVELOPMENT.md`.
-- [ ] **f.** Do not add business endpoints before FND-004 is reviewed.
+- [x] **a.** Select supported stable framework/runtime versions and commit the dependency lockfile; document the selected versions.
+- [x] **b.** Provide safe local configuration instructions and `.env.example` placeholders; no real secrets are checked in.
+- [x] **c.** Configure migrations and a disposable isolated test database workflow; document how a developer creates and resets local data safely.
+- [x] **d.** Configure the backend unit/feature test runner and a minimal passing baseline test.
+- [x] **e.** Record and verify exact install, setup, migration, style/static-check, and test commands in `docs/DEVELOPMENT.md`.
+- [x] **f.** Do not add business endpoints before FND-004 is reviewed.
 
-**Verification:** clean dependency install, disposable-database migration, and backend baseline test/checks.
+**Verification (2026-10-11, re-verified 2026-10-12):** clean `composer install` (79 packages from the committed `composer.lock`), `composer validate --strict` and `composer audit` clean; `php artisan migrate` + `php artisan migrate:status` green for the `eshopverse_dev` / disposable `eshopverse_test` workflow; `php artisan test` = 5 tests, 8 assertions, 0 failures; `vendor\bin\pint --test` passed; `php artisan serve` answered `GET /up` 200 and an unknown route 404. The 2026-10-11 run used hosted MySQL 8.4.11 over verified TLS 1.3; after the provider deleted that free service, every database-dependent command was re-verified on 2026-10-12 against the documented local MySQL 8.4 workflow. Commands and safety rules are recorded in `docs/DEVELOPMENT.md`.
 
 ### Step 2 — FND-004 — Draft and review the OpenAPI contract
 
