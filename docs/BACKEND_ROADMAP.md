@@ -41,7 +41,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 ### Step 2 — FND-004 — Draft and review the OpenAPI contract
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** none; must finish before any endpoint or client integration Task
 
@@ -59,15 +59,15 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Acceptance criteria:**
 
-- [ ] **a.** Describe registration, login/logout, profile, and password-reset flows; public category/product listing, search, sorting, pagination, and product details; customer cart; order creation, history/detail, and simulated payment result; admin authentication, catalog/category/inventory management, and order-status management.
-- [ ] **b.** Define request/response schemas, required/optional fields, validation constraints, status codes, shared error envelope, pagination, USD money representation, and representative examples.
-- [ ] **c.** Define Android bearer-token and admin Sanctum session/CSRF security schemes, ownership/role expectations, and rate-limit classes/limits.
-- [ ] **d.** Define order idempotency behavior, price/stock authority, order/address snapshots, and simulated payment success/failure state semantics consistently with `PRODUCT.md` and `DATABASE.md`.
-- [ ] **e.** Resolve category lifecycle and product reassignment behavior: the roadmap mentions category archive, while the current logical category schema has no status field.
-- [ ] **f.** Validate the document with a documented OpenAPI validator and record the exact validation command; resolve all errors.
-- [ ] **g.** Obtain API-owner review/acceptance and update `API_CONTRACT.md` to link to the approved machine-readable contract without duplicating endpoint schemas.
+- [x] **a.** Describe registration, login/logout, profile, and password-reset flows; public category/product listing, search, sorting, pagination, and product details; customer cart; order creation, history/detail, and simulated payment result; admin authentication, catalog/category/inventory management, and order-status management.
+- [x] **b.** Define request/response schemas, required/optional fields, validation constraints, status codes, shared error envelope, pagination, USD money representation, and representative examples.
+- [x] **c.** Define Android bearer-token and admin Sanctum session/CSRF security schemes, ownership/role expectations, and rate-limit classes/limits.
+- [x] **d.** Define order idempotency behavior, price/stock authority, order/address snapshots, and simulated payment success/failure state semantics consistently with `PRODUCT.md` and `DATABASE.md`.
+- [x] **e.** Resolve category lifecycle and product reassignment behavior: the roadmap mentions category archive, while the current logical category schema has no status field.
+- [x] **f.** Validate the document with a documented OpenAPI validator and record the exact validation command; resolve all errors.
+- [x] **g.** Obtain API-owner review/acceptance and update `API_CONTRACT.md` to link to the approved machine-readable contract without duplicating endpoint schemas.
 
-**Verification:** OpenAPI validation plus a human review against the referenced product, architecture, database, and security documents. Endpoint implementation remains blocked until acceptance.
+**Verification:** OpenAPI validation (0 errors — exact command and output in `docs/DEVELOPMENT.md`) plus API-owner review against the referenced product, architecture, database, and security documents; acceptance recorded 2026-10-12. Endpoint implementation is unblocked.
 
 ## Phase 1 — Accounts and Catalog
 

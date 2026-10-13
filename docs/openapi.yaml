@@ -1,21 +1,23 @@
 # EShop Verse REST API — machine-readable contract
 #
-# Status: DRAFT — awaiting API-owner review and acceptance.
-# Canonical task: FND-004 (docs/BACKEND_ROADMAP.md).
-# No endpoint may be implemented, and no client integration may start, until this
-# file is reviewed and accepted (docs/API_CONTRACT.md, docs/ROADMAP.md).
+# Status: ACCEPTED — reviewed and approved by the API owner on 2026-10-12.
+# Canonical task: FND-004 (docs/BACKEND_ROADMAP.md), criterion g satisfied.
+# This file is now the source of truth: endpoint and client work follows it, and any
+# contract change is made here first (docs/API_CONTRACT.md, docs/ROADMAP.md).
 #
-# This draft resolves the open contract decisions that block Android client work:
+# This contract resolves the open decisions that blocked Android client work:
 # FND-004 criteria a-e, including the category-lifecycle question recorded in
-# docs/SCREEN_SPECIFICATIONS.md ("Open contract alignment item").
+# docs/SCREEN_SPECIFICATIONS.md ("Open contract alignment item", resolved there).
 #
-# See x-open-decisions below for the items that still require an owner answer.
+# No item awaits an owner answer: every entry in x-open-decisions below was closed on
+# 2026-10-11 with its recorded decision. Owner acceptance on 2026-10-12 unblocked
+# endpoint implementation and client integration (Backend Phase 1 onward).
 
 openapi: 3.1.0
 
 info:
   title: EShop Verse API
-  version: 1.0.0-draft
+  version: 1.0.0
   description: |
     Single-store portfolio demo API serving the Android customer application and the
     React admin dashboard.
@@ -38,6 +40,7 @@ info:
     name: EShop Verse maintainers
   license:
     name: MIT
+    identifier: MIT
 
 servers:
   - url: http://localhost:8000/api/v1
@@ -45,7 +48,12 @@ servers:
   - url: http://localhost:8081/api/v1
     description: Local contract mock used by Android development before the API exists (see docs/android/API-MOCK-STRATEGY.md).
   - url: https://api.example.test/api/v1
-    description: PLACEHOLDER production-like origin. The real host is an open decision (x-open-decisions); replace before any public demo.
+    description: |
+      PLACEHOLDER production-like origin. Replace it with the confirmed deployment host
+      before any public demo, screenshot, recording, or store listing. The concrete host
+      is deliberately still unset (decision OPEN-1, closed with the placeholder kept on
+      2026-10-11); the API owner substitutes the real host at deployment time. No client
+      may hard-code this value: clients read the base URL from configuration.
 
 tags:
   - name: Catalog
@@ -69,6 +77,7 @@ security:
   - bearerAuth: []
 
 paths:
+
   # ------------------------------------------------------------------ Catalog
 
   /categories:
@@ -92,6 +101,19 @@ paths:
                   data:
                     type: array
                     items: { $ref: '#/components/schemas/Category' }
+              examples:
+                two-active-categories:
+                  summary: Two seeded categories, ordered by sortOrder
+                  value:
+                    data:
+                      - id: 1
+                        name: Electronics
+                        sortOrder: 10
+                        status: active
+                      - id: 2
+                        name: Home & Kitchen
+                        sortOrder: 20
+                        status: active
         '429': { $ref: '#/components/responses/RateLimited' }
 
   /products:
@@ -134,6 +156,34 @@ paths:
                     type: array
                     items: { $ref: '#/components/schemas/ProductSummary' }
                   pagination: { $ref: '#/components/schemas/Pagination' }
+              examples:
+                first-page-of-two-products:
+                  summary: One page with two summaries; money is text, never a number
+                  value:
+                    data:
+                      - id: 1
+                        name: Aurora Desk Lamp
+                        price: "39.99"
+                        currency: USD
+                        categoryId: 1
+                        categoryName: Electronics
+                        imageUrl: /images/products/aurora-lamp-1.jpg
+                        inStock: true
+                        status: active
+                      - id: 2
+                        name: Ridgeback Backpack
+                        price: "74.50"
+                        currency: USD
+                        categoryId: 2
+                        categoryName: Outdoor
+                        imageUrl: null
+                        inStock: false
+                        status: active
+                    pagination:
+                      currentPage: 1
+                      perPage: 20
+                      totalItems: 2
+                      totalPages: 1
         '422':
           description: |
             `VALIDATION_ERROR` for an invalid filter or pagination value, or
@@ -161,6 +211,28 @@ paths:
                 required: [data]
                 properties:
                   data: { $ref: '#/components/schemas/ProductDetail' }
+              examples:
+                product-detail-with-images:
+                  summary: Ordered image set plus the exact stock used by the quantity stepper
+                  value:
+                    data:
+                      id: 1
+                      name: Aurora Desk Lamp
+                      price: "39.99"
+                      currency: USD
+                      categoryId: 1
+                      categoryName: Electronics
+                      imageUrl: /images/products/aurora-lamp-1.jpg
+                      inStock: true
+                      status: active
+                      description: A warm dimmable desk lamp with an oak base.
+                      sku: AUR-LAMP-001
+                      stockQuantity: 12
+                      images:
+                        - url: /images/products/aurora-lamp-1.jpg
+                          sortOrder: 0
+                        - url: /images/products/aurora-lamp-2.jpg
+                          sortOrder: 1
         '404': { $ref: '#/components/responses/NotFound' }
         '429': { $ref: '#/components/responses/RateLimited' }
 
@@ -177,6 +249,11 @@ paths:
         content:
           application/json:
             schema: { $ref: '#/components/schemas/RegisterRequest' }
+            example:
+              email: sara@example.com
+              password: BlueSky2026
+              firstName: Sara
+              lastName: Nouri
       responses:
         '201':
           description: Account created; the returned token is already valid.
@@ -187,6 +264,20 @@ paths:
                 required: [data]
                 properties:
                   data: { $ref: '#/components/schemas/AuthSession' }
+              examples:
+                registered-with-token:
+                  summary: Registration returns a ready-to-use bearer token
+                  value:
+                    data:
+                      token: "1|abc123DEF456ghi789JKL012mno345PQR"
+                      expiresAt: "2026-11-10T09:30:00Z"
+                      user:
+                        id: 41
+                        email: sara@example.com
+                        firstName: Sara
+                        lastName: Nouri
+                        role: customer
+                        status: active
         '409':
           description: '`EMAIL_ALREADY_REGISTERED` — the email is already registered.'
           content:
@@ -211,6 +302,9 @@ paths:
         content:
           application/json:
             schema: { $ref: '#/components/schemas/LoginRequest' }
+            example:
+              email: sara@example.com
+              password: BlueSky2026
       responses:
         '200':
           description: Signed in.
@@ -221,6 +315,20 @@ paths:
                 required: [data]
                 properties:
                   data: { $ref: '#/components/schemas/AuthSession' }
+              examples:
+                signed-in-customer:
+                  summary: Bearer token plus the customer profile
+                  value:
+                    data:
+                      token: "1|abc123DEF456ghi789JKL012mno345PQR"
+                      expiresAt: "2026-11-10T09:30:00Z"
+                      user:
+                        id: 41
+                        email: sara@example.com
+                        firstName: Sara
+                        lastName: Nouri
+                        role: customer
+                        status: active
         '401': { $ref: '#/components/responses/InvalidCredentials' }
         '422': { $ref: '#/components/responses/ValidationError' }
         '429': { $ref: '#/components/responses/RateLimited' }
@@ -236,6 +344,7 @@ paths:
       responses:
         '204': { description: Token revoked. }
         '401': { $ref: '#/components/responses/Unauthenticated' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /auth/profile:
     get:
@@ -255,6 +364,7 @@ paths:
                 properties:
                   data: { $ref: '#/components/schemas/User' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
+        '429': { $ref: '#/components/responses/RateLimited' }
     patch:
       tags: [Customer auth]
       operationId: updateCustomerProfile
@@ -285,6 +395,7 @@ paths:
                   data: { $ref: '#/components/schemas/User' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /auth/password-reset:
     post:
@@ -364,7 +475,31 @@ paths:
                 required: [data]
                 properties:
                   data: { $ref: '#/components/schemas/Cart' }
+              examples:
+                cart-with-one-line:
+                  summary: Server-priced cart; lineTotal and totals are authoritative
+                  value:
+                    data:
+                      items:
+                        - productId: 1
+                          name: Aurora Desk Lamp
+                          imageUrl: /images/products/aurora-lamp-1.jpg
+                          unitPrice: "39.99"
+                          currency: USD
+                          quantity: 2
+                          lineTotal: "79.98"
+                          inStock: true
+                          availableQuantity: 12
+                          priceChanged: false
+                          unavailable: false
+                      itemCount: 2
+                      subtotal: "79.98"
+                      shipping: "5.00"
+                      total: "84.98"
+                      currency: USD
+                      hasIssues: false
         '401': { $ref: '#/components/responses/Unauthenticated' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /cart/items:
     post:
@@ -387,6 +522,9 @@ paths:
               properties:
                 productId: { type: integer, minimum: 1 }
                 quantity: { $ref: '#/components/schemas/CartQuantity' }
+            example:
+              productId: 1
+              quantity: 1
       responses:
         '200':
           description: Cart after the mutation.
@@ -397,6 +535,29 @@ paths:
                 required: [data]
                 properties:
                   data: { $ref: '#/components/schemas/Cart' }
+              examples:
+                cart-with-the-new-line:
+                  summary: The whole cart is returned so no read-back is needed
+                  value:
+                    data:
+                      items:
+                        - productId: 1
+                          name: Aurora Desk Lamp
+                          imageUrl: /images/products/aurora-lamp-1.jpg
+                          unitPrice: "39.99"
+                          currency: USD
+                          quantity: 1
+                          lineTotal: "39.99"
+                          inStock: true
+                          availableQuantity: 12
+                          priceChanged: false
+                          unavailable: false
+                      itemCount: 1
+                      subtotal: "39.99"
+                      shipping: "5.00"
+                      total: "44.99"
+                      currency: USD
+                      hasIssues: false
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '404': { $ref: '#/components/responses/NotFound' }
         '409':
@@ -408,6 +569,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
         '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
     delete:
       tags: [Cart]
       operationId: clearCart
@@ -425,6 +587,7 @@ paths:
                 properties:
                   data: { $ref: '#/components/schemas/Cart' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /cart/items/{productId}:
     parameters:
@@ -467,6 +630,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
         '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
     delete:
       tags: [Cart]
       operationId: removeCartItem
@@ -489,6 +653,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   # ---------------------------------------------------------------- Checkout
 
@@ -513,6 +678,14 @@ paths:
               additionalProperties: false
               properties:
                 shippingAddress: { $ref: '#/components/schemas/ShippingAddress' }
+            example:
+              shippingAddress:
+                recipientName: Sara Nouri
+                line1: 14 Maple Street
+                city: Seattle
+                region: WA
+                postalCode: "98101"
+                country: US
       responses:
         '200':
           description: Quote for the current cart and address.
@@ -523,6 +696,35 @@ paths:
                 required: [data]
                 properties:
                   data: { $ref: '#/components/schemas/CheckoutQuote' }
+              examples:
+                quoted-with-flat-shipping:
+                  summary: Shipping is the configured flat USD 5.00 sample rate
+                  value:
+                    data:
+                      items:
+                        - productId: 1
+                          name: Aurora Desk Lamp
+                          imageUrl: /images/products/aurora-lamp-1.jpg
+                          unitPrice: "39.99"
+                          currency: USD
+                          quantity: 2
+                          lineTotal: "79.98"
+                          inStock: true
+                          availableQuantity: 12
+                          priceChanged: false
+                          unavailable: false
+                      subtotal: "79.98"
+                      shipping: "5.00"
+                      total: "84.98"
+                      currency: USD
+                      shippingAddress:
+                        recipientName: Sara Nouri
+                        line1: 14 Maple Street
+                        city: Seattle
+                        region: WA
+                        postalCode: "98101"
+                        country: US
+                      shippingAddressId: addr_2f9c4b7e1a8d
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '409':
           description: '`CART_EMPTY`, `PRODUCT_UNAVAILABLE`, or `INSUFFICIENT_STOCK`.'
@@ -530,6 +732,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
         '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /orders:
     post:
@@ -558,7 +761,16 @@ paths:
               additionalProperties: false
               properties:
                 shippingAddress: { $ref: '#/components/schemas/ShippingAddress' }
-                notes: { type: string, maxLength: 500, nullable: true }
+                notes: { type: [string, 'null'], maxLength: 500 }
+            example:
+              shippingAddress:
+                recipientName: Sara Nouri
+                line1: 14 Maple Street
+                city: Seattle
+                region: WA
+                postalCode: "98101"
+                country: US
+              notes: Please leave at the front desk.
       responses:
         '201':
           description: Order created and awaiting the simulated payment outcome.
@@ -569,6 +781,39 @@ paths:
                 required: [data]
                 properties:
                   data: { $ref: '#/components/schemas/Order' }
+              examples:
+                order-awaiting-payment:
+                  summary: Freshly created order; stock is not reserved until payment succeeds
+                  value:
+                    data:
+                      id: 17
+                      reference: ESV-000017
+                      status: pending_payment
+                      paymentStatus: pending
+                      items:
+                        - productId: 1
+                          productName: Aurora Desk Lamp
+                          quantity: 2
+                          unitPrice: "39.99"
+                          lineTotal: "79.98"
+                      subtotal: "79.98"
+                      shipping: "5.00"
+                      total: "84.98"
+                      currency: USD
+                      shippingAddress:
+                        recipientName: Sara Nouri
+                        line1: 14 Maple Street
+                        city: Seattle
+                        region: WA
+                        postalCode: "98101"
+                        country: US
+                      notes: Please leave at the front desk.
+                      payment: null
+                      timeline:
+                        - status: pending_payment
+                          at: "2026-10-11T09:41:00Z"
+                      createdAt: "2026-10-11T09:41:00Z"
+                      updatedAt: "2026-10-11T09:41:00Z"
         '400':
           description: '`MISSING_IDEMPOTENCY_KEY` — the header is absent or not a UUID.'
           content:
@@ -583,6 +828,7 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
         '422': { $ref: '#/components/responses/ValidationError' }
         '500': { $ref: '#/components/responses/ServerError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
     get:
       tags: [Orders]
       operationId: listOrders
@@ -605,7 +851,34 @@ paths:
                     type: array
                     items: { $ref: '#/components/schemas/OrderSummary' }
                   pagination: { $ref: '#/components/schemas/Pagination' }
+              examples:
+                two-owned-orders:
+                  summary: Only the caller's orders appear here
+                  value:
+                    data:
+                      - id: 17
+                        reference: ESV-000017
+                        status: pending_payment
+                        paymentStatus: pending
+                        total: "84.98"
+                        currency: USD
+                        itemCount: 2
+                        createdAt: "2026-10-11T09:41:00Z"
+                      - id: 12
+                        reference: ESV-000012
+                        status: delivered
+                        paymentStatus: completed
+                        total: "24.99"
+                        currency: USD
+                        itemCount: 1
+                        createdAt: "2026-10-02T11:20:00Z"
+                    pagination:
+                      currentPage: 1
+                      perPage: 20
+                      totalItems: 2
+                      totalPages: 1
         '401': { $ref: '#/components/responses/Unauthenticated' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /orders/{orderId}:
     get:
@@ -631,6 +904,7 @@ paths:
                   data: { $ref: '#/components/schemas/Order' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /orders/{orderId}/payment:
     post:
@@ -664,6 +938,8 @@ paths:
                 outcome:
                   type: string
                   enum: [success, failure]
+            example:
+              outcome: success
       responses:
         '200':
           description: The simulated result and the resulting order state.
@@ -674,6 +950,39 @@ paths:
                 required: [data]
                 properties:
                   data: { $ref: '#/components/schemas/PaymentResult' }
+              examples:
+                payment-success:
+                  summary: Success confirms the order and decrements stock transactionally
+                  value:
+                    data:
+                      orderId: 17
+                      orderReference: ESV-000017
+                      orderStatus: confirmed
+                      paymentStatus: completed
+                      simulated: true
+                      payment:
+                        method: demo
+                        status: completed
+                        amount: "84.98"
+                        currency: USD
+                        transactionId: DEMO-8HZK4M2QW7PR
+                        createdAt: "2026-10-11T09:41:05Z"
+                payment-failure:
+                  summary: Failure keeps the order in pending_payment so the customer can retry
+                  value:
+                    data:
+                      orderId: 17
+                      orderReference: ESV-000017
+                      orderStatus: pending_payment
+                      paymentStatus: failed
+                      simulated: true
+                      payment:
+                        method: demo
+                        status: failed
+                        amount: "84.98"
+                        currency: USD
+                        transactionId: DEMO-3TRB9N5XC1KD
+                        createdAt: "2026-10-11T09:41:05Z"
         '400':
           description: '`MISSING_IDEMPOTENCY_KEY`.'
           content:
@@ -688,6 +997,7 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
         '422': { $ref: '#/components/responses/ValidationError' }
         '500': { $ref: '#/components/responses/ServerError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   # --------------------------------------------------------------- Admin auth
 
@@ -702,6 +1012,7 @@ paths:
       security: []
       responses:
         '204': { description: CSRF cookie issued. }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /admin/auth/login:
     post:
@@ -720,6 +1031,9 @@ paths:
         content:
           application/json:
             schema: { $ref: '#/components/schemas/LoginRequest' }
+            example:
+              email: admin@example.com
+              password: BlueSky2026
       responses:
         '200':
           description: Session established; the session cookie is set.
@@ -730,6 +1044,18 @@ paths:
                 required: [data]
                 properties:
                   data: { $ref: '#/components/schemas/AdminSession' }
+              examples:
+                admin-session:
+                  summary: The session cookie is set by Set-Cookie; the body carries the admin user
+                  value:
+                    data:
+                      user:
+                        id: 1
+                        email: admin@example.com
+                        firstName: Alex
+                        lastName: Morgan
+                        role: admin
+                        status: active
         '401': { $ref: '#/components/responses/InvalidCredentials' }
         '403': { $ref: '#/components/responses/CsrfRejected' }
         '422': { $ref: '#/components/responses/ValidationError' }
@@ -755,6 +1081,7 @@ paths:
                   data: { $ref: '#/components/schemas/AdminSession' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/Forbidden' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /admin/auth/logout:
     post:
@@ -769,6 +1096,7 @@ paths:
         '204': { description: Session ended. }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/CsrfRejected' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   # ------------------------------------------------------------ Admin catalog
 
@@ -805,6 +1133,7 @@ paths:
                     items: { $ref: '#/components/schemas/AdminProduct' }
                   pagination: { $ref: '#/components/schemas/Pagination' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
+        '429': { $ref: '#/components/responses/RateLimited' }
     post:
       tags: [Admin catalog]
       operationId: adminCreateProduct
@@ -821,6 +1150,16 @@ paths:
         content:
           application/json:
             schema: { $ref: '#/components/schemas/AdminProductInput' }
+            example:
+              name: Aurora Desk Lamp
+              description: A warm dimmable desk lamp with an oak base.
+              price: "39.99"
+              sku: AUR-LAMP-001
+              categoryId: 1
+              status: active
+              imageUrls:
+                - /images/products/aurora-lamp-1.jpg
+                - /images/products/aurora-lamp-2.jpg
       responses:
         '201':
           description: Product created.
@@ -831,6 +1170,29 @@ paths:
                 required: [data]
                 properties:
                   data: { $ref: '#/components/schemas/AdminProduct' }
+              examples:
+                product-created:
+                  summary: Stock stays 0 until PATCH /admin/inventory/{productId}
+                  value:
+                    data:
+                      id: 1
+                      name: Aurora Desk Lamp
+                      price: "39.99"
+                      currency: USD
+                      categoryId: 1
+                      categoryName: Electronics
+                      imageUrl: /images/products/aurora-lamp-1.jpg
+                      inStock: false
+                      status: active
+                      description: A warm dimmable desk lamp with an oak base.
+                      sku: AUR-LAMP-001
+                      stockQuantity: 0
+                      images:
+                        - url: /images/products/aurora-lamp-1.jpg
+                          sortOrder: 0
+                        - url: /images/products/aurora-lamp-2.jpg
+                          sortOrder: 1
+                      updatedAt: "2026-10-11T10:00:00Z"
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/CsrfRejected' }
         '409':
@@ -839,6 +1201,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
         '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /admin/products/{productId}:
     parameters:
@@ -861,6 +1224,7 @@ paths:
                   data: { $ref: '#/components/schemas/AdminProduct' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
     put:
       tags: [Admin catalog]
       operationId: adminUpdateProduct
@@ -894,6 +1258,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
         '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /admin/products/{productId}/archive:
     post:
@@ -927,6 +1292,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /admin/categories:
     get:
@@ -953,6 +1319,7 @@ paths:
                     type: array
                     items: { $ref: '#/components/schemas/AdminCategory' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
+        '429': { $ref: '#/components/responses/RateLimited' }
     post:
       tags: [Admin catalog]
       operationId: adminCreateCategory
@@ -984,6 +1351,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
         '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /admin/categories/{categoryId}:
     parameters:
@@ -1020,6 +1388,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
         '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   # Resolves the open question recorded in docs/SCREEN_SPECIFICATIONS.md: categories are
   # archived, never deleted, and a category holding any non-archived product cannot be
@@ -1061,6 +1430,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /admin/categories/{categoryId}/restore:
     post:
@@ -1091,6 +1461,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/Error' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /admin/inventory:
     get:
@@ -1122,6 +1493,7 @@ paths:
                     items: { $ref: '#/components/schemas/InventoryRow' }
                   pagination: { $ref: '#/components/schemas/Pagination' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /admin/inventory/{productId}:
     patch:
@@ -1161,6 +1533,7 @@ paths:
         '403': { $ref: '#/components/responses/CsrfRejected' }
         '404': { $ref: '#/components/responses/NotFound' }
         '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   # ------------------------------------------------------------- Admin orders
 
@@ -1204,6 +1577,7 @@ paths:
                   pagination: { $ref: '#/components/schemas/Pagination' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /admin/orders/{orderId}:
     get:
@@ -1226,6 +1600,7 @@ paths:
                   data: { $ref: '#/components/schemas/AdminOrder' }
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /admin/orders/{orderId}/status:
     patch:
@@ -1260,6 +1635,8 @@ paths:
               additionalProperties: false
               properties:
                 status: { $ref: '#/components/schemas/OrderStatus' }
+            example:
+              status: processing
       responses:
         '200':
           description: The order after the transition.
@@ -1270,6 +1647,55 @@ paths:
                 required: [data]
                 properties:
                   data: { $ref: '#/components/schemas/AdminOrder' }
+              examples:
+                order-moved-to-processing:
+                  summary: allowedTransitions shows only the moves the server will accept next
+                  value:
+                    data:
+                      id: 17
+                      reference: ESV-000017
+                      status: processing
+                      paymentStatus: completed
+                      items:
+                        - productId: 1
+                          productName: Aurora Desk Lamp
+                          quantity: 2
+                          unitPrice: "39.99"
+                          lineTotal: "79.98"
+                      subtotal: "79.98"
+                      shipping: "5.00"
+                      total: "84.98"
+                      currency: USD
+                      shippingAddress:
+                        recipientName: Sara Nouri
+                        line1: 14 Maple Street
+                        city: Seattle
+                        region: WA
+                        postalCode: "98101"
+                        country: US
+                      notes: Please leave at the front desk.
+                      payment:
+                        method: demo
+                        status: completed
+                        amount: "84.98"
+                        currency: USD
+                        transactionId: DEMO-8HZK4M2QW7PR
+                        createdAt: "2026-10-11T09:41:05Z"
+                      timeline:
+                        - status: pending_payment
+                          at: "2026-10-11T09:41:00Z"
+                        - status: confirmed
+                          at: "2026-10-11T09:41:05Z"
+                        - status: processing
+                          at: "2026-10-11T10:05:00Z"
+                      createdAt: "2026-10-11T09:41:00Z"
+                      updatedAt: "2026-10-11T10:05:00Z"
+                      customer:
+                        id: 41
+                        email: sara@example.com
+                        firstName: Sara
+                        lastName: Nouri
+                      allowedTransitions: [shipped, cancelled]
         '401': { $ref: '#/components/responses/Unauthenticated' }
         '403': { $ref: '#/components/responses/CsrfRejected' }
         '404': { $ref: '#/components/responses/NotFound' }
@@ -1280,6 +1706,7 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
         '422': { $ref: '#/components/responses/ValidationError' }
         '500': { $ref: '#/components/responses/ServerError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
 components:
 
@@ -1350,6 +1777,18 @@ components:
       content:
         application/json:
           schema: { $ref: '#/components/schemas/Error' }
+          examples:
+            validation-error:
+              summary: Two invalid fields on registration
+              value:
+                error:
+                  code: VALIDATION_ERROR
+                  message: The given data was invalid.
+                  details:
+                    - field: email
+                      message: The email must be a valid email address.
+                    - field: password
+                      message: The password must be at least 8 characters.
     Unauthenticated:
       description: |
         `UNAUTHENTICATED` — the credential is missing, revoked, expired, or not a valid
@@ -1362,6 +1801,13 @@ components:
       content:
         application/json:
           schema: { $ref: '#/components/schemas/Error' }
+          examples:
+            invalid-credentials:
+              summary: Wrong email or password
+              value:
+                error:
+                  code: INVALID_CREDENTIALS
+                  message: The provided credentials are incorrect.
     CsrfRejected:
       description: |
         `CSRF_TOKEN_MISMATCH` — the `X-XSRF-TOKEN` header is missing or does not match the cookie.
@@ -1398,6 +1844,13 @@ components:
       content:
         application/json:
           schema: { $ref: '#/components/schemas/Error' }
+          examples:
+            rate-limited:
+              summary: Customer write limit reached
+              value:
+                error:
+                  code: RATE_LIMITED
+                  message: Too many requests. Please try again later.
 
   schemas:
 
@@ -1902,14 +2355,20 @@ x-error-codes:
   INTERNAL_ERROR: { status: 500, meaning: Unexpected failure; no internal detail is returned. }
 
 x-rate-limit-classes:
+  # `global` applies to every operation. Each class below narrows the limit for the
+  # operationIds it lists and is applied in addition to `global`. Operations governed
+  # by `global` only: getCustomerProfile, getCart, listOrders, getOrder,
+  # getAdminCsrfCookie, getAdminSession, adminListProducts, adminGetProduct,
+  # adminListCategories, adminListInventory, adminListOrders, adminGetOrder.
+  # Every operation documents `429` via the shared RateLimited response.
   global: { limit: 300, window: 1m, key: ip }
   public-read: { limit: 120, window: 1m, key: ip, applies-to: [listCategories, listProducts, getProduct] }
-  customer-login: { limit: 10, window: 1m, key: ip, reset-on-success: true, note: Also counts 5 consecutive failures per email for account lockout. }
-  customer-register: { limit: 5, window: 1h, key: ip }
-  password-reset: { limit: 3, window: 1h, key: email, secondary: { limit: 10, window: 1h, key: ip } }
-  admin-login: { limit: 10, window: 1m, key: ip }
-  customer-write: { limit: 60, window: 1m, key: token }
-  admin-write: { limit: 120, window: 1m, key: session }
+  customer-login: { limit: 10, window: 1m, key: ip, reset-on-success: true, note: Also counts 5 consecutive failures per email for account lockout., applies-to: [loginCustomer] }
+  customer-register: { limit: 5, window: 1h, key: ip, applies-to: [registerCustomer] }
+  password-reset: { limit: 3, window: 1h, key: email, secondary: { limit: 10, window: 1h, key: ip }, applies-to: [requestPasswordReset, confirmPasswordReset] }
+  admin-login: { limit: 10, window: 1m, key: ip, applies-to: [loginAdmin] }
+  customer-write: { limit: 60, window: 1m, key: token, applies-to: [logoutCustomer, updateCustomerProfile, addCartItem, clearCart, updateCartItem, removeCartItem, createCheckoutQuote, createOrder, submitSimulatedPayment] }
+  admin-write: { limit: 120, window: 1m, key: session, applies-to: [logoutAdmin, adminCreateProduct, adminUpdateProduct, adminArchiveProduct, adminCreateCategory, adminUpdateCategory, adminArchiveCategory, adminRestoreCategory, adminUpdateInventory, adminUpdateOrderStatus] }
 
 x-order-state-machine:
   initial: pending_payment
@@ -1938,17 +2397,39 @@ x-money-rules:
 x-open-decisions:
   - id: OPEN-1
     question: Confirm the production-like API host that replaces `api.example.test`.
-    blocks: Any public deployment. Does not block Phase 0 or Phase 1 Android or backend work.
+    status: closed
+    decided-on: 2026-10-11
+    decision: >-
+      Keep `https://api.example.test/api/v1` as a labelled placeholder and strengthen the
+      replacement warning. The API owner substitutes the concrete deployment host at deployment
+      time. Clients must read the base URL from configuration and never hard-code it. This blocks
+      only a public demo, never Phase 0 or Phase 1 work.
   - id: OPEN-2
     question: >-
       Confirm category lifecycle: categories are archived (never deleted) and archiving is
-      refused while non-archived products remain. This draft assumes it.
-    blocks: Backend CAT-003 and Admin CAT-004 destructive actions.
+      refused while non-archived products remain.
+    status: closed
+    decided-on: 2026-10-11
+    decision: >-
+      Confirmed. Categories are archived and restored, never deleted; archiving is refused with
+      `409 CATEGORY_NOT_EMPTY` while any non-archived product still references the category.
+      Implemented by `adminArchiveCategory` and `adminRestoreCategory`.
   - id: OPEN-3
     question: Confirm the flat sample shipping rate (USD 5.00) and that no free-shipping threshold exists.
-    blocks: Nothing; the value is returned by the API so clients stay correct if it changes.
+    status: closed
+    decided-on: 2026-10-11
+    decision: >-
+      Confirmed. One configured flat sample shipping rate of USD 5.00 is applied per order,
+      including in the checkout quote. No free-shipping threshold exists in the first release.
+      The server always returns the amount, so clients stay correct if the configured value
+      changes later.
   - id: OPEN-4
     question: >-
       Confirm that a failed simulated payment leaves the order in `pending_payment` for retry
       rather than cancelling it.
-    blocks: Order-result copy in Android CHECK-001 and Admin ORD-003.
+    status: closed
+    decided-on: 2026-10-11
+    decision: >-
+      Confirmed. `outcome: failure` marks the payment `failed` and leaves the order in
+      `pending_payment` so the customer can retry with a new idempotency key; stock stays
+      unchanged. The order is cancelled only by an explicit admin transition.

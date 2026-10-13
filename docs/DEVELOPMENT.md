@@ -206,7 +206,40 @@ machine, so no TLS is involved. When a hosted MySQL 8+ service replaces it:
   silently falling back to plaintext.
 - Never use a hosted MySQL older than 8.0, or one that offers no TLS, for development credentials.
 
-> The OpenAPI contract draft lives at [`openapi.yaml`](openapi.yaml). It must be reviewed and accepted by the API owner before any endpoint, client integration, or business migration is implemented.
+> The OpenAPI contract lives at [`openapi.yaml`](openapi.yaml); it was reviewed and accepted by the API owner on 2026-10-12 (FND-004). Implement endpoints, client integration, and business migrations only as it describes, and change it first through the contract-change process.
+
+### OpenAPI contract lint (FND-004)
+
+The contract is validated with the pinned Redocly CLI (the toolchain decision for FND-004; Node.js 24 is already required for the Android toolchain):
+
+```bash
+npx --yes "@redocly/cli@2.62.1" lint docs/openapi.yaml
+```
+
+Verified output (2026-10-12, exit code 0):
+
+```text
+No configurations were provided -- using built in recommended configuration by default.
+
+validating docs\openapi.yaml...
+docs\openapi.yaml:
+  46:10  warning  no-server-example.com  Server `url` should not point to example.com or localhost.
+  48:10  warning  no-server-example.com  Server `url` should not point to example.com or localhost.
+
+docs\openapi.yaml: validated in 400ms
+
+Woohoo! Your API description is valid. 🎉
+You have 2 warnings.
+```
+
+Result: **0 errors, 2 warnings, exit 0.** Both warnings are intentional, understood, and accepted:
+
+- `46:10` — `http://localhost:8000/api/v1`, the local Laravel development server.
+- `48:10` — `http://localhost:8081/api/v1`, the local contract mock used by Android development before the API exists.
+
+They document local development servers on purpose; the production-like origin is the separately labelled `https://api.example.test/api/v1` placeholder whose replacement is recorded as decision OPEN-1 (closed 2026-10-11). These two warnings are the complete accepted baseline: any new warning or error is a regression and must be fixed.
+
+**Do not add a `redocly.yaml` (or any Redocly configuration file) to silence, downgrade, or exclude rules.** The warnings stay visible as living documentation of the accepted state.
 
 ### Admin Dashboard
 
