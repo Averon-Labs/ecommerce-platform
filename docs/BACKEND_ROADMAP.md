@@ -75,7 +75,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 ### Step 1 — AUTH-001 — Customer account API
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-002, FND-004, FND-005
 
@@ -93,12 +93,12 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Acceptance criteria:**
 
-- [ ] **a.** Valid registration/login/profile/logout/reset flows match the reviewed OpenAPI schemas and security rules.
-- [ ] **b.** Invalid input, duplicate email, invalid credentials, reset-token failure/expiry, rate limits, and logout revocation return documented outcomes without leaking secrets.
-- [ ] **c.** Tests prove passwords are hashed, token lifetime/revocation rules and account lockout after repeated failures are enforced, and reset email can be safely exercised through a local mail sink.
-- [ ] **d.** Tests cover relevant validation, authentication, and abuse boundaries; no real email or external provider is required for local tests.
+- [x] **a.** Valid registration/login/profile/logout/reset flows match the reviewed OpenAPI schemas and security rules.
+- [x] **b.** Invalid input, duplicate email, invalid credentials, reset-token failure/expiry, rate limits, and logout revocation return documented outcomes without leaking secrets.
+- [x] **c.** Tests prove passwords are hashed, token lifetime/revocation rules and account lockout after repeated failures are enforced, and reset email can be safely exercised through a local mail sink.
+- [x] **d.** Tests cover relevant validation, authentication, and abuse boundaries; no real email or external provider is required for local tests.
 
-**Verification:** backend unit and API feature/security tests for every listed success and failure path.
+**Verification (2026-10-12):** implemented per accepted `docs/openapi.yaml` operations (register, login, logout, profile GET/PATCH, password-reset request/confirm). Sanctum `laravel/sanctum` ^4.3 added (pinned in `composer.lock`); bearer tokens expire after 30 days (`SANCTUM_TOKEN_EXPIRATION=43200`), logout revokes only the presented token, and a successful reset revokes every token. Passwords hashed with bcrypt; login answers a deliberately vague `401 INVALID_CREDENTIALS`, locks the account for 15 minutes after 5 consecutive failures (`429 ACCOUNT_LOCKED` + `Retry-After`), and resets the counter on success. Password-reset request always answers `202` with no account disclosure; the token is delivered only through the configured mail flow (local sink in tests, `ResetPassword::toMailUsing` without any web route). Rate limits per contract: login 10/min/IP, register 5/h/IP, reset 3/h/email + 10/h/IP. `php artisan test` = 38 tests, 322 assertions, 0 failures (5 baseline + 33 new AUTH-001 feature tests); `vendor\bin\pint --test` passed; migrations green on `eshopverse_dev` and disposable `eshopverse_test`.
 
 ### Step 2 — CAT-001 — Catalog read API and fictional seed data
 
