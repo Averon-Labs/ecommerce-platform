@@ -14,8 +14,20 @@
 */
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
+
+// --------------------------------------------------------------- Catalog (public)
+
+Route::get('categories', [CategoryController::class, 'index'])
+    ->middleware('throttle:public-read');
+Route::get('products', [ProductController::class, 'index'])
+    ->middleware('throttle:public-read');
+Route::get('products/{productId}', [ProductController::class, 'show'])
+    ->whereNumber('productId')
+    ->middleware('throttle:public-read');
 
 // ------------------------------------------------------------- Customer auth
 

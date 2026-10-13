@@ -102,7 +102,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 ### Step 2 — CAT-001 — Catalog read API and fictional seed data
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-002, FND-004, FND-005
 
@@ -119,12 +119,12 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Acceptance criteria:**
 
-- [ ] **a.** Migrations enforce documented relationships, valid prices, product status, and image ordering; use fixed-precision USD money.
-- [ ] **b.** Seed/reset creates useful fictional categories/products/images reproducibly and never contains real personal data.
-- [ ] **c.** Listing, detail, category, search, sort, pagination, and empty-result behavior match OpenAPI.
-- [ ] **d.** Invalid filters and pagination boundaries return documented errors; inactive/unavailable products do not leak into customer results.
+- [x] **a.** Migrations enforce documented relationships, valid prices, product status, and image ordering; use fixed-precision USD money.
+- [x] **b.** Seed/reset creates useful fictional categories/products/images reproducibly and never contains real personal data.
+- [x] **c.** Listing, detail, category, search, sort, pagination, and empty-result behavior match OpenAPI.
+- [x] **d.** Invalid filters and pagination boundaries return documented errors; inactive/unavailable products do not leak into customer results.
 
-**Verification:** migration/seed checks and API feature tests for results, filters, pagination, validation, and public access.
+**Verification (2026-10-12):** four migrations (`categories`, `products`, `product_images`, `inventories`) enforce FK relationships, unsigned fixed-precision `price` decimal(11,2) (widened from decimal(10,2) during Step 3 — CAT-003 — so the column accepts the full contract Money pattern `^\d{1,9}\.\d{2}$`)/`quantity`, product/category status enums, unique SKU, one inventory row per product (unique `product_id`), and image ordering (`sort_order` + `id`). `DatabaseSeeder` seeds a deterministic fictional catalog (5 categories — 1 archived; 12 products — 1 inactive, 1 archived, 1 out-of-stock; 25 images; placeholder URLs via `picsum.photos` seed strings; no real personal data) idempotently via `updateOrCreate`. Endpoints: `GET /categories` (active only, `sortOrder` then `name`), `GET /products` (`q` case-insensitive name/description search with escaped LIKE wildcards, `categoryId` → 422 `CATEGORY_NOT_FOUND` for unknown/archived, `inStock`, four sort orders, `page`/`perPage` 1–100, pagination meta with 0-page empty results), `GET /products/{productId}` (ordered images, exact `stockQuantity`, 404 for missing/inactive/archived/non-numeric). Money serialized as a two-fraction-digit decimal string plus `USD`; listings expose only the boolean `inStock`. Rate limited `public-read` 120/min/IP. `php artisan test` = 60 tests, 502 assertions, 0 failures (38 AUTH-001 + 22 new CAT-001); `vendor\bin\pint --test` passed; live smoke of all five read paths against seeded `eshopverse_dev` verified.
 
 ### Step 3 — CAT-003 — Admin catalog and inventory API
 
