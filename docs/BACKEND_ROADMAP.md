@@ -157,7 +157,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 ### Step 1 — CART-001 — Customer cart API
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-002, FND-004, AUTH-001, CAT-001
 
@@ -174,16 +174,16 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Acceptance criteria:**
 
-- [ ] **a.** Server validates product availability, positive bounded quantity, and current product/stock state on every mutation.
-- [ ] **b.** Cart totals use server-side fixed-precision money; clients cannot set authoritative prices.
-- [ ] **c.** Customer ownership is enforced on every read and mutation; tests try another customer's cart identifiers.
-- [ ] **d.** Empty cart, unavailable product, stock conflict, invalid quantity, and normal edits return the documented outcomes.
+- [x] **a.** Server validates product availability, positive bounded quantity, and current product/stock state on every mutation.
+- [x] **b.** Cart totals use server-side fixed-precision money; clients cannot set authoritative prices.
+- [x] **c.** Customer ownership is enforced on every read and mutation; tests try another customer's cart identifiers.
+- [x] **d.** Empty cart, unavailable product, stock conflict, invalid quantity, and normal edits return the documented outcomes.
 
-**Verification:** database-backed API tests for all mutations, totals, errors, and cross-customer authorization.
+**Verification (2026-10-14):** Implemented against `docs/openapi.yaml` Cart operations `getCart`, `addCartItem`, `updateCartItem`, `removeCartItem`, `clearCart`. Schema: `carts` (unique `user_id`, lazily created on first mutation) and `cart_items` (unique `cart_id`+`product_id`, unsigned quantity, `added_at`); the `unit_price` decimal(11,2) add-time snapshot was added — and `docs/DATABASE.md` amended — because the binding contract's `CartItem.priceChanged` requires a stored line price to compare against the current product price. Ownership: the cart is implicit per bearer token — no client-facing cart identifier exists to leak — and a two-customer test proves each token only ever sees and mutates its own lines (a foreign line answers 404 `CART_ITEM_NOT_FOUND`). Mutations (`throttle:customer-write`, the new 60/min/token limiter from `x-rate-limit-classes`, registered in `AppServiceProvider`) validate on every call: missing product 404 `NOT_FOUND`, non-`active` product 409 `PRODUCT_UNAVAILABLE`, quantity outside 1..99 (and increments pushing a line past 99) 422 `VALIDATION_ERROR`, quantity above current stock 409 `INSUFFICIENT_STOCK` with the available count in `error.details`; adding increments an existing line. Every read reprices all lines from the current product record (`App\Support\Money` integer-cent arithmetic, never floats), so price drift and newly-unavailable/out-of-shopped lines surface as `priceChanged`/`unavailable`/`hasIssues` without client action; `subtotal` includes all lines, the flat USD 5.00 sample shipping (`x-money-rules` OPEN-3) is previewed for any non-empty cart while an empty cart answers `0.00` shipping/total (recorded decision: an empty cart previews no order), and clients can never set a price (request bodies accept only the contract fields; `ApiFormRequest` rejects unknown fields). `php artisan test` = 110 tests, 1343 assertions, 0 failures (23 new in `tests/Feature/Cart/CartTest.php`); `vendor\bin\pint --test` passes.
 
 ### Step 2 — ORD-001 — Order creation and simulated payment API
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-002, FND-004, AUTH-001, CAT-001, CART-001
 
@@ -198,18 +198,18 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 - Shipping calculation (sample) strategy defined
 - Immutable snapshot strategy for products/prices/addresses
 
-**Scope:** server-authoritative checkout quote/order creation, address and line-item snapshots, idempotency, and explicitly simulated success/failure payment outcomes.
+**Scope:** server-authoritative checkout quote/order creation, address and line-item snapshots, idempotency, and explicitly simulated success/failure payment outcomes, plus the admin order list/detail/status operations that the Admin Roadmap's ORD-003 expects this task to provide (recorded scope decision; no other backend task owns them).
 
 **Acceptance criteria:**
 
-- [ ] **a.** Server recalculates prices, subtotal, configured sample shipping, and total using fixed precision; it ignores client totals.
-- [ ] **b.** Order stores immutable product/address/price snapshots and follows documented state transitions.
-- [ ] **c.** Order creation and payment/stock transitions are transaction-safe under concurrent or stale-stock requests; match `DATABASE.md` by changing inventory transactionally only when simulated payment succeeds.
-- [ ] **d.** Repeating the same idempotency key/request does not create duplicate orders; conflicting reuse returns a documented result.
-- [ ] **e.** Simulation accepts no card data, calls no real provider, and clearly distinguishes success from failure; failed payment is never shown as paid.
-- [ ] **f.** Tests cover duplicate submission, stale stock, insufficient stock, transaction rollback, totals, ownership, and both payment outcomes.
+- [x] **a.** Server recalculates prices, subtotal, configured sample shipping, and total using fixed precision; it ignores client totals.
+- [x] **b.** Order stores immutable product/address/price snapshots and follows documented state transitions.
+- [x] **c.** Order creation and payment/stock transitions are transaction-safe under concurrent or stale-stock requests; match `DATABASE.md` by changing inventory transactionally only when simulated payment succeeds.
+- [x] **d.** Repeating the same idempotency key/request does not create duplicate orders; conflicting reuse returns a documented result.
+- [x] **e.** Simulation accepts no card data, calls no real provider, and clearly distinguishes success from failure; failed payment is never shown as paid.
+- [x] **f.** Tests cover duplicate submission, stale stock, insufficient stock, transaction rollback, totals, ownership, and both payment outcomes.
 
-**Verification:** database-backed API/transaction tests, idempotency tests, and security/ownership tests.
+**Verification (2026-10-14):** Implemented against `docs/openapi.yaml` Checkout/Orders operations `createCheckoutQuote`, `createOrder`, `listOrders`, `getOrder`, `submitSimulatedPayment` plus the three Admin orders operations (`adminListOrders`, `adminGetOrder`, `adminUpdateOrderStatus` — the Admin Roadmap's ORD-003 dependency folded into this task's scope as recorded above). Schema: four migrations — `orders` (unique `reference` = `ESV-` + zero-padded primary key set inside the creating transaction, `shipping_address_snapshot` JSON, append-only `timeline` JSON; `payment_status` deliberately derived from the latest `demo_payments` row so it can never drift), `order_items` (immutable product-name/quantity/unit-price snapshots; products are archived, never deleted, so snapshots stay intact), `demo_payments`, and `idempotency_keys` (unique user+endpoint+key — added because the contract requires `Idempotency-Key` and the logical model had no store; documented in `DATABASE.md` together with the Orders decisions). Pricing: `App\Support\CartPricing` was extracted from the CART-001 controller so `GET /cart`, the quote, and order creation share one integer-cent repricing path; the server recomputes subtotal + flat USD 5.00 (`x-money-rules` OPEN-3) + total and ignores every client money field (unknown fields answer 422 via `ApiFormRequest`). Quote: side-effect free, validates the `ShippingAddress` schema (422), answers 409 `CART_EMPTY`/`PRODUCT_UNAVAILABLE`/`INSUFFICIENT_STOCK`, and echoes the address with a deterministic `addr_` fingerprint. Create: `201` with immutable snapshots and the cart emptied; 409 `CART_EMPTY`/`INSUFFICIENT_STOCK` only (recorded decision: availability is the quote's documented gate — the `POST /orders` 409 list documents no `PRODUCT_UNAVAILABLE`); idempotency replays the stored `201` for the same key+body, answers 409 `IDEMPOTENCY_KEY_REUSED` for a different body and 400 `MISSING_IDEMPOTENCY_KEY` for absent/non-UUID keys, and its record is scoped per user+endpoint and written inside the creating transaction so a concurrent duplicate insert rolls the whole order back. Reads: paged newest-first owned summaries; a foreign order answers 404, never 403. Payment: `success` locks the inventory rows, re-checks availability, decrements transactionally, moves the order to `confirmed`, and records a `completed` demo payment (`DEMO-` + 12 `[A-Z0-9]`); stale stock answers 409 `INSUFFICIENT_STOCK` and rolls everything back (recorded decision: this operation's own 409 list omits the stale-stock case, but integrity forbids overselling and the code exists in the global `x-error-codes`); `failure` records a `failed` attempt and keeps `pending_payment` so the customer retries with a new key (OPEN-4), and a failed payment is never rendered as paid; duplicate submissions replay without a second decrement; non-pending orders answer 409 `INVALID_ORDER_STATE`; any body field beyond `outcome` is 422, so card data cannot be submitted. Admin: list filters LIKE-escaped `q` (reference/customer email), `status`, inclusive UTC `from`/`to`, and page/perPage; detail exposes `allowedTransitions` from `App\Support\OrderStateMachine` (`confirmed` reachable only through payment); `PATCH /admin/orders/{orderId}/status` applies a permitted transition or answers 409 `INVALID_TRANSITION`, appends to `timeline`, and is throttled `admin-write`; quote/create/payment carry `throttle:customer-write`. Test-environment note for later admin suites: the admin session identity persists in-process, so every customer call must run before `actingAsAdmin()` (Sanctum resolves the session guard before bearer tokens). `php artisan test` = 143 tests, 1947 assertions, 0 failures (33 new: 25 in `tests/Feature/Order/OrderTest.php`, 8 in `tests/Feature/Admin/AdminOrderTest.php`); `vendor\bin\pint --test` passes. Phase-2 completion sweep (2026-10-14): a fresh-eyes audit of CART-001 + ORD-001 against the binding contract confirmed full schema/error-code/rate-limit conformance and fixed two concurrency defects under criterion (c) — `POST /orders/{orderId}/payment` now locks every stock row in one `product_id`-ordered statement (the previous per-line locking reads took rows in cart-line order, so two concurrent payments on differently ordered carts could interleave locks and deadlock), and the admin status update now performs its read-modify-write inside a transaction on a locked order row (a stale read could overwrite a concurrently appended payment timeline event). Behavior is unchanged; the full suite still reports 143 tests, 1947 assertions, 0 failures.
 
 ## Phase 3 — Quality and Portfolio Delivery
 

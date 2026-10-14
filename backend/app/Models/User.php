@@ -7,6 +7,8 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -42,5 +44,19 @@ class User extends Authenticatable
             'role' => 'string',
             'status' => 'string',
         ];
+    }
+
+    /** @return HasOne<Cart, $this> */
+    public function cart(): HasOne
+    {
+        // CART-001: exactly one persistent cart per signed-in customer.
+        return $this->hasOne(Cart::class);
+    }
+
+    /** @return HasMany<Order, $this> */
+    public function orders(): HasMany
+    {
+        // ORD-001: a customer owns every order they placed.
+        return $this->hasMany(Order::class);
     }
 }
