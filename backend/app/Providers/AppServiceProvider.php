@@ -73,5 +73,15 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('admin-write', function (Request $request) {
             return Limit::perMinute(120)->by('admin-write:'.$request->user()?->getAuthIdentifier());
         });
+
+        // x-rate-limit-classes: customer-write { limit: 60, window: 1m, key: token }.
+        // CART-001 applies it to every cart mutation; ORD-001 to the
+        // checkout quote, order creation, and the simulated payment.
+        RateLimiter::for('customer-write', function (Request $request) {
+            $user = $request->user();
+            $key = $user?->currentAccessToken()?->id ?? $user?->getAuthIdentifier() ?? $request->ip();
+
+            return Limit::perMinute(60)->by('customer-write:'.$key);
+        });
     }
 }

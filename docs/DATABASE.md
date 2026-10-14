@@ -91,9 +91,10 @@ Categories are flat in the first release; hierarchical categories are deferred. 
 | cart_id | Foreign Key | References Cart |
 | product_id | Foreign Key | References Products |
 | quantity | Integer | |
+| unit_price | Decimal(11,2) | Price snapshot taken when the line was added; compared with the current product price on every read to expose the contract's `priceChanged` flag |
 | added_at | Timestamp | |
 
-There is one cart per signed-in user in the first release. A cart contains at most one row per product.
+There is one cart per signed-in user in the first release. A cart contains at most one row per product. The `unit_price` snapshot column was added on 2026-10-14 for CART-001 so the accepted contract's `CartItem.priceChanged` behavior is observable (the binding contract supersedes the earlier price-less logical model).
 
 ### Orders
 
@@ -101,14 +102,18 @@ There is one cart per signed-in user in the first release. A cart contains at mo
 |-------|------|-------|
 | id | Primary Key | |
 | user_id | Foreign Key | References Users |
+| reference | String | Unique order reference `ESV-NNNNNN`, derived from the primary key |
 | status | Enum | pending_payment, confirmed, processing, shipped, delivered, cancelled |
 | subtotal_amount | Decimal | Sum of order item totals |
 | shipping_amount | Decimal | Fixed sample shipping amount; USD |
 | total_amount | Decimal | |
 | shipping_address_snapshot | JSON | Required immutable copy of the address used for this order |
 | notes | Text | Optional |
+| timeline | JSON | Recorded status transitions, oldest first (contract `Order.timeline`) |
 | created_at | Timestamp | |
 | updated_at | Timestamp | |
+
+Three recorded decisions for ORD-001 (2026-10-14): `reference` is generated as `ESV-` plus the zero-padded primary key (matching the contract's `ESV-000017` example) and set inside the creating transaction. `payment_status` is deliberately not a column — it is derived from the latest `demo_payments` row and answers `pending` when none exists, so it can never drift from the payment records. `timeline` is an append-only JSON array of `{status, at}` entries written at creation and on every applied transition. Stock is never reserved at order creation; inventory is decremented only inside the successful simulated-payment transaction, which locks the inventory rows and re-checks availability first (see Inventory above).
 
 ### Order Items
 
@@ -133,6 +138,21 @@ There is one cart per signed-in user in the first release. A cart contains at mo
 | status | Enum | pending, completed, failed |
 | transaction_id | String | Fictional demo reference; never a real payment credential |
 | created_at | Timestamp | |
+
+### Idempotency Keys
+
+| Field | Type | Notes |
+|-------|------|-------|
+| id | Primary Key | |
+| user_id | Foreign Key | References Users |
+| endpoint | String | Operation scope: `orders.create` or `orders.payment:<orderId>` |
+| key | String | Client-supplied `Idempotency-Key` header (UUID) |
+| hash | String | SHA-256 of the JSON request body |
+| response_code | Integer | Stored response status replayed on duplicate submission |
+| response_body | JSON | Stored response body replayed on duplicate submission |
+| created_at | Timestamp |
+
+Added on 2026-10-14 for ORD-001 because the accepted contract requires an `Idempotency-Key` header on `POST /orders` and `POST /orders/{orderId}/payment`, and the earlier logical model had no store for it. Rows are unique per (user, endpoint, key): the same key with the same body replays the stored response without repeating the mutation, while reuse with a different body answers `409 IDEMPOTENCY_KEY_REUSED`. The row is written inside the mutation's own transaction, so a concurrent duplicate insert rolls the whole mutation back instead of applying it twice.
 
 ### Deferred Domains
 

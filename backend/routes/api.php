@@ -16,9 +16,12 @@
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminInventoryController;
+use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -49,6 +52,37 @@ Route::prefix('auth')->group(function (): void {
         Route::get('profile', [AuthController::class, 'showProfile']);
         Route::patch('profile', [AuthController::class, 'updateProfile']);
     });
+});
+
+// ----------------------------------------------------------- Customer cart (CART-001)
+
+Route::middleware('auth:sanctum')->group(function (): void {
+    Route::get('cart', [CartController::class, 'show']);
+    Route::post('cart/items', [CartController::class, 'store'])
+        ->middleware('throttle:customer-write');
+    Route::patch('cart/items/{productId}', [CartController::class, 'update'])
+        ->whereNumber('productId')
+        ->middleware('throttle:customer-write');
+    Route::delete('cart/items/{productId}', [CartController::class, 'destroy'])
+        ->whereNumber('productId')
+        ->middleware('throttle:customer-write');
+    Route::delete('cart', [CartController::class, 'clear'])
+        ->middleware('throttle:customer-write');
+});
+
+// ------------------------------------------------ Checkout and orders (ORD-001)
+
+Route::middleware('auth:sanctum')->group(function (): void {
+    Route::post('checkout/quote', [OrderController::class, 'quote'])
+        ->middleware('throttle:customer-write');
+    Route::post('orders', [OrderController::class, 'store'])
+        ->middleware('throttle:customer-write');
+    Route::get('orders', [OrderController::class, 'index']);
+    Route::get('orders/{orderId}', [OrderController::class, 'show'])
+        ->whereNumber('orderId');
+    Route::post('orders/{orderId}/payment', [OrderController::class, 'pay'])
+        ->whereNumber('orderId')
+        ->middleware('throttle:customer-write');
 });
 
 // ----------------------------------------------------------- Admin session (AUTH-003)
@@ -93,6 +127,15 @@ Route::prefix('admin')->group(function (): void {
             Route::get('inventory', [AdminInventoryController::class, 'index']);
             Route::patch('inventory/{productId}', [AdminInventoryController::class, 'update'])
                 ->whereNumber('productId')
+                ->middleware('throttle:admin-write');
+
+            // ---------------------------------------------------- Admin orders (ORD-001)
+
+            Route::get('orders', [AdminOrderController::class, 'index']);
+            Route::get('orders/{orderId}', [AdminOrderController::class, 'show'])
+                ->whereNumber('orderId');
+            Route::patch('orders/{orderId}/status', [AdminOrderController::class, 'updateStatus'])
+                ->whereNumber('orderId')
                 ->middleware('throttle:admin-write');
         });
     });
