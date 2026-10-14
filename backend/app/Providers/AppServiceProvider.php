@@ -42,7 +42,18 @@ class AppServiceProvider extends ServiceProvider
         /*
          * Rate-limit classes from docs/openapi.yaml x-rate-limit-classes
          * (customer auth: AUTH-001, catalog: CAT-001, admin: AUTH-003).
+         *
+         * `global` applies to every operation, in addition to any narrower
+         * class below (QUAL-003). It is appended to the whole `api`
+         * middleware group in bootstrap/app.php, so the "global-only"
+         * operations (getCart, listOrders, getOrder, the admin reads, and
+         * getCustomerProfile) are covered even though they carry no
+         * per-route limiter of their own.
          */
+        RateLimiter::for('global', function (Request $request) {
+            return Limit::perMinute(300)->by($request->ip());
+        });
+
         RateLimiter::for('auth-login', function (Request $request) {
             return Limit::perMinute(10)->by($request->ip());
         });

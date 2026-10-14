@@ -23,6 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // QUAL-003: x-rate-limit-classes `global` (300/min/ip) applies to
+        // every operation, on top of the narrower per-operation limiters
+        // declared on individual routes in routes/api.php.
+        $middleware->appendToGroup('api', 'throttle:global');
+
         // AUTH-003: stateful (first-party SPA) requests to the API get
         // cookie sessions + CSRF verification; stateless bearer requests
         // (Android) pass through untouched.

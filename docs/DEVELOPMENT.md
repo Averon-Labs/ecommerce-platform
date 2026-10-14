@@ -177,24 +177,22 @@ php artisan serve        # http://127.0.0.1:8000  (health: GET /up)
 - Tests are hard-wired in `phpunit.xml` to `DB_CONNECTION=mysql` and `DB_DATABASE=eshopverse_test`. Never point them at `eshopverse_dev`.
 - `RefreshDatabase` wraps each test in a transaction after a one-time `migrate:fresh`, so test data never survives a run.
 
-**Verification status (re-verified 2026-10-12)** — executed on this checkout, output recorded:
+**Verification status (re-verified 2026-10-14, QUAL-005 clean-checkout rehearsal)** — executed on the committed backend tree, output recorded:
 
 | Command | Result |
 |---------|--------|
-| `composer install` | ✔ exit 0 — 79 packages from `composer.lock` (2026-10-11; `vendor/` unchanged) |
-| setup (`Copy-Item .env.example .env`, `php artisan key:generate`) | ✔ the skeleton's `post-root-package-install` created `.env` from `.env.example` and `key:generate` reported `Application key set successfully`; no secret is checked in |
+| `composer install` | ✔ exit 0 — packages resolved from the committed `composer.lock` |
+| setup (`Copy-Item .env.example .env`, `php artisan key:generate`) | ✔ `.env` created from `.env.example` (placeholders only); `key:generate` reported `Application key set successfully`; no secret is checked in |
 | `composer validate --strict` | ✔ `./composer.json is valid` |
 | `composer audit` | ✔ `No security vulnerability advisories found` |
-| `php artisan migrate` | ✔ 3 migrations ran on `eshopverse_dev` (local MySQL **8.4.0**, 2026-10-12) |
-| `php artisan migrate:status` | ✔ all 3 `[1] Ran` |
-| `php artisan test` | ✔ 5 tests, 8 assertions, 0 failures (runs on `eshopverse_test`) |
+| `php artisan migrate` / `php artisan migrate:fresh --seed` | ✔ all 15 migrations ran on local MySQL **8.4.0**; seeding produced 2 users (1 admin), 5 categories, 12 products (10 active), 12 inventories |
+| `php artisan test` | ✔ 153 tests, 2062 assertions, 0 failures (runs on `eshopverse_test`) |
 | `vendor\bin\pint --test` | ✔ `{"result":"passed"}` |
-| `php artisan serve` | ✔ `GET /up` → 200, `GET /api/v1/definitely-not-a-route` → 404 |
+| `php artisan serve` | ✔ `GET /up` → 200 |
 
-The development database for this run is the **local zip-based MySQL 8.4** workflow described
-above. The original 2026-10-11 run used a hosted MySQL 8.4.11 service over verified TLS 1.3, but
-the free tier was deleted by the provider after inactivity, so every database-dependent command
-was re-verified locally on 2026-10-12. Host and credentials live only in `.env`.
+The OpenAPI contract (`docs/openapi.yaml`) was **not modified** in Phase 3, so the accepted Redocly lint baseline recorded under *OpenAPI contract lint (FND-004)* — 0 errors, 2 intentional warnings — still holds unchanged.
+
+The development database for this run is the **local zip-based MySQL 8.4** workflow described above. Host and credentials live only in `.env`.
 
 **TLS:** `docs/SECURITY.md` requires encrypted database connections where the hosting provider
 supports it. The local workflow binds to `127.0.0.1` loopback only — traffic never leaves the

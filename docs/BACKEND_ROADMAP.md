@@ -221,11 +221,15 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Component contribution:** Supply API/database-side purchase-flow regression evidence and resolve backend-specific failures.
 
+**Backend contribution (2026-10-14):** `tests/Feature/Quality/PurchaseFlowRegressionTest.php` walks the documented customer journey end to end against the real seeded store — sign in as the seeded demo customer, browse the catalog, add/update a cart line, quote, create an order (immutable snapshots, cart emptied), complete the simulated success, and read the resulting order — verifying the database side effects (inventory decremented, payment `completed`, timeline `pending_payment → confirmed`). It also covers the boundary cases: duplicate submission (same key+body replays, conflicting reuse 409 `IDEMPOTENCY_KEY_REUSED`), simulated failure (stays `pending_payment`, stock unchanged, retryable), and an object-level authorization boundary (another customer answers 404). Isolated disposable data, no real provider. Backend-side regression evidence delivered; the canonical task stays open pending the Android and admin contributions.
+
 ### Step 2 — QUAL-002 — Component contribution
 
 **Canonical task:** [QUAL-002 in the Project Roadmap](ROADMAP.md). The task scope, status, acceptance criteria, and verification record live only in that canonical entry.
 
 **Component contribution:** Verify API error behavior and backend-supported UI states against shared quality requirements.
+
+**Backend contribution (2026-10-14):** `tests/Feature/Quality/ApiQualityStateTest.php` verifies the two contract behaviors every screen depends on: (1) every failure path — 401 `UNAUTHENTICATED`, 404 `NOT_FOUND`, 409 `CART_EMPTY`, 422 `VALIDATION_ERROR` — returns the single documented `{error:{code,message[,details]}}` envelope so a client can render one generic error state, and (2) every empty result — the cart-less cart read, an empty order list, a no-match catalog search, and a page requested past the end — returns a well-formed payload (correct `pagination` with `totalPages` 0) so screens show an empty state rather than a dead end. This proves the server supports consistent loading/empty/error/success/retry states at the contract layer; the Android/admin rendering of those states is their components' contribution.
 
 ### Step 3 — QUAL-003 — Component contribution
 
@@ -233,14 +237,20 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Component contribution:** Review authentication, authorization, validation, rate limits, data protection, logging, and dependency risks.
 
+**Backend contribution (2026-10-14):** Findings record in [`SECURITY_REVIEW.md`](SECURITY_REVIEW.md). One in-scope, high-risk finding was **fixed**: the contract's `global` 300/min/ip rate limiter (`x-rate-limit-classes`, which applies to every operation in addition to narrower classes) was not implemented — the "global-only" operations (`getCart`, `listOrders`, `getOrder`, `getCustomerProfile`, all admin reads, `password-reset/confirm`) carried no throttle at all. It is now registered in `AppServiceProvider` and appended to the whole `api` middleware group in `bootstrap/app.php`, stacking with the narrower per-route limiters; regression test `RateLimitRegressionTest` pins it. Remaining checks passed with no defects: `composer audit` clean, `composer validate --strict` valid, no committed secrets (`.env` git-ignored, `.env.example` placeholders only), Eloquent/parameterized queries only, user-safe error envelope with no stack traces/SQL/paths, bcrypt hashing, no PII/token logging, object-level ownership returns 404 not 403. Accepted non-production limitations (simulated payment, loopback HTTP, demo-tuned limits) are recorded per `SECURITY.md`.
+
 ### Step 4 — QUAL-004 — Component contribution
 
 **Canonical task:** [QUAL-004 in the Project Roadmap](ROADMAP.md). The task scope, status, acceptance criteria, and verification record live only in that canonical entry.
 
 **Component contribution:** Verify backend setup, migrations, seed data, demo roles, reset, and limitations in the handoff guide.
 
+**Backend contribution (2026-10-14):** Created [`HANDOFF.md`](HANDOFF.md), a reviewer-facing guide covering the backend clean setup (`composer install` → `.env` → `key:generate` → `migrate:fresh --seed` → `test` → `pint` → `serve`), the seeded demo roles (local-only `demo@example.com` customer and the env/random-password `demo-admin@eshopverse.test` administrator — no committed public credential), the `php artisan migrate:fresh --seed` reset procedure, a walk-through of the purchase flow, and the known limitations (simulated payment, flat sample shipping, no production-readiness claim). The documented reset was executed against the development database: all 15 migrations ran and seeding produced 2 users (1 admin), 5 categories, 12 products (10 active), and 12 inventories. The visual walkthrough/screenshots (criterion c) remain the Android and admin contributions.
+
 ### Step 5 — QUAL-005 — Component contribution
 
 **Canonical task:** [QUAL-005 in the Project Roadmap](ROADMAP.md). The task scope, status, acceptance criteria, and verification record live only in that canonical entry.
 
 **Component contribution:** Run documented backend and OpenAPI checks from a clean checkout and report exact commands and outcomes.
+
+**Backend contribution (2026-10-14):** Ran the documented backend checks on the committed tree and recorded exact commands and results in the `DEVELOPMENT.md` verification table: `composer install` (exit 0), `.env` from `.env.example` + `key:generate` (no secret checked in), `composer validate --strict` (valid), `composer audit` (no advisories), `php artisan migrate:fresh --seed` (15 migrations, seeded demo store), `php artisan test` (153 tests, 2062 assertions, 0 failures), and `vendor\bin\pint --test` (passed). `docs/openapi.yaml` was not modified this phase, so the accepted Redocly lint baseline (0 errors, 2 intentional warnings from FND-004) still holds unchanged. The `phpunit.xml`-enforced test database (`eshopverse_test`) keeps runs isolated from the development database.
