@@ -90,10 +90,26 @@ This step does not replace Task Entry creation or the Builder/Tester/Debugger
 workflow — it only precedes and informs them. No source code, roadmap, or
 configuration files are modified during this session.
 
+
+### Pre-Task Knowledge Discovery (Optional, Before Creating a New Task Entry)
+
+When scope, terminology, or an architectural trade-off is unclear before
+writing a new Task entry, run a grilling session first:
+
+See [`.agents/skills/grill-with-docs.md`](.agents/skills/grill-with-docs.md).
+
+This interview clarifies ambiguity through dialogue and may update:
+- `GLOSSARY.md` — shared project terminology
+- `docs/decisions/` — a new ADR, always created with `Status: PROPOSED`
+  pending human approval, with `docs/DECISIONS.md` updated accordingly
+
+This step does not replace Task Entry creation or the Builder/Tester/Debugger
+workflow — it only precedes and informs them. No source code, roadmap, or
+configuration files are modified during this session.
+
 For ambiguity discovered *during* an already-assigned task (not before
 creating one), follow the focused-question rule in "Step Assignment and
 Clarification" below instead of starting a full grilling session.
-
 
 
 ### Step Assignment and Clarification
@@ -111,7 +127,7 @@ Clarification" below instead of starting a full grilling session.
 
 - Select one existing Task ID from the applicable component roadmap, or [`docs/ROADMAP.md`](docs/ROADMAP.md) only for an explicitly cross-component task; do not assign a whole phase as one implementation task.
 - The Task entry is canonical in exactly one roadmap and contains scope, dependencies, acceptance criteria, and verification expectations. Component tasks are executed and reported from their own roadmap. `docs/ROADMAP.md` owns cross-component tasks and final integration/release validation; do not copy criteria into another roadmap or per-task file.
-- If planned work is missing from the roadmap, add and review a Task entry there before implementation. Link a GitHub Issue if one exists.
+- If planned work is missing from the roadmap, add and review a Task entry there before implementation. Link a GitHub Issue if one exists. When scope or terminology is unclear before writing that Task entry, run a grilling session first (see "Pre-Task Knowledge Discovery" above). Link a GitHub Issue if one exists.
 - Create an optional `.ai/tasks/<TASK-ID>.md` or `.ai/plans/<TASK-ID>.md` only for substantial persistent context that cannot fit in the roadmap; link it from the Task entry and avoid duplicating acceptance criteria.
 
 ---
