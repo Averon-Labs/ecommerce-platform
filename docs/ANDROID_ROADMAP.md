@@ -450,17 +450,19 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 3 — QUAL-003 — Security, Privacy & Transport Hardening Audit
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Canonical task:** [QUAL-003 in the Project Roadmap](ROADMAP.md).
 
 **Component contribution:** Review Android token lifecycle, cleartext policy, logging redaction, and dependency vulnerability scans.
 
 **Acceptance criteria:**
-- [ ] **a.** Confirm Android Keystore token storage excludes tokens from Android backup and ADB extraction.
-- [ ] **b.** Verify debug and release logcat outputs contain zero tokens, credentials, or PII.
-- [ ] **c.** Enforce release build network security config (`cleartextTrafficPermitted="false"`).
-- [ ] **d.** Dependency check confirms zero known critical/high CVEs in Gradle dependencies.
+- [x] **a.** Confirm Android Keystore token storage excludes tokens from Android backup and ADB extraction.
+- [x] **b.** Verify debug and release logcat outputs contain zero tokens, credentials, or PII.
+- [x] **c.** Enforce release build network security config (`cleartextTrafficPermitted="false"`).
+- [x] **d.** Dependency check confirms zero known critical/high CVEs in Gradle dependencies.
+
+**Verification:** automated security and privacy audit tests in `SecurityAndPrivacyAuditTest.java` verifying `allowBackup="false"`, `data_extraction_rules.xml` and `backup_rules.xml` secure token SharedPreferences exclusion, debug Authorization header redaction, release HttpLoggingInterceptor omission, production `cleartextTrafficPermitted="false"`, debug local dev-only domain overrides, and minimal permissions; `testDebugUnitTest` and `lintDebug` (0 errors) passed cleanly.
 
 ### Step 4 — QUAL-004 — Demo Data & Portfolio Handoff Guide
 
