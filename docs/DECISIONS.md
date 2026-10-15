@@ -23,6 +23,8 @@ See [docs/decisions/README.md](decisions/README.md) for ADR conventions.
 | [ADR-003](decisions/ADR-003-secure-token-storage.md) | Secure token storage mechanism | ACCEPTED | 2026-10-10 |
 | [ADR-004](decisions/ADR-004-defer-room-persistence.md) | Defer Room local persistence for initial release | ACCEPTED | 2026-10-10 |
 | [ADR-005](decisions/ADR-005-local-mock-api-runner.md) | Local mock API server runner | ACCEPTED | 2026-10-10 |
+| [ADR-006](decisions/ADR-006-in-app-offline-mock-interceptor.md) | In-App OfflineMockInterceptor for Android Independent Development | PROPOSED | 2026-10-15 |
+| [ADR-007](decisions/ADR-007-dual-authentication-strategy.md) | Dual Authentication Strategy: Stateful SPA Sessions and Revocable Mobile Bearer Tokens | PROPOSED | 2026-10-15 |
 
 ---
 

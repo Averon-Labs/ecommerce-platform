@@ -29,6 +29,11 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **Scope:** create the React/TypeScript admin foundation; do not implement product workflows yet.
 
+> ⚠️ **Developer Alignment & Backend Integration Notes for FND-003:**
+> - **Port & Origins:** Backend has pre-configured `SANCTUM_STATEFUL_DOMAINS` with `localhost:5173` and `localhost:5174`. The React Vite dev server should run on port 5173 (`http://localhost:5173`).
+> - **API Base URL:** Default local Laravel backend runs at `http://localhost:8000/api/v1`.
+> - **Credentials & Cookies:** All HTTP client requests from Admin SPA must configure `credentials: 'include'` (withCredentials in Axios/Fetch) so Sanctum session cookies (`eshop_admin_session`) and `XSRF-TOKEN` are sent.
+
 **Acceptance criteria:**
 
 - [ ] **a.** Select supported stable tooling and commit the package lockfile; use the agreed Vitest and React Testing Library strategy or document a reviewed equivalent.
@@ -64,6 +69,12 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **Demo admin account:** created by a backend database seeder owned by the AUTH-003 backend portion; it is local/demo-only, is documented in the handoff guide (QUAL-004), and must never be a reusable public credential.
 
+> ⚠️ **Developer Alignment & Backend Contract Notes for AUTH-003:**
+> - **Backend Status:** The backend portion of AUTH-003 is ALREADY fully implemented in `AdminAuthController.php` and verified by tests.
+> - **CSRF Handshake:** Call `GET /api/v1/admin/auth/csrf` to initialize the `XSRF-TOKEN` cookie before login. Send `X-XSRF-TOKEN` header on mutation requests (`POST /api/v1/admin/auth/login`, `POST /api/v1/admin/auth/logout`).
+> - **Demo Admin Credentials:** `demo-admin@eshopverse.test` (password configured in local `.env` as `DEMO_ADMIN_PASSWORD`).
+> - **Session Storage:** Do NOT store tokens or passwords in `localStorage`. Rely exclusively on HttpOnly session cookie and `GET /api/v1/admin/auth/session` on initial app boot.
+
 **Scope:** secure first-party admin sign-in/session lifecycle, Sanctum CSRF flow, and server-enforced admin role checks.
 
 **Acceptance criteria:**
@@ -93,6 +104,9 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 - Form validation strategy decided
 - Error state UI patterns defined
 - Keyboard accessibility requirements understood
+
+> ⚠️ **Developer Alignment & Contract Notes for CAT-004:**
+> - **Category Lifecycle:** Categories use `status: 'active' | 'archived'`. Destructive deletion is not permitted; use archive API (`PATCH /api/v1/admin/categories/{id}`). Backend rejects archiving if active products remain assigned to the category.
 
 **Scope:** React admin screens for product, category, and stock management through the REST API.
 
@@ -124,6 +138,15 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 - Order status transition rules defined in backend
 - Admin order authorization rules defined
 - Order snapshot display patterns defined
+
+> ⚠️ **Developer Alignment & Contract Notes for ORD-003:**
+> - **Permitted Order Status Transitions:** Valid transitions enforced by backend state machine:
+>   - `pending_payment -> cancelled`
+>   - `confirmed -> processing | cancelled`
+>   - `processing -> shipped | cancelled`
+>   - `shipped -> delivered`
+>   - (`confirmed` can only be set via customer payment success, never manually by admin).
+> - **Order Timeline:** Render the server-provided `timeline` array of `{status, at}` records.
 
 **Scope:** admin order list/detail and permitted status updates.
 

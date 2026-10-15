@@ -200,9 +200,11 @@ English is the only supported API-facing locale in the first release. Error mess
 
 ---
 
-## Open Decisions
+## Open Decisions and Resolution Status
 
-- [x] **Reviewed and accepted by the API owner on 2026-10-12.** [`openapi.yaml`](openapi.yaml) is the approved OpenAPI 3.1 machine-readable contract, covering customer registration/login/logout/profile/password reset, public category and product read/search/sort/pagination, the authenticated cart, checkout quote and order creation with idempotency, the simulated payment outcome, customer order history and detail, admin session authentication, admin product/category/inventory management, admin order status transitions, the shared error envelope and error-code list, and the status-code contract. Endpoint and client integration must follow it; any contract change is made in the contract first (canonical task: Backend FND-004).
-- [x] Rate limits for each endpoint class — `x-rate-limit-classes` in [`openapi.yaml`](openapi.yaml), accepted with the contract.
-- [x] Category lifecycle — OPEN-2 (categories are archived, never deleted, and archiving is refused while non-archived products remain), closed 2026-10-11 and confirmed by acceptance.
-- [x] Items OPEN-1, OPEN-3, and OPEN-4 in [`openapi.yaml`](openapi.yaml) record the closed contract decisions (deployment host placeholder, flat sample shipping rate, and failed-payment order state).
+- [x] **Reviewed and accepted by the API owner (FND-004):** [`openapi.yaml`](openapi.yaml) is the approved OpenAPI 3.1 machine-readable contract, covering customer registration/login/logout/profile/password reset, public category and product read/search/sort/pagination, the authenticated cart, checkout quote and order creation with idempotency, the simulated payment outcome, customer order history and detail, admin session authentication, admin product/category/inventory management, admin order status transitions, the shared error envelope and error-code list, and the status-code contract. Endpoint and client integration must follow it; any contract change is made in the contract first (canonical task: Backend FND-004). Full backend implementation completed across Phase 1–3 (`c42dbd0`).
+- [x] **Rate limits (QUAL-003):** Implemented in backend `AppServiceProvider` and `bootstrap/app.php` using `x-rate-limit-classes` in [`openapi.yaml`](openapi.yaml) (global 300/min/ip plus per-operation throttles).
+- [x] **Category lifecycle (OPEN-2):** Resolved as archived-only (`status: active | archived`). Backend `AdminCategoryController` enforces refusal to archive while active products remain assigned.
+- [x] **Flat sample shipping rate (OPEN-3):** Resolved as USD 5.00 flat rate per order (`CartPricing::SAMPLE_SHIPPING_CENTS = 500`).
+- [x] **Failed payment order state (OPEN-4):** Resolved as remaining in `pending_payment` on simulated failure, leaving stock intact and allowing client payment retry.
+- [ ] **Production API Host (OPEN-1):** Placeholder `api.example.test` remains for local/demo runs; real host to be specified prior to production deployment.

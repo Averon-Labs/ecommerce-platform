@@ -18,8 +18,7 @@ All user-facing copy is English. Customer price and total displays use en-US USD
 - Do not add wishlists/favorites, product reviews/ratings, coupons, taxes, saved-address books, customer-management screens, notifications, CMS, or real payment fields. These features are deferred by the product/database scope.
 - Customer browsing is available without an account. A cart belongs to a signed-in customer. Do not create or persist a guest cart. For an auth-required action, follow the existing auth and return-navigation requirements; make no cart mutation until the customer is signed in.
 - Checkout shows subtotal plus the configured sample shipping amount; do not show a tax calculation or invent a discount.
-- Payment result and order status always reflect the server response. A failed or timed-out request must not be shown as success or trigger an unsafe duplicate order.
-- Category archive/delete behavior is not fully defined: `DATABASE.md` has no category status field while Backend CAT-003 and Admin CAT-004 include category archive behavior. Until OpenAPI and schema review resolve this, category screens support list/create/edit/reorder; destructive category actions stay hidden or disabled with an explanation.
+- Category archive lifecycle is resolved: categories use `status: active | archived`. Hard deletion is not permitted; archiving is refused while active products remain assigned. Category management screens support list, create, edit, reorder, and archive.
 
 ## Android customer application
 

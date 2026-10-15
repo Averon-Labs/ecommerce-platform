@@ -227,7 +227,7 @@ Phase 0 supplies every cross-cutting layer the screen tasks depend on, so Phase 
 - [x] **f.** MockWebServer tests using the shared fixtures prove success and failure parsing, the auth header, the no-retry rule, the 401 hook, and idempotency-key behaviour.
 - [x] **g.** The local mock server described in the mock strategy runs from the shared fixture directory and honours idempotency, so Phases 1 and 2 can be verified before the backend exists.
 
-**Verification:** 8 unit tests in `ApiClientTest` passing with MockWebServer, 10 shared fixture files in `fixtures/api/`, Python 3 local mock server in `tools/mock-api/server.py` (ADR-005), build-time base URL (`BuildConfig.API_BASE_URL` defaulting to `http://10.0.2.2:8081/api/v1` for debug and `https://api.eshopverse.example.com/api/v1` for release), `testDebugUnitTest` (50 passed), `assembleDebugAndroidTest`, and `lintDebug` passed with zero errors. Phase 0 complete!
+**Verification:** 8 unit tests in `ApiClientTest` passing with MockWebServer, 10 shared fixture files in `fixtures/api/`, Python 3 local mock server in `tools/mock-api/server.py` (ADR-005) and in-app offline mock capability via `OfflineMockInterceptor` (ADR-006), build-time base URL (`BuildConfig.API_BASE_URL` defaulting to `http://10.0.2.2:8081/api/v1` for debug and `https://api.eshopverse.example.com/api/v1` for release), `testDebugUnitTest` (50 passed), `assembleDebugAndroidTest`, and `lintDebug` passed with zero errors. Phase 0 complete!
 
 ## Phase 1 — Accounts and Catalog
 
@@ -490,21 +490,21 @@ These are the only cross-component items the Android tasks depend on. They are l
 coordination; their canonical scope, status, and criteria live in their own roadmaps and must not be
 reported as Android work.
 
-| Dependency | Canonical location | Effect on Android |
-|------------|--------------------|-------------------|
-| FND-004 — OpenAPI contract | [Backend Roadmap — Phase 0 — Step 2](BACKEND_ROADMAP.md) | Blocks starting any Phase 1/2 client integration until accepted |
-| AUTH-001 — Customer account API | [Backend Roadmap — Phase 1 — Step 1](BACKEND_ROADMAP.md) | Deferred to QUAL-001 integration; not a build blocker thanks to the mock strategy |
-| CAT-001 — Catalog read API and seed data | [Backend Roadmap — Phase 1 — Step 2](BACKEND_ROADMAP.md) | Deferred to QUAL-001 integration |
-| CART-001 — Customer cart API | [Backend Roadmap — Phase 2 — Step 1](BACKEND_ROADMAP.md) | Deferred to QUAL-001 integration |
-| ORD-001 — Order creation and simulated payment API | [Backend Roadmap — Phase 2 — Step 2](BACKEND_ROADMAP.md) | Deferred to QUAL-001 integration |
-| FND-005 — Setup documentation and CI | [Project Roadmap — Phase 0 — Step 4](ROADMAP.md) | Owns cross-component CI consolidation after FND-006 adds the Android job |
+| Dependency | Canonical location | Effect on Android | Status |
+|------------|--------------------|-------------------|--------|
+| FND-004 — OpenAPI contract | [Backend Roadmap — Phase 0 — Step 2](BACKEND_ROADMAP.md) | Blocks starting any Phase 1/2 client integration until accepted | **COMPLETE** (`openapi.yaml` accepted) |
+| AUTH-001 — Customer account API | [Backend Roadmap — Phase 1 — Step 1](BACKEND_ROADMAP.md) | Deferred to QUAL-001 integration; not a build blocker thanks to the mock strategy | **COMPLETE on `develop`** (ready for QUAL-001) |
+| CAT-001 — Catalog read API and seed data | [Backend Roadmap — Phase 1 — Step 2](BACKEND_ROADMAP.md) | Deferred to QUAL-001 integration | **COMPLETE on `develop`** (ready for QUAL-001) |
+| CART-001 — Customer cart API | [Backend Roadmap — Phase 2 — Step 1](BACKEND_ROADMAP.md) | Deferred to QUAL-001 integration | **COMPLETE on `develop`** (ready for QUAL-001) |
+| ORD-001 — Order creation and simulated payment API | [Backend Roadmap — Phase 2 — Step 2](BACKEND_ROADMAP.md) | Deferred to QUAL-001 integration | **COMPLETE on `develop`** (ready for QUAL-001) |
+| FND-005 — Setup documentation and CI | [Project Roadmap — Phase 0 — Step 4](ROADMAP.md) | Owns cross-component CI consolidation after FND-006 adds the Android job | **COMPLETE** (`.github/workflows/android.yml` live) |
 
 ## Open decisions affecting Android
 
-| ID | Question | Owner decision needed before |
-|----|----------|------------------------------|
-| OPEN-5 | Local mock server runner (Python 3 stdlib recommended) | NET-002 completion |
-| OPEN-6 | Token storage mechanism | DATA-002 |
-| OPEN-9 | `allowBackup` for the demo app | DATA-002 |
-| OPEN-10 | Room deferred for the first release | DATA-002 |
-| OPEN-1..4 | Contract decisions listed in [`openapi.yaml`](openapi.yaml) | FND-004 acceptance |
+| ID | Question | Owner decision needed before | Resolution / Current State |
+|----|----------|------------------------------|----------------------------|
+| OPEN-5 | Local mock server runner (Python 3 stdlib recommended) | NET-002 completion | **RESOLVED:** Python 3 stdlib runner implemented in `tools/mock-api/server.py` ([ADR-005](decisions/ADR-005-local-mock-server-strategy.md)) + in-app offline interceptor documented in [ADR-006](decisions/ADR-006-in-app-offline-mock-interceptor.md). |
+| OPEN-6 | Token storage mechanism | DATA-002 | **RESOLVED:** `KeystoreTokenStore` with Android Keystore backed `EncryptedSharedPreferences` implemented ([ADR-003](decisions/ADR-003-token-storage-strategy.md)). |
+| OPEN-9 | `allowBackup` for the demo app | DATA-002 | **RESOLVED:** Set `android:allowBackup="false"` in `AndroidManifest.xml` to prevent token/cache backup leakage. |
+| OPEN-10 | Room deferred for the first release | DATA-002 | **RESOLVED:** In-memory repository caches implemented; Room persistence deferred for release 1 ([ADR-004](decisions/ADR-004-data-persistence-strategy.md)). |
+| OPEN-1..4 | Contract decisions listed in [`openapi.yaml`](openapi.yaml) | FND-004 acceptance | **RESOLVED:** Base URL via `BuildConfig.API_BASE_URL` (OPEN-1); Category archive lifecycle via `CategoryStatus.ARCHIVED` (OPEN-2); Sample shipping flat $5.00 via server quote (OPEN-3); Failed payment leaves order in `pending_payment` without inventory decrement (OPEN-4). |
