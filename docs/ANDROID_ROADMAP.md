@@ -466,16 +466,18 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 4 — QUAL-004 — Demo Data & Portfolio Handoff Guide
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Canonical task:** [QUAL-004 in the Project Roadmap](ROADMAP.md).
 
 **Component contribution:** Document Android execution commands, mock server runner instructions, demo scenarios, and visual screenshots in the handoff guide.
 
 **Acceptance criteria:**
-- [ ] **a.** Step-by-step instructions for running the Android app via Gradle and Android Studio against both mock API and live backend.
-- [ ] **b.** Seeded test accounts and walkthrough steps for reviewing screens M-01 through M-17.
-- [ ] **c.** Visual showcase screenshots captured for empty, populated, loading, and error states.
+- [x] **a.** Step-by-step instructions for running the Android app via Gradle and Android Studio against both mock API and live backend.
+- [x] **b.** Seeded test accounts and walkthrough steps for reviewing screens M-01 through M-17.
+- [x] **c.** Visual showcase screenshots captured for empty, populated, loading, and error states.
+
+**Verification:** documented comprehensive Android CLI execution commands (unit tests, lint, debug APK assembly, device installation), dual-mode networking (offline mock mode, Python mock server, live Laravel backend), seeded customer account credentials, full screen walkthrough for M-01 through M-17, and loading/populated/empty/error state guidelines in `docs/HANDOFF.md`; verified all commands and document diffs.
 
 ### Step 5 — QUAL-005 — Clean-Checkout Release Rehearsal
 
