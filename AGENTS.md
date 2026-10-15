@@ -73,6 +73,29 @@ Debuggers must keep an attempt record and must not repeat a failed approach with
 6. **Follow Ponytail principles** — see [`.agents/skills/ponytail/SKILL.md`](.agents/skills/ponytail/SKILL.md) (minimal code, strict YAGNI, reuse existing libs/code).
 7. For substantial work, plan from the roadmap entry before implementing; keep the plan in the task discussion unless durable extra context is genuinely needed.
 
+
+### Pre-Task Knowledge Discovery (Optional, Before Creating a New Task Entry)
+
+When scope, terminology, or an architectural trade-off is unclear before
+writing a new Task entry, run a grilling session first:
+
+See [`.agents/skills/grill-with-docs.md`](.agents/skills/grill-with-docs.md).
+
+This interview clarifies ambiguity through dialogue and may update:
+- `GLOSSARY.md` — shared project terminology
+- `docs/decisions/` — a new ADR, always created with `Status: PROPOSED`
+  pending human approval, with `docs/DECISIONS.md` updated accordingly
+
+This step does not replace Task Entry creation or the Builder/Tester/Debugger
+workflow — it only precedes and informs them. No source code, roadmap, or
+configuration files are modified during this session.
+
+For ambiguity discovered *during* an already-assigned task (not before
+creating one), follow the focused-question rule in "Step Assignment and
+Clarification" below instead of starting a full grilling session.
+
+
+
 ### Step Assignment and Clarification
 
 - Identify work by roadmap name, phase, and step (for example, `Android Roadmap — Phase 1 — Step 1`) or by stable Task ID. Step numbering restarts at 1 in every phase. If the owner names a phase and step without identifying a roadmap, ask which component they mean. An Android assignment means Android Roadmap only; never expand it to backend/admin work because those tasks appear in a project-level gate or dependency list.
