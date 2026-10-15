@@ -1,0 +1,20 @@
+{
+  "data": [
+    {
+      "id": 5001,
+      "reference": "ESV-005001",
+      "status": "confirmed",
+      "paymentStatus": "completed",
+      "total": "94.99",
+      "currency": "USD",
+      "itemCount": 1,
+      "createdAt": "2026-10-10T12:00:00Z"
+    }
+  ],
+  "pagination": {
+    "currentPage": 1,
+    "perPage": 20,
+    "totalItems": 1,
+    "totalPages": 1
+  }
+}

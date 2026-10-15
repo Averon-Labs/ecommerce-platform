@@ -1,0 +1,43 @@
+{
+  "data": {
+    "id": 5001,
+    "reference": "ESV-005001",
+    "status": "confirmed",
+    "paymentStatus": "completed",
+    "subtotal": "89.99",
+    "shipping": "5.00",
+    "total": "94.99",
+    "currency": "USD",
+    "createdAt": "2026-10-10T12:00:00Z",
+    "updatedAt": "2026-10-10T12:05:00Z",
+    "shippingAddress": {
+      "recipientName": "John Doe",
+      "line1": "123 Main St",
+      "line2": "Apt 4B",
+      "city": "Metropolis",
+      "region": "NY",
+      "postalCode": "10001",
+      "country": "US"
+    },
+    "notes": "Please leave at door",
+    "items": [
+      {
+        "productId": 101,
+        "productName": "Classic Leather Sneaker",
+        "unitPrice": "89.99",
+        "quantity": 1,
+        "lineTotal": "89.99"
+      }
+    ],
+    "timeline": [
+      {
+        "status": "pending_payment",
+        "at": "2026-10-10T12:00:00Z"
+      },
+      {
+        "status": "confirmed",
+        "at": "2026-10-10T12:05:00Z"
+      }
+    ]
+  }
+}
