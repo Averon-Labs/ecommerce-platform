@@ -33,4 +33,7 @@
     <string name="payment_status_completed">Completed</string>
     <string name="payment_status_failed">Failed</string>
     <string name="payment_status_refunded">Refunded</string>
+
+    <!-- Accessibility Descriptions -->
+    <string name="order_card_content_description">Order %1$s, status %2$s, placed %3$s, %4$s, total %5$s</string>
 </resources>

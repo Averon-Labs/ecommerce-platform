@@ -36,10 +36,12 @@ public final class QuantityStepperView extends LinearLayout {
         setGravity(Gravity.CENTER_VERTICAL);
 
         decrementButton = createButton(context, "−");
+        decrementButton.setContentDescription(context.getString(R.string.catalog_cd_stepper_decrement));
         quantityText = new MaterialTextView(context);
         quantityText.setTextAppearance(R.style.TextAppearance_EShopVerse_ComponentTitle);
         quantityText.setGravity(Gravity.CENTER);
         incrementButton = createButton(context, "+");
+        incrementButton.setContentDescription(context.getString(R.string.catalog_cd_stepper_increment));
 
         addView(decrementButton, buttonLayoutParams());
         addView(quantityText, new LayoutParams(
@@ -106,7 +108,21 @@ public final class QuantityStepperView extends LinearLayout {
         }
     }
 
+    public MaterialButton getDecrementButton() {
+        return decrementButton;
+    }
+
+    public MaterialButton getIncrementButton() {
+        return incrementButton;
+    }
+
+    public MaterialTextView getQuantityTextView() {
+        return quantityText;
+    }
+
     private void renderQuantity() {
-        quantityText.setText(String.valueOf(quantityRange.getQuantity()));
+        int qty = quantityRange.getQuantity();
+        quantityText.setText(String.valueOf(qty));
+        quantityText.setContentDescription(getContext().getString(R.string.stepper_quantity_desc, qty));
     }
 }

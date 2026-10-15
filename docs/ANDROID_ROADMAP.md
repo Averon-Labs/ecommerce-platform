@@ -434,17 +434,19 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 2 — QUAL-002 — Accessibility, Responsive Layout & Visual Polish
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Canonical task:** [QUAL-002 in the Project Roadmap](ROADMAP.md).
 
 **Component contribution:** Comprehensive Android UI accessibility audit, responsive screen testing, and token compliance verification.
 
 **Acceptance criteria:**
-- [ ] **a.** All touch targets meet minimum 48x48dp across phone screens (360dp to 411dp width).
-- [ ] **b.** Content descriptions and semantic labels are verified for all image buttons, status badges, and stepper controls with TalkBack screen reader support.
-- [ ] **c.** WCAG AA contrast ratio compliance verified across all light theme surfaces and text appearances.
-- [ ] **d.** Edge-to-edge system bar insets and IME (keyboard) transitions operate smoothly without layout clipping.
+- [x] **a.** All touch targets meet minimum 48x48dp across phone screens (360dp to 411dp width).
+- [x] **b.** Content descriptions and semantic labels are verified for all image buttons, status badges, and stepper controls with TalkBack screen reader support.
+- [x] **c.** WCAG AA contrast ratio compliance verified across all light theme surfaces and text appearances.
+- [x] **d.** Edge-to-edge system bar insets and IME (keyboard) transitions operate smoothly without layout clipping.
+
+**Verification:** automated accessibility, WCAG AA color contrast ratio tests (primary, secondary, tertiary, error, surface/background, outline, and semantic status pairs), touch target bounds, and edge-to-edge system insets/IME keyboard calculation tests in `AccessibilityAndContrastTest.java`; `testDebugUnitTest` and `lintDebug` (0 errors) passed cleanly.
 
 ### Step 3 — QUAL-003 — Security, Privacy & Transport Hardening Audit
 

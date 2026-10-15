@@ -163,7 +163,9 @@ public class ExploreFragment extends Fragment {
             public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
                 Chip chip = (Chip) holder.itemView;
                 if (position == 0) {
-                    chip.setText(R.string.catalog_category_all);
+                    String label = getString(R.string.catalog_category_all);
+                    chip.setText(label);
+                    chip.setContentDescription(getString(R.string.catalog_cd_category_chip, label));
                     chip.setChecked(categoryViewModel.getSelectedCategoryId().getValue() == null);
                     chip.setOnClickListener(v -> {
                         categoryViewModel.selectCategory(null);
@@ -172,6 +174,7 @@ public class ExploreFragment extends Fragment {
                 } else {
                     Category category = categories.get(position - 1);
                     chip.setText(category.getName());
+                    chip.setContentDescription(getString(R.string.catalog_cd_category_chip, category.getName()));
                     Long currentSelected = categoryViewModel.getSelectedCategoryId().getValue();
                     long catId = (long) category.getId();
                     boolean isSelected = currentSelected != null && currentSelected == catId;

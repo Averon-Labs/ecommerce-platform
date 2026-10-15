@@ -1,20 +1,22 @@
 package com.averonlabs.eshopverse.core.ui.view;
 
-final class QuantityRange {
+public final class QuantityRange {
     private int min = 1;
     private int max = Integer.MAX_VALUE;
     private int quantity = 1;
 
-    int getQuantity() {
+    public QuantityRange() {}
+
+    public int getQuantity() {
         return quantity;
     }
 
-    int setQuantity(int value) {
+    public int setQuantity(int value) {
         quantity = clamp(value);
         return quantity;
     }
 
-    int setMin(int value) {
+    public int setMin(int value) {
         if (value < 0 || value > max) {
             throw new IllegalArgumentException("Minimum must be non-negative and no greater than maximum");
         }
@@ -22,7 +24,7 @@ final class QuantityRange {
         return setQuantity(quantity);
     }
 
-    int setMax(int value) {
+    public int setMax(int value) {
         if (value < min) {
             throw new IllegalArgumentException("Maximum must be no less than minimum");
         }
@@ -30,14 +32,14 @@ final class QuantityRange {
         return setQuantity(quantity);
     }
 
-    int increment() {
+    public int increment() {
         if (quantity < max) {
             quantity++;
         }
         return quantity;
     }
 
-    int decrement() {
+    public int decrement() {
         if (quantity > min) {
             quantity--;
         }

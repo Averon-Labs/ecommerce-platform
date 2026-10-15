@@ -63,10 +63,18 @@ public class OrderAdapter extends ListAdapter<OrderSummary, OrderAdapter.OrderVi
 
             binding.tvOrderTotal.setFormattedPrice(MoneyFormat.format(order.getTotalMoney()));
 
-            binding.badgeOrderStatus.setText(
-                    binding.getRoot().getContext().getString(OrderStatusFormatter.getStatusTextRes(order.getStatus()))
-            );
+            String statusLabel = binding.getRoot().getContext().getString(OrderStatusFormatter.getStatusTextRes(order.getStatus()));
+            binding.badgeOrderStatus.setText(statusLabel);
             binding.badgeOrderStatus.setStatus(OrderStatusFormatter.getBadgeStatus(order.getStatus()));
+
+            binding.cardOrder.setContentDescription(binding.getRoot().getContext().getString(
+                    R.string.order_card_content_description,
+                    order.getReference(),
+                    statusLabel,
+                    order.getCreatedAt(),
+                    itemCountText,
+                    MoneyFormat.format(order.getTotalMoney())
+            ));
 
             binding.getRoot().setOnClickListener(v -> listener.onOrderClick(order));
         }
