@@ -11,6 +11,9 @@
     <string name="account_title">Account</string>
     <string name="action_search">Search</string>
     <string name="action_account">Account</string>
+    <string name="action_theme_toggle">Toggle Theme</string>
+    <string name="theme_light_desc">Switch to dark mode</string>
+    <string name="theme_dark_desc">Switch to light mode</string>
 
     <!-- Global Accessibility and Screen Reader Labels -->
     <string name="status_badge_description">Status: %1$s</string>

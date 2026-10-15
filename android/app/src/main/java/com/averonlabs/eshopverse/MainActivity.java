@@ -19,6 +19,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.averonlabs.eshopverse.core.ui.ThemeManager;
 import com.averonlabs.eshopverse.databinding.ActivityMainBinding;
 import com.google.android.material.badge.BadgeDrawable;
 
@@ -32,12 +33,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        boolean isDarkMode = ThemeManager.isDarkMode(this);
         WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
         if (insetsController != null) {
-            insetsController.setAppearanceLightStatusBars(true);
-            insetsController.setAppearanceLightNavigationBars(true);
+            insetsController.setAppearanceLightStatusBars(!isDarkMode);
+            insetsController.setAppearanceLightNavigationBars(!isDarkMode);
         }
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -154,6 +157,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_home, menu);
+        MenuItem themeItem = menu.findItem(R.id.action_theme_toggle);
+        if (themeItem != null) {
+            boolean isDarkMode = ThemeManager.isDarkMode(this);
+            themeItem.setIcon(isDarkMode ? R.drawable.ic_light_mode : R.drawable.ic_dark_mode);
+            themeItem.setTitle(isDarkMode ? R.string.theme_dark_desc : R.string.theme_light_desc);
+        }
         return true;
     }
 
@@ -163,8 +172,8 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_search) {
             binding.bottomNav.setSelectedItemId(R.id.exploreFragment);
             return true;
-        } else if (id == R.id.action_account) {
-            binding.bottomNav.setSelectedItemId(R.id.accountFragment);
+        } else if (id == R.id.action_theme_toggle) {
+            ThemeManager.toggleTheme(this);
             return true;
         }
         if (navController != null && NavigationUI.onNavDestinationSelected(item, navController)) {

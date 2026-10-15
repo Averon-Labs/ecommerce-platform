@@ -23,19 +23,19 @@
     <color name="m3_on_error">#690005</color>
     <color name="m3_error_container">#93000A</color>
     <color name="m3_on_error_container">#FFDAD6</color>
-    <color name="m3_background">#000000</color>
+    <color name="m3_background">#121212</color>
     <color name="m3_on_background">#F0F0F4</color>
-    <color name="m3_surface">#0D0D0E</color>
+    <color name="m3_surface">#1E1E1E</color>
     <color name="m3_on_surface">#F0F0F4</color>
-    <color name="m3_surface_variant">#1A1C20</color>
-    <color name="m3_on_surface_variant">#C4C6D0</color>
-    <color name="m3_surface_container_lowest">#000000</color>
-    <color name="m3_surface_container_low">#0D0D0E</color>
-    <color name="m3_surface_container">#131416</color>
-    <color name="m3_surface_container_high">#1A1B1E</color>
-    <color name="m3_surface_container_highest">#222428</color>
+    <color name="m3_surface_variant">#282828</color>
+    <color name="m3_on_surface_variant">#A8A8A8</color>
+    <color name="m3_surface_container_lowest">#121212</color>
+    <color name="m3_surface_container_low">#181818</color>
+    <color name="m3_surface_container">#1E1E1E</color>
+    <color name="m3_surface_container_high">#252525</color>
+    <color name="m3_surface_container_highest">#2E2E2E</color>
     <color name="m3_outline">#8E9099</color>
-    <color name="m3_outline_variant">#2D3037</color>
+    <color name="m3_outline_variant">#363842</color>
     <color name="m3_surface_tint">#FFB3B8</color>
     <color name="m3_inverse_surface">#E2E2E6</color>
     <color name="m3_inverse_on_surface">#1B1B1F</color>
@@ -59,8 +59,8 @@
     <color name="status_neutral_container">#252528</color>
 
     <!-- Semantic aliases matching Design System tokens -->
-    <color name="canvas_background">#000000</color>
-    <color name="surface_color">#0D0D0E</color>
+    <color name="canvas_background">#121212</color>
+    <color name="surface_color">#1E1E1E</color>
     <color name="text_primary_ink">#F0F0F4</color>
     <color name="text_secondary">#A8A8A8</color>
     <color name="neutral_dark">#A8A8A8</color>
@@ -68,14 +68,14 @@
     <color name="success_color">#72D8A4</color>
     <color name="warning_color">#FFBA4B</color>
     <color name="error_color">#FFB4AB</color>
-    <color name="surface_container_low">#0D0D0E</color>
-    <color name="border_hairline">#2D3037</color>
-    <color name="surface_white">#0D0D0E</color>
+    <color name="surface_container_low">#181818</color>
+    <color name="border_hairline">#363842</color>
+    <color name="surface_white">#1E1E1E</color>
     <color name="text_secondary_muted">#A8A8A8</color>
 
     <!-- Luxury Accents & Glass Translucency in dark mode -->
     <color name="glass_white_15">#26FFFFFF</color>
     <color name="glass_white_30">#33FFFFFF</color>
-    <color name="glass_dark_40">#B30D0D0E</color>
-    <color name="glass_dark_stroke">#332D3037</color>
+    <color name="glass_dark_40">#801E1E1E</color>
+    <color name="glass_dark_stroke">#33363842</color>
 </resources>
