@@ -8,6 +8,10 @@ This file is the canonical task list for its component. Each task appears once h
 
 A roadmap assignment uses this roadmap name, phase, and step, for example: Backend Roadmap, Phase 1, Step 1; a stable Task ID may also identify the work. Step numbers restart at 1 in every phase. Lowercase letter labels restart at `a` in each acceptance-criteria block and identify individual criteria for discussion or verification, not separate assignments. Check dependencies before starting; a later step is not ready until its listed dependencies are complete. See [the project roadmap](ROADMAP.md) and [repository Git naming conventions](../AGENTS.md).
 
+## Component status
+
+**✅ All backend phases are complete (2026-10-15).** Phases 0–2 are `[x]` with dated verification records below; Phase 3 records the backend contributions to the cross-component QUAL tasks, whose canonical status and verification record live in [ROADMAP.md](ROADMAP.md). Final clean-checkout verification (2026-10-15, re-run on this fresh copy of the merged tree): `composer install` (79 packages from `composer.lock`), `composer validate --strict` valid, `composer audit` no advisories, `php artisan migrate:fresh --seed` (15 migrations, seeded demo store), `php artisan test` = 153 tests / 2062 assertions / 0 failures, `vendor\bin\pint --test` passed. No backend task remains open; the canonical QUAL-001..QUAL-005 entries are marked `[~]` (backend contributions delivered; Android and admin contributions pending).
+
 ## Phase steps
 
 ## Phase 0 — Foundation

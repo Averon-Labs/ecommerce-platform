@@ -1,6 +1,6 @@
 # Project State
 
-> Last updated: 2026-10-11
+> Last updated: 2026-10-15
 
 ## Current Phase
 
@@ -13,11 +13,11 @@
 | Repository structure | ✅ Established | Android scaffold and component guidance exist |
 | Documentation | ⚠️ Foundation documented | Project gates/shared tasks are in `docs/ROADMAP.md`; numbered canonical task steps are in the Android, Backend, and Admin roadmaps; `docs/android/` now holds the task-brief template, the mock strategy, and the Phase 0–2 implementation specs; verified component commands remain open |
 | Android app | 🟡 Phase 2 In Progress | Java/XML Material 3 app. Phase 0 Foundation complete (FND-001, FND-006, UI-002, APP-002, DOM-002, DATA-002, NET-002). Phase 1 complete (AUTH-002, CAT-002). Phase 2 Step 1 complete (CART-002). Phase 2 Step 2 complete (CHECK-001 — checkout and simulated payment flow, Screens M-11..M-14, zero credential capture, idempotent order placement, safe retry). 136 unit tests passing, instrumentation test suite verified, 0 lint errors. |
-| Backend API | 🟡 Initialized — FND-002 implemented, awaiting independent verification | Laravel 13 (`laravel/framework` 13.35.0) on PHP 8.4.25, Composer 2.10.3, PHPUnit 12.5.38, Pint 1.32.1 (PSR-12). Database is a **hosted** MySQL 8.4.11 (Aiven Free tier) with `eshopverse_dev` + `eshopverse_test`, reached over TLS 1.3 with certificate verification (`MYSQL_ATTR_SSL_CA`). Verified 2026-10-11: `composer install`, `composer validate --strict`, `composer audit`, `pint --test`, `migrate`, `test` (5 tests / 8 assertions), `serve` (`/up` 200). `routes/api.php` is empty and mounted at `/api/v1`; no business endpoint exists before FND-004 acceptance. |
+| Backend API | ✅ Complete — Backend Roadmap Phases 0–3 all delivered and verified | Laravel 13 (`laravel/framework` 13.35.0) on PHP 8.4.25, Composer 2.10.3, PHPUnit 12, Pint (PSR-12), Sanctum ^4.3. Database: local zip-based MySQL 8.4 (`127.0.0.1:3306`) with `eshopverse_dev` + disposable `eshopverse_test` (`phpunit.xml` hard-wired; a hosted MySQL 8+ TLS service is a documented drop-in replacement). Full REST surface per the accepted contract: customer auth, catalog reads, cart, checkout quote, idempotent order creation, simulated payment, admin session/catalog/inventory/order operations, and every rate-limit class from `x-rate-limit-classes` (including the `global` 300/min limiter added in QUAL-003). Final clean-checkout verification 2026-10-15: `composer install` (79 packages from `composer.lock`), `composer validate --strict` valid, `composer audit` no advisories, `migrate:fresh --seed` (15 migrations, seeded demo store), `php artisan test` = 153 tests / 2062 assertions / 0 failures, `pint --test` passed. Per-phase records in `docs/BACKEND_ROADMAP.md`; findings in `docs/SECURITY_REVIEW.md`; reviewer guide in `docs/HANDOFF.md`. |
 | Admin dashboard | ⬜ Not initialized | `admin/` has guidance only; React/TypeScript setup is FND-003 |
-| API contract | ⚠️ Draft awaiting review | `docs/openapi.yaml` exists as an OpenAPI 3.1 draft resolving the recorded open contract decisions, including category lifecycle; it passes a structural check (no duplicate keys, no unresolved `$ref`) but API-owner acceptance is still required before endpoint or client work (FND-004) |
+| API contract | ✅ Accepted (FND-004) | `docs/openapi.yaml` (OpenAPI 3.1) was reviewed and accepted by the API owner on 2026-10-12 as the binding machine-readable contract; `docs/API_CONTRACT.md` records shared conventions and links to it without duplicating endpoint schemas. Any contract change is made in `openapi.yaml` first and re-accepted. |
 | CI/CD | ⚠️ Placeholder | `.github/workflows/ci.yml` only validates repository structure; Android FND-006 adds the Android build/lint/test job and FND-005 owns component-check consolidation |
-| Database | ⬜ Not implemented | Logical model documented; migrations and isolated test database are part of backend/component Tasks |
+| Database | ✅ Implemented (backend) | 15 migrations shipped with the backend (users/account fields, categories, products, product images, inventories, personal access tokens, carts, cart items, orders, order items, demo payments, idempotency keys); deterministic fictional seed data via `php artisan migrate:fresh --seed` (5 categories, 12 products / 10 active, demo customer + env/random-password demo admin, no real personal data); disposable `eshopverse_test` database enforced by `phpunit.xml`. Logical model and decisions remain documented in `docs/DATABASE.md`. |
 
 ## Active Branches
 
@@ -29,9 +29,9 @@
 
 ## Recent Decisions
 
-- **Backend database (2026-10-11, owner decision):** no local MySQL — a hosted MySQL service is used instead. The chosen provider is Aiven Free tier (MySQL 8.4.11, remote host/port, project `ca.pem`); two databases `eshopverse_dev` and `eshopverse_test` were created on it. Connections run over TLS 1.3 and are verified against the CA file, as `docs/SECURITY.md` requires. Credentials and `MYSQL_ATTR_SSL_CA` live only in the git-ignored `backend/.env`.
+- **Backend database (2026-10-11, owner decision):** no local MySQL — a hosted MySQL service is used instead. The chosen provider is Aiven Free tier (MySQL 8.4.11, remote host/port, project `ca.pem`); two databases `eshopverse_dev` and `eshopverse_test` were created on it. Connections run over TLS 1.3 and are verified against the CA file, as `docs/SECURITY.md` requires. Credentials and `MYSQL_ATTR_SSL_CA` live only in the git-ignored `backend/.env`. **Superseded 2026-10-12:** the provider deleted that free service after inactivity; the documented local zip-based MySQL 8.4 workflow in `docs/DEVELOPMENT.md` is now the verified default, with a hosted MySQL 8+ TLS service remaining a documented drop-in replacement.
 - **Backend test naming (2026-10-11):** PHP test methods use `snake_case` because Laravel Pint enforces `php_unit_method_casing`; the `docs/TESTING.md` PHP example was aligned with the enforced style.
-- **Backend API mounting (2026-10-11):** `routes/api.php` exists and is registered with the `api/v1` prefix from `ARCHITECTURE.md`, but stays empty until the OpenAPI contract is accepted (FND-004).
+- **Backend API mounting (2026-10-11):** `routes/api.php` exists and is registered with the `api/v1` prefix from `ARCHITECTURE.md`, but stays empty until the OpenAPI contract is accepted (FND-004). **Superseded:** FND-004 was accepted 2026-10-12 and the full endpoint set (auth, catalog, cart, checkout/orders, admin operations) now lives behind that prefix; `routes/api.php` is no longer empty.
 
 - First-release portfolio scope and stack recorded in ADR-001
 - Sequential build/test/debug workflow documented
@@ -46,8 +46,8 @@
 
 ## Next Steps
 
-1. Independent verification of Backend **FND-002** (roadmap status is `[~]`): tester repeats the commands in `docs/DEVELOPMENT.md`, then the owner commits `backend/` (`composer.lock`, `.env.example`, config, tests) — backend agents run no Git commands.
-2. Owner review of `docs/openapi.yaml` and of the open decisions OPEN-1..OPEN-11 (contract, token storage, contrast token, Lato weight, backup policy, Room scope, mock runner). This unblocks Backend FND-004 acceptance and therefore every Phase 1 endpoint task.
+1. **Backend component: nothing outstanding.** Backend Roadmap Phases 0–3 are complete and verified (final clean-checkout run 2026-10-15: 153 tests / 2062 assertions / 0 failures, pint clean, composer audit clean). Per AGENTS.md, backend agents run no Git commands — the owner manages commits/pushes/PRs. The canonical cross-component QUAL-001..QUAL-005 entries in `docs/ROADMAP.md` are marked `[~]` (backend contributions delivered; the Android and admin contributions — screenshots, accessibility pass, full multi-component rehearsal — are still pending); the backend portions are recorded in `docs/BACKEND_ROADMAP.md` Phase 3.
+2. **Backend-adjacent, needs owner approval:** enabling the backend job in `.github/workflows/ci.yml` (currently a commented template that still says PHP `8.2` and `vendor/bin/phpunit`, both outdated versus the project's PHP 8.4 / `php artisan test`). This belongs to cross-component FND-005 (criterion b) and, as a CI/CD pipeline change, requires explicit human approval per AGENTS.md before any edit.
 3. Complete Phase 0 tasks in their canonical roadmaps, respecting the waves in `docs/ANDROID_ROADMAP.md` and the shared phase gate.
 4. Android FND-006 first: it unblocks the parallel wave (UI-002, DOM-002, DATA-002) and produces the build/test evidence that is currently missing.
 5. Begin Phase 1 only after Phase 0 exit criteria are verified.

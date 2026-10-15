@@ -30,7 +30,7 @@ Deliver a polished, end-to-end, single-store shopping demo for an international 
 
 ## Verified starting point
 
-Last reviewed: 2026-10-13. Recheck source and Git state before starting each Task.
+Last reviewed: 2026-10-15 (backend facts refreshed; other components' bullets unchanged). Recheck source and Git state before starting each Task.
 
 ## Authority and component scope
 
@@ -39,11 +39,11 @@ This roadmap is for explicitly cross-component work and final project/release va
 - Android has a regenerated Java/XML Gradle scaffold: namespace/application ID com.averonlabs.eshopverse, compile SDK 36.1, minSdk 25, targetSdk 36, Java 11 source/target, AGP 9.2.1, Gradle 9.4.1. The complete Phase 0-2 dependency set (Material 1.14.0, AndroidX libraries, Retrofit, OkHttp, Glide, test dependencies) was declared in FND-006. Verified build/lint/test commands are documented in `docs/DEVELOPMENT.md`.
 - Android Phase 0 was expanded by PLAN-005 with six cross-cutting foundation steps (FND-006, UI-002, APP-002, DOM-002, DATA-002, NET-002) that must complete before the Phase 1 screen tasks; `docs/openapi.yaml` is the accepted contract (FND-004, accepted 2026-10-12), and contract-derived fixtures plus a local mock server let the Android tasks be verified without a running backend.
 - Android Phase 1 and Phase 2 steps depend only on Android and shared steps. Their backend dependencies are recorded once, in the coordination table in `docs/ANDROID_ROADMAP.md`, with integration deferred to QUAL-001.
-- `backend/` now contains the initialized Laravel 13 application (FND-002 complete, re-verified 2026-10-12) with a local MySQL 8.4 development workflow; a hosted MySQL 8 service over TLS is a documented drop-in replacement when one is available. `admin/` still contains agent guidance only (FND-003).
+- `backend/` contains the completed Laravel 13 REST API — Backend Roadmap Phases 0–3 are delivered (FND-002 through the Phase 3 QUAL contributions; final clean-checkout verification 2026-10-15: 153 tests, 2062 assertions, 0 failures) with a local MySQL 8.4 development workflow; a hosted MySQL 8 service over TLS is a documented drop-in replacement when one is available. `admin/` still contains agent guidance only (FND-003).
 - .github/workflows/ci.yml is a placeholder. Its active job checks repository structure; component checks are not active.
 - GitHub develop was created from the current pre-policy main baseline. Default branch, auto-delete, and branch protection must be verified under GIT-001.
 - `docs/openapi.yaml` was accepted by the API owner on 2026-10-12 (FND-004 complete). `docs/API_CONTRACT.md` records shared conventions; endpoint schemas and per-class rate limits are binding as accepted in the OpenAPI file.
-- docs/DATABASE.md is a logical model, not implemented migrations.
+- docs/DATABASE.md records the logical model and the recorded schema decisions; the backend implements them in 15 migrations with deterministic seed data and the disposable `eshopverse_test` workflow (all backend database tasks complete).
 
 This is a repository snapshot, not a promise that the state remains unchanged. Confirm facts again when a Task starts.
 
@@ -263,7 +263,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 1 — QUAL-001 — Cross-component purchase-flow regression
 
-**Status:** `[ ]`
+**Status:** `[~]` (backend contribution delivered 2026-10-14 — recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
 
 **Depends on:** AUTH-002, CAT-002, CART-002, CHECK-001, ORD-002
 
@@ -280,7 +280,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 2 — QUAL-002 — Accessibility and UI quality pass
 
-**Status:** `[ ]`
+**Status:** `[~]` (backend contribution delivered 2026-10-14 — recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
 
 **Depends on:** DES-001, CAT-002, CAT-004, CART-002, CHECK-001, ORD-002, ORD-003
 
@@ -296,7 +296,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 3 — QUAL-003 — Security and privacy review
 
-**Status:** `[ ]`
+**Status:** `[~]` (backend contribution delivered 2026-10-14 — findings record in [SECURITY_REVIEW.md](SECURITY_REVIEW.md), global rate limiter fixed; recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
 
 **Depends on:** AUTH-001, AUTH-003, CAT-003, CART-001, ORD-001, ORD-003
 
@@ -313,7 +313,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 4 — QUAL-004 — Demo data and portfolio handoff guide
 
-**Status:** `[ ]`
+**Status:** `[~]` (backend contribution delivered 2026-10-14 — handoff guide in [HANDOFF.md](HANDOFF.md); recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
 
 **Depends on:** FND-002, FND-003, CAT-001, AUTH-003, ORD-001
 
@@ -330,7 +330,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 5 — QUAL-005 — Clean-checkout release rehearsal
 
-**Status:** `[ ]`
+**Status:** `[~]` (backend contribution delivered 2026-10-14, re-verified on a fresh clean checkout 2026-10-15 — commands and outcomes in [DEVELOPMENT.md](DEVELOPMENT.md); recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
 
 **Depends on:** FND-005, QUAL-001, QUAL-002, QUAL-003, QUAL-004
 
