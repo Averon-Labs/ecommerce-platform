@@ -140,6 +140,8 @@ Supported agents include Claude Code, OpenAI Codex, Google Gemini/Antigravity, G
 
 The first-release product scope and engineering workflow are documented. Feature completion has not yet been verified.
 
+**Backend API: ✅ complete and verified (2026-10-15).** All Backend Roadmap Phases 0–3 are delivered — customer auth, catalog, cart, checkout/orders with idempotency, simulated payment, and the admin session/catalog/inventory/order APIs — with 153 passing tests (2062 assertions), clean style and dependency audits. See [docs/BACKEND_ROADMAP.md](docs/BACKEND_ROADMAP.md), [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md), and [docs/HANDOFF.md](docs/HANDOFF.md).
+
 Use the relevant component roadmap to execute and report component work. Use [docs/ROADMAP.md](docs/ROADMAP.md) for cross-component tasks and final project/release validation only.
 
 ---

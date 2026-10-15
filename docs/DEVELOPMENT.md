@@ -21,7 +21,7 @@ cd eshop-verse
 Each component has its own setup process. The source code and actual dependency versions remain authoritative. See:
 
 - `android/` — Java/XML Android application in Android Studio
-- `backend/` — Laravel API; configure the local environment from `.env.example`, migrate the hosted development database, and run tests against a separate disposable test database (see the Backend section)
+- `backend/` — Laravel API; configure the local environment from `.env.example`, migrate the development database, and run tests against a separate disposable test database (see the Backend section)
 - `admin/` — React/TypeScript client; configure its API origin without committing credentials
 
 Before a component is implemented, document its exact setup, build, lint, and test commands here. Do not invent commands in task prompts; copy them from the current project scripts/tooling.

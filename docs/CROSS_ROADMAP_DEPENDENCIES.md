@@ -6,7 +6,7 @@ This document highlights the key cross-component dependencies where work in one 
 
 ## Critical Blocking Dependencies
 
-### 🚨 FND-004 (Backend) — THE BIG BLOCKER
+### 🚨 FND-004 (Backend) — THE BIG BLOCKER — RESOLVED 2026-10-12
 
 **Task:** Draft and review the OpenAPI contract (`docs/openapi.yaml`)
 
@@ -23,7 +23,7 @@ This document highlights the key cross-component dependencies where work in one 
 
 **Impact:** This is the **single most critical cross-component dependency**. Until the OpenAPI contract is accepted, no API integration work can start in any component. Android can work on Phase 0 tasks that don't need the contract (FND-006, UI-002, APP-002, DATA-002), but Phase 1 and 2 are completely blocked.
 
-**Status:** Draft exists (`docs/openapi.yaml`, OpenAPI 3.1) and has passed structural validation; awaiting API-owner review and acceptance (criterion g).
+**Status:** ✅ **Accepted** — `docs/openapi.yaml` (OpenAPI 3.1) passed structural validation and was reviewed and accepted by the API owner on 2026-10-12 (FND-004 complete; recorded in `docs/API_CONTRACT.md`). This blocker is cleared for every component; any contract change is made in `openapi.yaml` first and re-accepted.
 
 ---
 
@@ -44,7 +44,7 @@ This document highlights the key cross-component dependencies where work in one 
 
 | Backend Task | Requires | Notes |
 |--------------|----------|-------|
-| FND-002 | None | **Complete (2026-10-11):** Laravel 13 app + hosted MySQL dev/test workflow; exact commands in `docs/DEVELOPMENT.md` |
+| FND-002 | None | **Complete (2026-10-11, re-verified 2026-10-12):** Laravel 13 app + local MySQL 8.4 dev/test workflow (the hosted free service was deleted by its provider; a hosted MySQL 8+ TLS service remains a documented drop-in replacement); exact commands in `docs/DEVELOPMENT.md` |
 | FND-004 | Product/API/DB/Security docs | Must complete before **anyone** does API work |
 
 ### Admin Dependencies on Other Teams
@@ -145,9 +145,7 @@ Backend FND-004 (OpenAPI Contract)
 
 ### For Backend Developer (Your Colleague)
 
-1. **Phase 0:** Start FND-002 immediately. Complete FND-004 ASAP — it blocks everyone.
-2. **Phase 1:** After FND-004, implement AUTH-001 and CAT-001. Then coordinate with Admin dev on AUTH-003 backend portion before doing CAT-003.
-3. **Phase 2:** Complete CART-001, then ORD-001. These unlock Admin ORD-003.
+**Status 2026-10-15: ✅ Backend Roadmap Phases 0–3 are complete — no backend step remains open.** Historical execution order: FND-002 first, then FND-004 (the contract above, accepted 2026-10-12), then Phase 1 (AUTH-001, CAT-001, the AUTH-003 backend portion, CAT-003), then Phase 2 (CART-001, then ORD-001 — which unlocked Admin ORD-003), then the Phase 3 quality contributions (records in `docs/BACKEND_ROADMAP.md`). The only backend-adjacent item left is the commented backend CI job in `.github/workflows/ci.yml`, owned by cross-component FND-005 and gated on owner approval for CI/CD changes.
 
 ### For Admin Developer (Your Colleague)
 
@@ -197,18 +195,13 @@ These decisions are listed in Android roadmap but may need input from Backend/Ad
 
 ### What Backend Colleague Should Focus On
 
-**Right now (Phase 0):**
-- 🔨 FND-002 — Laravel initialization (start immediately)
-- 🚨 **FND-004 — OpenAPI contract** (HIGHEST PRIORITY — blocks everyone)
+**✅ Complete (2026-10-15) — Backend Roadmap Phases 0–3 all delivered:**
+- Phase 0: FND-002, FND-004 (contract accepted 2026-10-12)
+- Phase 1: AUTH-001, CAT-001, AUTH-003 backend portion, CAT-003
+- Phase 2: CART-001, ORD-001 (unlocked Admin ORD-003)
+- Phase 3: QUAL-001..QUAL-005 backend contributions (records in `docs/BACKEND_ROADMAP.md`; final verification 2026-10-15: 153 tests, 2062 assertions, 0 failures)
 
-**Phase 1:**
-- 🔨 AUTH-001, CAT-001 (can run in parallel after FND-004)
-- 🔨 AUTH-003 backend portion (coordinate with Admin dev)
-- 🔨 CAT-003 (after AUTH-003)
-
-**Phase 2:**
-- 🔨 CART-001 (after Phase 1 backend complete)
-- 🔨 ORD-001 (after CART-001)
+**Remaining backend-adjacent item:** enable the backend CI job template in `.github/workflows/ci.yml` (cross-component FND-005; CI/CD changes require owner approval).
 
 ### What Admin Colleague Should Focus On
 
