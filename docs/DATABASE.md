@@ -58,9 +58,11 @@ Product images are separate rows so each product can have an ordered image set. 
 | id | Primary Key | |
 | name | String | Required |
 | sort_order | Integer | |
+| status | Enum | active, archived |
 | created_at | Timestamp | |
+| updated_at | Timestamp | |
 
-Categories are flat in the first release; hierarchical categories are deferred.
+Categories are flat in the first release; hierarchical categories are deferred. Archive lifecycle is supported (destructive deletion is refused if products remain).
 
 ### Inventory
 
@@ -99,13 +101,15 @@ There is one cart per signed-in user in the first release. A cart contains at mo
 | Field | Type | Notes |
 |-------|------|-------|
 | id | Primary Key | |
+| reference | String | Contract reference format ESV-NNNNNN |
 | user_id | Foreign Key | References Users |
 | status | Enum | pending_payment, confirmed, processing, shipped, delivered, cancelled |
 | subtotal_amount | Decimal | Sum of order item totals |
 | shipping_amount | Decimal | Fixed sample shipping amount; USD |
-| total_amount | Decimal | |
+| total_amount | Decimal | Subtotal plus shipping |
 | shipping_address_snapshot | JSON | Required immutable copy of the address used for this order |
 | notes | Text | Optional |
+| timeline | JSON | Recorded status transitions with UTC timestamps, oldest first |
 | created_at | Timestamp | |
 | updated_at | Timestamp | |
 

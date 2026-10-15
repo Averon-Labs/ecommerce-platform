@@ -198,6 +198,13 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 - Shipping calculation (sample) strategy defined
 - Immutable snapshot strategy for products/prices/addresses
 
+> ⚠️ **Developer Alignment & Contract Guidelines for ORD-001:**
+> - **Initial Order Status:** Must be `pending_payment` (OPEN-4). On simulated payment failure, order remains in `pending_payment` so customer can retry payment.
+> - **Inventory Decrement:** Decrement inventory inside an atomic database transaction only upon payment success; failed payment leaves inventory unchanged.
+> - **Order Audit Timeline:** Store state transitions (e.g. `status_history` JSON column in `orders` or audit table) to provide the timeline required by OpenAPI and clients.
+> - **Flat Shipping:** Flat USD 5.00 sample shipping rate applies per order (OPEN-3).
+
+
 **Scope:** server-authoritative checkout quote/order creation, address and line-item snapshots, idempotency, and explicitly simulated success/failure payment outcomes.
 
 **Acceptance criteria:**
