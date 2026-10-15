@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Dark / Deep OLED application theme -->
+    <style name="Theme.EShopVerse" parent="Base.Theme.EShopVerse">
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

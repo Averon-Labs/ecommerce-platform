@@ -75,4 +75,12 @@
     <color name="border_hairline">#D8D8DE</color>
     <color name="surface_white">#FFFFFF</color>
     <color name="text_secondary_muted">#6B6B6B</color>
+
+    <!-- Luxury Accents & Glass Translucency (from my-ui-ux-skill) -->
+    <color name="glass_white_15">#26FFFFFF</color>
+    <color name="glass_white_30">#4DFFFFFF</color>
+    <color name="glass_dark_40">#66111827</color>
+    <color name="glass_dark_stroke">#33374151</color>
+    <color name="glow_indigo_start">#4D4F46E5</color>
+    <color name="glow_violet_start">#4D8B5CF6</color>
 </resources>
