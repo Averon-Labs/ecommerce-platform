@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ======================================================== -->
+    <!-- 8DP SPACING GRID SYSTEM                                  -->
+    <!-- ======================================================== -->
+    <dimen name="spacing_xxs">4dp</dimen>
+    <dimen name="spacing_xs">8dp</dimen>
+    <dimen name="spacing_sm">12dp</dimen>
+    <dimen name="spacing_md">16dp</dimen>
+    <dimen name="spacing_lg">24dp</dimen>
+    <dimen name="spacing_xl">32dp</dimen>
+    <dimen name="spacing_xxl">48dp</dimen>
+
+    <!-- Screen Margins -->
+    <dimen name="screen_margin_horizontal">16dp</dimen>
+    <dimen name="screen_margin_vertical">20dp</dimen>
+
+    <!-- ======================================================== -->
+    <!-- CORNER RADIUS TOKENS                                     -->
+    <!-- ======================================================== -->
+    <dimen name="radius_xs">4dp</dimen>
+    <dimen name="radius_sm">8dp</dimen>
+    <dimen name="radius_md">16dp</dimen>
+    <dimen name="radius_lg">20dp</dimen>
+    <dimen name="radius_bento">24dp</dimen>
+    <dimen name="radius_bottom_sheet">28dp</dimen>
+    <dimen name="radius_pill">999dp</dimen>
+
+    <!-- ======================================================== -->
+    <!-- ERGONOMIC COMPONENT DIMENSIONS & HIT TARGETS             -->
+    <!-- ======================================================== -->
+    <dimen name="min_touch_target_size">48dp</dimen>
+    
+    <dimen name="btn_height_compact">40dp</dimen>
+    <dimen name="btn_height_standard">48dp</dimen>
+    <dimen name="btn_height_large">56dp</dimen>
+    
+    <dimen name="nav_island_height">64dp</dimen>
+    <dimen name="bottom_sheet_handle_width">36dp</dimen>
+    <dimen name="bottom_sheet_handle_height">4dp</dimen>
+
+    <!-- Border Stroke Widths -->
+    <dimen name="stroke_hairline">1dp</dimen>
+    <dimen name="stroke_active">2dp</dimen>
+
+    <!-- Tonal Elevations -->
+    <dimen name="elevation_flat">0dp</dimen>
+    <dimen name="elevation_subtle">2dp</dimen>
+    <dimen name="elevation_card">4dp</dimen>
+    <dimen name="elevation_dialog">8dp</dimen>
+</resources>
