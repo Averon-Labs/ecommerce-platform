@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 98%;      /* #F8FAFC Soft Crisp Light */
+    --foreground: 222 47% 11%;      /* #0F172A */
+    --card: 0 0% 100%;              /* #FFFFFF */
+    --card-foreground: 222 47% 11%;
+    --primary: 243 75% 59%;         /* #4F46E5 Modern Indigo */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 199 89% 48%;       /* #0EA5E9 Sky Accent */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 40% 96%;           /* #F1F5F9 */
+    --muted-foreground: 215 16% 47%;/* #64748B */
+    --accent: 160 84% 39%;          /* #10B981 Emerald */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214 32% 91%;          /* #E2E8F0 */
+    --input: 214 32% 91%;
+    --ring: 243 75% 59%;
+    --radius: 1rem;
+  }
+
+  /* Deep Space & OLED Dark Mode */
+  .dark {
+    --background: 240 10% 4%;       /* #09090B */
+    --foreground: 0 0% 98%;         /* #FAFAFA */
+    --card: 240 10% 7%;             /* #121215 Tinted Zinc Surface */
+    --card-foreground: 0 0% 98%;
+    --primary: 239 84% 67%;         /* #6366F1 Luminous Indigo */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 199 89% 48%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 4% 16%;            /* #27272A */
+    --muted-foreground: 240 5% 65%; /* #A1A1AA */
+    --accent: 160 84% 39%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 4% 16%;           /* #27272A Hairline Stroke */
+    --input: 240 4% 16%;
+    --ring: 239 84% 67%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Modern Frosted Glass Utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-panel {
+  background: rgba(18, 18, 21, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* W3C View Transitions */
+@supports (view-transition-name: none) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 220ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

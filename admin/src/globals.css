@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 98%;      /* #F5F6F7 Clean Canvas */
+    --foreground: 0 0% 9%;          /* #161616 Deep Ink */
+    --card: 0 0% 100%;              /* #FFFFFF Crisp Card */
+    --card-foreground: 0 0% 9%;
+    --primary: 356 89% 72%;         /* #F7767E Brand Coral */
+    --primary-foreground: 0 0% 9%;
+    --secondary: 262 41% 52%;       /* #7651B5 Brand Lavender */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 5% 95%;            /* #F1F1F3 */
+    --muted-foreground: 0 0% 42%;   /* #6B6B6B */
+    --accent: 186 54% 34%;          /* #287E87 Brand Aqua */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 71% 41%;       /* #B3261E Error */
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 86%;           /* #D8D8DE Hairline Border */
+    --input: 240 6% 86%;
+    --ring: 356 89% 72%;
+    --radius: 1rem;
+  }
+
+  /* Deep Space & OLED Dark Mode */
+  .dark {
+    --background: 0 0% 0%;          /* #000000 Pitch Black OLED */
+    --foreground: 240 5% 95%;       /* #F0F0F4 */
+    --card: 240 4% 5%;              /* #0D0D0E Deep Dark Surface */
+    --card-foreground: 240 5% 95%;
+    --primary: 356 100% 85%;        /* #FFB3B8 Luminous Coral */
+    --primary-foreground: 352 68% 22%; /* #5F121C */
+    --secondary: 256 100% 87%;      /* #D0BCFF Luminous Lavender */
+    --secondary-foreground: 260 59% 28%;
+    --muted: 240 4% 12%;            /* #1A1C20 */
+    --muted-foreground: 228 11% 79%;/* #C4C6D0 */
+    --accent: 186 55% 67%;          /* #7BD0D9 Luminous Aqua */
+    --accent-foreground: 185 100% 11%;
+    --destructive: 6 100% 84%;      /* #FFB4AB */
+    --destructive-foreground: 356 100% 21%;
+    --border: 223 10% 20%;          /* #2D3037 Hairline Stroke */
+    --input: 223 10% 20%;
+    --ring: 356 100% 85%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Vercel standard: Tabular figures for data tables, metrics, inventory */
+  table, .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Modern Frosted Glass Utility */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-panel {
+  background: rgba(13, 13, 14, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* W3C View Transitions */
+@supports (view-transition-name: none) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 220ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -19,6 +19,7 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.averonlabs.eshopverse.core.ui.ThemeManager;
 import com.averonlabs.eshopverse.databinding.ActivityMainBinding;
 import com.google.android.material.badge.BadgeDrawable;
 
@@ -27,26 +28,36 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private NavController navController;
+    private Insets lastSystemBars = Insets.NONE;
+    private Insets lastIme = Insets.NONE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ThemeManager.applyTheme(this);
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        boolean isDarkMode = ThemeManager.isDarkMode(this);
         WindowInsetsControllerCompat insetsController = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
         if (insetsController != null) {
-            insetsController.setAppearanceLightStatusBars(true);
-            insetsController.setAppearanceLightNavigationBars(true);
+            insetsController.setAppearanceLightStatusBars(!isDarkMode);
+            insetsController.setAppearanceLightNavigationBars(!isDarkMode);
         }
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Insets handling: left/right to root, top to AppBarLayout, bottom to BottomNavigationView
+        // Insets handling: left/right to root, top to AppBarLayout, bottom to BottomNavigationView and content
         ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
+            lastSystemBars = bars;
+            lastIme = ime;
+
             v.setPadding(bars.left, 0, bars.right, 0);
             binding.appBarLayout.setPadding(0, bars.top, 0, 0);
             binding.bottomNav.setPadding(0, 0, 0, bars.bottom);
+
+            updateContentBottomPadding();
             return insets;
         });
 
@@ -112,8 +123,15 @@ public class MainActivity extends AppCompatActivity {
         if (binding == null) {
             return;
         }
-        int bottomPadding = binding.bottomNav.getVisibility() == View.VISIBLE ? binding.bottomNav.getHeight() : 0;
-        binding.contentMain.navHostFragmentContentMain.setPadding(0, 0, 0, bottomPadding);
+        int imeBottom = lastIme != null ? lastIme.bottom : 0;
+        int systemBottom = lastSystemBars != null ? lastSystemBars.bottom : 0;
+        int bottomNavHeight = (binding.bottomNav != null && binding.bottomNav.getVisibility() == View.VISIBLE)
+                ? binding.bottomNav.getHeight()
+                : 0;
+        int baseBottom = Math.max(bottomNavHeight, systemBottom);
+        int finalPadding = Math.max(baseBottom, imeBottom);
+
+        binding.contentMain.navHostFragmentContentMain.setPadding(0, 0, 0, finalPadding);
     }
 
     /**
@@ -130,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
             BadgeDrawable badge = binding.bottomNav.getOrCreateBadge(R.id.cartFragment);
             badge.setVisible(true);
             badge.setNumber(count);
+            badge.setContentDescriptionQuantityStringsResource(R.plurals.cart_badge_content_description);
         } else {
             binding.bottomNav.removeBadge(R.id.cartFragment);
         }
@@ -138,6 +157,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_home, menu);
+        MenuItem themeItem = menu.findItem(R.id.action_theme_toggle);
+        if (themeItem != null) {
+            boolean isDarkMode = ThemeManager.isDarkMode(this);
+            themeItem.setIcon(isDarkMode ? R.drawable.ic_light_mode : R.drawable.ic_dark_mode);
+            themeItem.setTitle(isDarkMode ? R.string.theme_dark_desc : R.string.theme_light_desc);
+        }
         return true;
     }
 
@@ -147,8 +172,8 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_search) {
             binding.bottomNav.setSelectedItemId(R.id.exploreFragment);
             return true;
-        } else if (id == R.id.action_account) {
-            binding.bottomNav.setSelectedItemId(R.id.accountFragment);
+        } else if (id == R.id.action_theme_toggle) {
+            ThemeManager.toggleTheme(this);
             return true;
         }
         if (navController != null && NavigationUI.onNavDestinationSelected(item, navController)) {

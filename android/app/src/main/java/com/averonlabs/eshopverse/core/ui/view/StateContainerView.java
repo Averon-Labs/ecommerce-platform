@@ -53,6 +53,7 @@ public final class StateContainerView extends FrameLayout {
         message.setTextAppearance(R.style.TextAppearance_EShopVerse_Body);
         retry = new MaterialButton(context, null,
                 com.google.android.material.R.attr.materialButtonOutlinedStyle);
+        retry.setMinWidth(getResources().getDimensionPixelSize(R.dimen.touch_target_min));
         retry.setMinHeight(getResources().getDimensionPixelSize(R.dimen.touch_target_min));
         retry.setOnClickListener(view -> {
             if (retryAction != null) retryAction.run();
@@ -89,6 +90,18 @@ public final class StateContainerView extends FrameLayout {
         setImportantForAccessibility(state == State.LOADING
                 ? IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS
                 : IMPORTANT_FOR_ACCESSIBILITY_AUTO);
+    }
+
+    public MaterialButton getRetryButton() {
+        return retry;
+    }
+
+    public MaterialTextView getMessageView() {
+        return message;
+    }
+
+    public CircularProgressIndicator getProgressIndicator() {
+        return progress;
     }
 
     private LinearLayout.LayoutParams centeredLayoutParams() {

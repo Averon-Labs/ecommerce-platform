@@ -29,13 +29,17 @@ All user-facing copy is English. Customer price and total displays use en-US USD
 - Home top bar shows the text wordmark **EShop Verse**, a search entry point, and a profile/account icon. Use initials rather than inventing a profile photo when the API has no avatar.
 - Use a 16dp horizontal content gutter, 12dp card/grid gaps, and sticky bottom actions only when the page needs a primary action. Respect system bars and keyboard insets.
 - The reference's heart, discount sticker, shoe size/color selectors, and FAB are not copied: wishlist, discounts, and product variants are not part of the first-release model; actions use the appropriate Material 3 button or navigation item.
+- Modern visual craftsmanship per `.agents/skills/my-ui-ux-skill/`:
+  - **Bento Card Structure:** Product and catalog cards adopt asymmetric Bento styling with 20dp corners (`bg_bento_item.xml`), 1dp hairline border depth (`colorOutlineVariant`), and spring touch physics (`scaleX(0.97f)` on press).
+  - **Glassmorphism:** Navigation bar and floating overlays utilize `bg_card_glass.xml` with subtle blur/tint.
+  - **OLED Dark Mode:** Seamless switching between Light and Deep Pitch Black (`#000000` canvas, `#0D0D0E` surface, `#2D3037` hairline stroke) with full WCAG AA contrast.
 
 ### Screen inventory
 
 | ID | Screen | Structure and primary behavior |
 |----|--------|--------------------------------|
-| M-01 | Home | Use the existing catalog-browsing entry points defined for CAT-002. Apply the reference's product-forward cards and whitespace only to catalog content that the app already presents; do not add a promotional/editorial hero or new content sections to imitate the reference. |
-| M-02 | Explore / all products | Screen title, search field, category navigation, supported sort control, and product grid. Cards show product image, name, and USD price, with availability only when the API provides it. Tapping a product opens M-05; do not add ratings, favorite hearts, or a card-level add action. |
+| M-01 | Home | Use the existing catalog-browsing entry points defined for CAT-002. Product-forward asymmetric Bento grid layout: top featured product banner/hero (wide 2-col, 180dp) anchored over dual 1-column square category cards (140dp) with `bg_bento_item.xml`, hairline borders, and spring touch feedback. |
+| M-02 | Explore / all products | Screen title, search field, horizontal category pill chips (`bg_pill_button.xml`), supported sort control, and responsive 2-column Bento product grid. Cards show product image, name, and USD price, with availability only when the API provides it. Tapping a product opens M-05; do not add ratings, favorite hearts, or a card-level add action. |
 | M-03 | Search results | Search field retains the query; result count only when returned by pagination metadata; sort menu uses API-supported options; results reuse M-02 cards. Empty results explain that no match was found and offer **Clear search** plus category browsing. |
 | M-04 | Category products | Category title, optional one-line description only if the API supplies it, sort control, and the same product grid. Empty category state links back to Explore. |
 | M-05 | Product details | Large edge-to-edge product image/gallery when multiple seeded URLs exist; product name and USD price; concise description; stock/availability; quantity stepper only when available; sticky coral **Add to cart** action. No size/color/variant selectors unless the product model is explicitly extended later. |
@@ -72,6 +76,10 @@ M-17 Account belongs to AUTH-002 together with M-06–M-09: it presents only the
 - Sidebar destinations are **Products**, **Categories**, **Inventory**, and **Orders**, matching the approved admin capabilities. Sign out is in the account menu. Do not add destinations for overview/analytics, customers, notifications, transactions, or CMS.
 - Keep list pages task-oriented: filters above the table, primary action aligned with the page heading, row actions visible and keyboard accessible, and status expressed as text plus color.
 - Desktop uses a fixed 248px sidebar and content area capped near 1440px. Tablet collapses the sidebar; below 768px it becomes a drawer and tables reflow into labeled cards.
+- Modern visual craftsmanship per `.agents/skills/my-ui-ux-skill/`:
+  - **Asymmetric Bento Metrics:** Performance, stock, and orders displayed in high-density Bento grid modules (`BentoGrid.tsx`) with 1dp borders and subtle aurora glow.
+  - **Vercel Engineering Standards:** Zero CLS (< 0.1) skeleton layouts, `tabular-nums` typography for financial and inventory rows, and accessible focus rings (`focus-visible:ring-2`).
+  - **Deep OLED Dark Mode:** Neutral dark surfaces (`bg-neutral-900`/`bg-neutral-950`) with frosted translucency (`GlassCard.tsx`) and compound modals (`CompoundModal.tsx`).
 
 ### Screen inventory
 

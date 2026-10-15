@@ -2,11 +2,11 @@
 
 ## Purpose
 
-This document defines the shared visual language for the Android customer app and React admin dashboard. Android uses XML Views and Material 3; the web dashboard uses its own responsive web patterns with the same brand tokens. Page-by-page composition and behavior are in [`SCREEN_SPECIFICATIONS.md`](SCREEN_SPECIFICATIONS.md).
+This document defines the shared visual language for the Android customer app and React admin dashboard, governed by the unified design intelligence in [`.agents/skills/my-ui-ux-skill`](../.agents/skills/my-ui-ux-skill/SKILL.md). Android uses XML Views, Material 3, and modern mobile patterns; the web dashboard uses semantic, responsive React and Tailwind with Vercel engineering standards. Page-by-page composition and behavior are in [`SCREEN_SPECIFICATIONS.md`](SCREEN_SPECIFICATIONS.md).
 
 The first release is English-only, en-US, and USD. Store customer-facing Android copy in string resources and web copy in the app's central message/constants layer so the UI can be localized later without layout rewrites.
 
-The visual direction is based on the owner's supplied e-commerce mobile/dashboard reference: bright white surfaces, a soft light-gray canvas, coral highlights, near-black text, generous whitespace, rounded cards, product-forward imagery, and Lato typography. The reference supplies visual style only. It does not define this product's page inventory, content, or behavior; those remain governed by `PRODUCT.md`, the API contract, and `ROADMAP.md`. See [ADR-002](decisions/ADR-002-shared-visual-direction.md).
+The visual direction fuses the owner's supplied e-commerce reference (bright coral highlights, clean surfaces, near-black text, Lato typography) with modern **Dribbble visual craft (asymmetric Bento grids, frosted glassmorphism, micro-border depth, pill buttons)** and strict **WCAG 2.2 AA accessibility (4.5:1 text contrast, 48dp Android / 44px Web touch targets, zero layout shifts)**. See [ADR-002](decisions/ADR-002-shared-visual-direction.md) and `.agents/skills/my-ui-ux-skill/`.
 
 Keep the tokens below synchronized across Android resources and web CSS variables. Change them centrally through a reviewed design update; never introduce unrelated per-screen palettes.
 
@@ -14,8 +14,8 @@ Keep the tokens below synchronized across Android resources and web CSS variable
 
 - This is the single visual language for every Android and admin screen. New screens extend the patterns and tokens here and in `SCREEN_SPECIFICATIONS.md`; they do not introduce an unrelated screen-specific design language.
 - Apply a reference layout cue only to an existing project screen with a matching role. For other screens, use shared tokens and components while preserving the content hierarchy and flow defined by the product and roadmap. Do not add pages, controls, data, or behavior just because they appear in the reference.
-- Build Android UI with XML Views and Material 3 components. Use the shared app theme and Android resources for colors, type, dimensions, shapes, and component styles. The first release follows the light visual reference; do not let device dynamic color replace the brand palette.
-- Build admin UI with semantic, responsive React web patterns and the same brand tokens. Use shared CSS variables/design tokens for color, type, spacing, shape, elevation, and focus styles; do not imitate Android's bottom navigation in the desktop dashboard.
+- Build Android UI with XML Views, Material 3 components, and modern patterns from `.agents/skills/my-ui-ux-skill/android/`. Use the shared app theme and Android resources for colors, type, dimensions, shapes, and component styles. Support both Light and deep Dark / OLED modes with full tonal parity.
+- Build admin UI with semantic, responsive React web patterns and Tailwind from `.agents/skills/my-ui-ux-skill/web/`. Use shared CSS variables/design tokens for color, type, spacing, shape, elevation, and focus styles; do not imitate Android's bottom navigation in the desktop dashboard.
 - Do not hardcode color, spacing, corner radius, text appearance, or elevation in individual screens. A deliberate token change updates this document and the shared Android/web resources together.
 - Use Material 3 components and shared patterns for Android app bars, bottom navigation, buttons, fields, cards, dialogs, snackbars, and progress. Use consistent web navigation, buttons, fields, tables, cards, dialogs, and status badges in the dashboard.
 - Every data-driven screen defines loading, content, empty, error/retry, and success feedback as applicable. Reuse consistent layout, wording, icon treatment, and action placement across the app or dashboard.
@@ -37,17 +37,17 @@ For each new or materially changed screen, verify during implementation/review t
 
 ## Color System
 
-**Status: ACCEPTED — light palette derived from the owner's reference**
+**Status: ACCEPTED — Light and Dark/OLED palettes derived from owner reference and `my-ui-ux-skill`**
 
-The reference's recognizable palette is bright coral actions, white cards, a very light neutral canvas, near-black text, and soft pink, lavender, aqua, and lime product surfaces. Use Material 3 semantic roles for controls and text; the pastel product surfaces are decorative only. The values below are deliberate accessible approximations of the supplied image, not claims of exact pixel sampling.
+The palette is rooted in vibrant coral primary actions, crisp surfaces, near-black or deep-slate contrast text, and subtle pastels for merchandising. It implements the full 29 Material 3 semantic roles across Light, Dark, and OLED Dark themes.
 
-### Material 3 light roles
+### Material 3 Light Roles
 
 | Role token | Value | Use |
 |------------|-------|-----|
 | Primary / on-primary | `#F7767E` / `#161616` | Coral actions and their foregrounds |
 | Primary container / on-primary-container | `#FFF0F1` / `#8D2531` | Selected surfaces and soft coral emphasis |
-| Secondary / on-secondary | `#7651B5` / `#FFFFFF` | Secondary emphasis, reflecting the promo's lavender end |
+| Secondary / on-secondary | `#7651B5` / `#FFFFFF` | Secondary emphasis, lavender accent |
 | Secondary container / on-secondary-container | `#EEE7F7` / `#392653` | Soft lavender chips and selected surfaces |
 | Tertiary / on-tertiary | `#287E87` / `#FFFFFF` | Aqua emphasis and promo accents |
 | Tertiary container / on-tertiary-container | `#DDF3F4` / `#164E53` | Soft aqua surfaces |
@@ -57,11 +57,28 @@ The reference's recognizable palette is bright coral actions, white cards, a ver
 | Surface / on-surface | `#FFFFFF` / `#161616` | Cards, sheets, fields, dialogs, and text |
 | Surface variant / on-surface-variant | `#F1F1F3` / `#6B6B6B` | Supporting surfaces and secondary text |
 | Surface containers (lowest → highest) | `#FFFFFF`, `#FAFAFB`, `#F5F6F7`, `#EFF0F2`, `#E7E8EA` | Nested neutral surface hierarchy |
-| Outline / outline variant | `#767676` / `#D8D8DE` | Strong control boundary / decorative divider |
+| Outline / outline variant | `#767676` / `#D8D8DE` | Strong control boundary / decorative hairline divider |
 | Surface tint | `#F7767E` | Material tonal elevation tint |
 | Inverse surface / inverse-on-surface | `#28242C` / `#F7F1FA` | Temporary inverse surfaces such as snackbars |
 | Inverse primary | `#FFB6BC` | Primary emphasis on inverse surfaces |
 | Scrim | `#000000` | Modal dimming, with component-provided opacity |
+
+### Material 3 Dark & Deep OLED Roles
+
+| Role token | Dark Value | OLED Value | Use |
+|------------|------------|------------|-----|
+| Primary / on-primary | `#FFB3B8` / `#5F121C` | `#FFB3B8` / `#5F121C` | Luminous coral in dark mode |
+| Primary container / on-primary-container | `#8D2531` / `#FFDADF` | `#8D2531` / `#FFDADF` | Dark coral container |
+| Secondary / on-secondary | `#D0BCFF` / `#381E72` | `#D0BCFF` / `#381E72` | Luminous lavender |
+| Secondary container / on-secondary-container | `#4F378B` / `#EADDFF` | `#4F378B` / `#EADDFF` | Dark lavender container |
+| Tertiary / on-tertiary | `#7BD0D9` / `#00363B` | `#7BD0D9` / `#00363B` | Luminous aqua |
+| Tertiary container / on-tertiary-container | `#1F4E53` / `#97ECEF` | `#1F4E53` / `#97ECEF` | Dark aqua container |
+| Error / on-error | `#FFB4AB` / `#690005` | `#FFB4AB` / `#690005` | Dark mode error indicator |
+| Error container / on-error-container | `#93000A` / `#FFDAD6` | `#93000A` / `#FFDAD6` | Dark error container |
+| Background / on-background | `#121212` / `#E2E2E6` | `#000000` / `#F0F0F4` | Pitch black OLED canvas |
+| Surface / on-surface | `#18181A` / `#E2E2E6` | `#0D0D0E` / `#F0F0F4` | Dark mode cards and sheets |
+| Surface variant / on-surface-variant | `#2D3037` / `#C4C6D0` | `#1A1C20` / `#C4C6D0` | Dark surface variant |
+| Outline / outline variant | `#8E9099` / `#44474F` | `#8E9099` / `#2D3037` | Crisp hairline strokes |
 
 ### Reference-only merchandising surfaces
 
@@ -83,7 +100,7 @@ These are non-semantic image backings, never status colors or text backgrounds. 
 | Error / failed / cancelled | `#B3261E` | `#FCEEEE` |
 | Neutral / informational | `#505050` | `#EFF0F2` |
 
-Status must always have a visible text label; color alone never communicates meaning. Dark mode and device dynamic color remain deferred so the brand palette is stable in the first release.
+Status must always have a visible text label; color alone never communicates meaning. Dark mode maps status roles to their corresponding high-contrast dark tonal variants.
 
 ### Measured Contrast Ratios (WCAG AA)
 
@@ -262,6 +279,33 @@ Use subtle separation rather than heavy shadows:
 | Validation error | Inline field-level errors |
 | Not found | 404-style message |
 | Session expired | Redirect to login |
+
+---
+
+## Modern Visual Craftsmanship (Dribbble & Vercel Standards)
+
+Per `.agents/skills/my-ui-ux-skill/`, EShop Verse bridges visual grandeur with strict software engineering:
+
+### 1. Mobile & Web Bento Grids
+- **Android Home / Explore:** Group diverse product highlights, category spotlights, and promotional tiles into asymmetric Bento cards (`bg_bento_item.xml`) with a 2-column wide Hero card (180dp) anchored over dual 1-column square cards (140dp).
+- **Web Admin Dashboard:** Organize core metrics into an asymmetric Bento layout (wide 8-col performance/revenue hero card + 4-col live inventory satellite cards + 3-col activity cards) using `BentoGrid.tsx`.
+- **Micro-Border Depth:** Eliminate muddy drop shadows; use 1dp hairline strokes (`app:strokeWidth="1dp"`, `app:strokeColor="?attr/colorOutlineVariant"` in Android, `border border-neutral-800` in Web) to produce razor-sharp edges.
+
+### 2. Glassmorphism & Frosted Translucency
+- **Android Floating Surfaces:** Apply `bg_card_glass.xml` (semi-translucent surface fill + 1dp outline) on floating app bars, bottom navigation pills, and checkout summary sheets.
+- **Web Frosted Cards:** Use `backdrop-blur-xl`, `bg-neutral-900/60`, and subtle ambient Aurora glow accents (`bg_gradient_glow.xml` / Tailwind radial gradients) on modal dialogs and sticky headers using `GlassCard.tsx`.
+
+### 3. Motion, Haptics & Micro-Interactions
+- **Touch Feedback:** Every interactive card and button must provide instant tactile feedback on touch:
+  - Android: `scaleX(0.97f)` / `scaleY(0.97f)` on press with masked ripples, plus `SpringAnimation` for dynamic physical damping.
+  - Web: Compositor-only transforms (`transform: scale(0.98)` / `transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1)`); never animate `width`, `height`, `top`, or `margin`.
+- **View Transitions:** Utilize native W3C View Transitions for seamless shared-element card morphing between catalog browsing and product details.
+
+### 4. Vercel Engineering Standards for Web Admin
+- **Zero Cumulative Layout Shift (CLS < 0.1):** Every image, chart, and dynamic card must have explicit dimensions and dedicated skeleton loaders to prevent layout jumps.
+- **Tabular Figures:** Always apply `tabular-nums` (font-variant-numeric: tabular-nums) on order IDs, USD totals, stock counts, and timestamps for perfectly aligned data tables.
+- **Accessible Focus Rings:** Never remove focus rings without an accessible replacement; apply `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2`.
+- **Unblocked Browser Behavior:** Never block native clipboard paste in input fields, never break middle-click tab opening on links, and maintain deep-linkable URL state for modal dialogs and tabs.
 
 ---
 

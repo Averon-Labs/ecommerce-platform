@@ -13,6 +13,8 @@ import com.google.android.material.textview.MaterialTextView;
 public final class StatusBadgeView extends MaterialTextView {
     public enum Status { SUCCESS, WARNING, ERROR, NEUTRAL }
 
+    private Status currentStatus = Status.NEUTRAL;
+
     public StatusBadgeView(Context context) {
         this(context, null);
     }
@@ -32,10 +34,21 @@ public final class StatusBadgeView extends MaterialTextView {
         setStatus(Status.NEUTRAL);
     }
 
+    @Override
+    public void setText(CharSequence text, BufferType type) {
+        super.setText(text, type);
+        updateSemanticDescription();
+    }
+
+    public Status getStatus() {
+        return currentStatus;
+    }
+
     public void setStatus(Status status) {
+        this.currentStatus = status != null ? status : Status.NEUTRAL;
         int foreground;
         int background;
-        switch (status) {
+        switch (this.currentStatus) {
             case SUCCESS:
                 foreground = R.color.status_success;
                 background = R.color.status_success_container;
@@ -55,5 +68,18 @@ public final class StatusBadgeView extends MaterialTextView {
         }
         setTextColor(ContextCompat.getColor(getContext(), foreground));
         getBackground().setTint(ContextCompat.getColor(getContext(), background));
+        updateSemanticDescription();
+    }
+
+    private void updateSemanticDescription() {
+        CharSequence text = getText();
+        if (text != null && text.length() > 0) {
+            String label = text.toString().trim();
+            if (!label.toLowerCase(java.util.Locale.US).startsWith("status")) {
+                setContentDescription(getContext().getString(R.string.status_badge_description, label));
+            } else {
+                setContentDescription(label);
+            }
+        }
     }
 }
