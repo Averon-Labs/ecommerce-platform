@@ -6,14 +6,6 @@ The canonical Backend task steps and acceptance criteria are in [`docs/BACKEND_R
 
 ---
 
-## Git Policy and Phase-Based Branches
-
-- **Owner-Managed Git:** All Git operations for Backend work remain strictly owner-managed. Agents must not run any Git commands (`status`, `diff`, `branch`, `checkout`, `add`, `commit`, `push`, `pull`, etc.).
-- **Phase-Based Branches:** Backend work uses feature branches created per phase (`feature/backend-phase-<N>`), housing all steps of that phase together.
-- **Sequential Steps as Commits:** The owner maintains the phase branch, and steps within that phase are committed sequentially using the Conventional Commit format: `<type>(backend-pNN-sNN-<task-id>): <summary>`. Agents hand off verified working-tree state without commits.
-
----
-
 ## Architecture
 
 | Aspect | Decision | Status |

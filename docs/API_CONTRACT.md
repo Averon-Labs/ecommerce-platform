@@ -202,8 +202,8 @@ English is the only supported API-facing locale in the first release. Error mess
 
 ## Open Decisions and Resolution Status
 
-- [x] **Contract Accepted (FND-004):** [`openapi.yaml`](openapi.yaml) accepted as canonical OpenAPI 3.1 contract. Full backend implementation completed across Phase 1–3 (`c42dbd0`).
-- [x] **Rate limits (QUAL-003):** Implemented in backend `AppServiceProvider` and `bootstrap/app.php` using `x-rate-limit-classes` (global 300/min/ip plus per-operation throttles).
+- [x] **Reviewed and accepted by the API owner (FND-004):** [`openapi.yaml`](openapi.yaml) is the approved OpenAPI 3.1 machine-readable contract, covering customer registration/login/logout/profile/password reset, public category and product read/search/sort/pagination, the authenticated cart, checkout quote and order creation with idempotency, the simulated payment outcome, customer order history and detail, admin session authentication, admin product/category/inventory management, admin order status transitions, the shared error envelope and error-code list, and the status-code contract. Endpoint and client integration must follow it; any contract change is made in the contract first (canonical task: Backend FND-004). Full backend implementation completed across Phase 1–3 (`c42dbd0`).
+- [x] **Rate limits (QUAL-003):** Implemented in backend `AppServiceProvider` and `bootstrap/app.php` using `x-rate-limit-classes` in [`openapi.yaml`](openapi.yaml) (global 300/min/ip plus per-operation throttles).
 - [x] **Category lifecycle (OPEN-2):** Resolved as archived-only (`status: active | archived`). Backend `AdminCategoryController` enforces refusal to archive while active products remain assigned.
 - [x] **Flat sample shipping rate (OPEN-3):** Resolved as USD 5.00 flat rate per order (`CartPricing::SAMPLE_SHIPPING_CENTS = 500`).
 - [x] **Failed payment order state (OPEN-4):** Resolved as remaining in `pending_payment` on simulated failure, leaving stock intact and allowing client payment retry.
