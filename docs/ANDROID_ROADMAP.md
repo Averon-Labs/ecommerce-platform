@@ -481,16 +481,18 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 5 — QUAL-005 — Clean-Checkout Release Rehearsal
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Canonical task:** [QUAL-005 in the Project Roadmap](ROADMAP.md).
 
 **Component contribution:** Run clean checkout verification on a fresh clone and ensure zero warnings or errors.
 
 **Acceptance criteria:**
-- [ ] **a.** Run `./gradlew clean assembleDebug testDebugUnitTest lintDebug assembleDebugAndroidTest` from a clean workspace.
-- [ ] **b.** All test suites pass 100% with zero test failures and zero lint errors.
-- [ ] **c.** Record exact git SHA, toolchain versions (JDK 17+, AGP 9.2+, Gradle 9.4+), and execution evidence.
+- [x] **a.** Run `./gradlew clean assembleDebug testDebugUnitTest lintDebug assembleDebugAndroidTest` from a clean workspace.
+- [x] **b.** All test suites pass 100% with zero test failures and zero lint errors.
+- [x] **c.** Record exact git SHA, toolchain versions (JDK 17+, AGP 9.2+, Gradle 9.4+), and execution evidence.
+
+**Verification:** executed full clean release rehearsal command `.\gradlew.bat clean assembleDebug testDebugUnitTest lintDebug assembleDebugAndroidTest --no-daemon`; all 83 tasks succeeded with 0 test failures and 0 lint errors; recorded commit SHA `32138d5f98148ed5795f459f7712d6406c896ec4`, Gradle 9.4.1, AGP 9.2.1, Oracle Java 25 / 21 LTS toolchain. Phase 3 complete! All Android roadmap phases (0 through 3) are now 100% complete!
 
 ## External dependencies owned by other components
 
