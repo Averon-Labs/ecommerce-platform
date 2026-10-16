@@ -148,6 +148,19 @@ class AdminAuthTest extends TestCase
             ->assertJsonPath('error.code', 'UNAUTHENTICATED');
     }
 
+    public function test_session_endpoint_answers_401_json_even_without_an_accept_header(): void
+    {
+        // Plain browser requests that do not send `Accept: application/json`
+        // must still receive the contracted 401 JSON. Without the guest
+        // redirect override these failed with a 500 because the framework
+        // tried to redirect to a `login` route that does not exist.
+        $response = $this->withHeaders(['Origin' => $this->statefulOrigin()])
+            ->get('/api/v1/admin/auth/session');
+
+        $response->assertStatus(401)
+            ->assertJsonPath('error.code', 'UNAUTHENTICATED');
+    }
+
     public function test_logout_destroys_the_admin_session(): void
     {
         $this->actingAsAdmin();

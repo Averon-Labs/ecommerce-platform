@@ -52,7 +52,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 ### Step 1 — AUTH-003 — Admin session authentication and API authorization
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-002, FND-003, FND-004, FND-005, DES-001
 
@@ -81,18 +81,20 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **Acceptance criteria:**
 
-- [ ] **a.** Admin login/logout and session/CSRF behavior work with the documented local SPA/API origins and reviewed contract.
-- [ ] **b.** Admin routes reject guests and customer accounts; tests verify role checks server-side, not only hidden UI controls.
-- [ ] **c.** Session cookies use secure settings appropriate to local vs. HTTPS environments; no bearer token is stored in browser local storage for the admin SPA.
-- [ ] **d.** Failure and expired-session UI states are visible and recoverable.
+- [x] **a.** Admin login/logout and session/CSRF behavior work with the documented local SPA/API origins and reviewed contract.
+- [x] **b.** Admin routes reject guests and customer accounts; tests verify role checks server-side, not only hidden UI controls.
+- [x] **c.** Session cookies use secure settings appropriate to local vs. HTTPS environments; no bearer token is stored in browser local storage for the admin SPA.
+- [x] **d.** Failure and expired-session UI states are visible and recoverable.
 
 **Verification:** backend authentication/authorization feature tests and admin UI tests for login, logout, CSRF/session expiry, and rejected access.
 
-**Backend portion (2026-10-13):** implemented and independently verified on the backend — admin auth endpoints (`/admin/auth/csrf|login|session|logout`), Sanctum stateful cookie sessions + CSRF enforcement, `EnsureUserIsAdmin` role middleware, `admin-login`/`admin-write` rate limiters, and the demo-admin seeder (see Backend Roadmap — Phase 1 — Step 3 — CAT-003 verification record). Server-side behavior for criteria **a**/**b**/**c** is covered; this task stays `[ ]` until the admin SPA work (FND-003/CAT-004) completes criteria **c**/**d** and the admin UI tests.
+**Backend portion (2026-10-13):** implemented and independently verified on the backend — admin auth endpoints (`/admin/auth/csrf|login|session|logout`), Sanctum stateful cookie sessions + CSRF enforcement, `EnsureUserIsAdmin` role middleware, `admin-login`/`admin-write` rate limiters, and the demo-admin seeder (see Backend Roadmap — Phase 1 — Step 3 — CAT-003 verification record). Server-side behavior for criteria **a**/**b**/**c** is covered; the admin SPA work later completed criteria **c**/**d** and the admin UI tests (see the verification record below).
+
+**Verification record (2026-10-16):** implemented in `c8224e2` (backend integration support), `d2a0cc0` (admin SPA), and independently verified at `58dc0ff` (test-only tester commit) — all criteria **a–d** PASS. Backend: `php artisan test` = 157 tests, 0 failures, including the new credentialed-CORS feature tests (`backend/tests/Feature/ApiCorsTest.php`) and the contract-conform 401 test for plain (non-JSON-`Accept`) requests; the reviewable integration changes are `redirectGuestsTo(null)` in `backend/bootstrap/app.php` and `backend/config/cors.php` (explicit `localhost:5173`/`localhost:5174` origins, `supports_credentials: true`, `CORS_ALLOWED_ORIGINS` override). Admin: `npm test` = 29 tests at this step (8 added by the tester), `npm run typecheck`, `npm run lint`, and `npm run build` all pass. The SPA performs its CSRF handshake at `GET /admin/auth/csrf`; live probes against the local API confirmed the full session handshake (CSRF cookie 204 with `XSRF-TOKEN`, login 200 with the admin JSON, `GET /admin/auth/session` 200, logout 204, re-session 401) plus wrong-password 401 `INVALID_CREDENTIALS`, missing-CSRF-header 403 `CSRF_TOKEN_MISMATCH`, customer-account 401 identical to unknown-account 401, and 401 rejection of every admin endpoint for guests; a 403 response for a non-admin session shows the visible "not an administrator" notice. Criterion **c** holds: the SPA derives auth state from `GET /admin/auth/session` and stores no token in `localStorage`; the session cookie is HttpOnly with `SameSite=Lax` in local development (Secure/None settings documented for HTTPS deployments in `backend/.env.example`). Criterion **d** holds: invalid credentials, rate limiting, unreachable service (boot retry), and expired sessions (global 401 → sign-in with an explanatory notice) are visible and recoverable. Known limitation: real-browser cross-origin behavior was verified with jsdom tests plus live `curl` probes, not a browser; browser E2E remains with QUAL-005. Tracked by [PR #43](https://github.com/Averon-Labs/eshop-verse/pull/43), which targets `develop`.
 
 ### Step 2 — CAT-004 — Admin catalog and inventory screens
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-003, FND-004, AUTH-003, CAT-003, DES-001
 
@@ -108,18 +110,20 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 - Keyboard accessibility requirements understood
 
 > ⚠️ **Developer Alignment & Contract Notes for CAT-004:**
-> - **Category Lifecycle:** Categories use `status: 'active' | 'archived'`. Destructive deletion is not permitted; use archive API (`PATCH /api/v1/admin/categories/{id}`). Backend rejects archiving if active products remain assigned to the category.
+> - **Category Lifecycle:** Categories use `status: 'active' | 'archived'`. Destructive deletion is not permitted; the SPA follows the authoritative contract in `docs/openapi.yaml`: edit with `PUT /api/v1/admin/categories/{id}`, archive with `POST /api/v1/admin/categories/{id}/archive`, and restore with `POST /api/v1/admin/categories/{id}/restore`. Backend rejects archiving while active products remain assigned to the category.
 
 **Scope:** React admin screens for product, category, and stock management through the REST API.
 
 **Acceptance criteria:**
 
-- [ ] **a.** Admin can list, create, edit, archive, and validate product/category data and update stock through documented APIs.
-- [ ] **b.** Loading, empty, validation, conflict, unauthorized/session-expired, and network-error states are understandable and recoverable.
-- [ ] **c.** Forms are keyboard accessible, have labels, and behave at supported narrow and desktop widths.
-- [ ] **d.** Tests cover critical form behavior and API error mapping without depending on backend internals.
+- [x] **a.** Admin can list, create, edit, archive, and validate product/category data and update stock through documented APIs.
+- [x] **b.** Loading, empty, validation, conflict, unauthorized/session-expired, and network-error states are understandable and recoverable.
+- [x] **c.** Forms are keyboard accessible, have labels, and behave at supported narrow and desktop widths.
+- [x] **d.** Tests cover critical form behavior and API error mapping without depending on backend internals.
 
 **Verification:** admin component/behavior tests and production build/type checks.
+
+**Verification record (2026-10-16):** implemented in `ecd64ee` (products A-02, product form A-03, categories A-04, inventory A-05, shared dialog/badge/pagination/state-panel/navigation-guard components, the catalog API module, and 20 new behavior tests) and independently verified at `8c4344f` (test-only commit on top of `ecd64ee`, +299 lines) — all criteria **a–d** PASS. The tester added 9 further tests plus one strengthened assertion (final total 58 tests in 8 files; three consecutive clean runs on the final content; typecheck, lint, and production build all clean) covering category status filtering, the categories empty state, product/category form validation boundaries and `422` field mapping, inventory error retry and in-dialog server-rejection handling, and that product filters and pagination follow API metadata. Live probes against the local admin API confirmed product create (201) → update (200) → archive (200) → re-archive `409 INVALID_PRODUCT_STATE`; category create (201) → duplicate-name `409 CATEGORY_NAME_TAKEN` → update (200) → archive (200) → restore (200) → archive non-empty `409 CATEGORY_NOT_EMPTY` with blocking details; inventory `PATCH` absolute quantity (200; zero ⇒ `inStock: false` in list responses); list filters `q`/`status`/`categoryId`; and `422 VALIDATION_ERROR` for `perPage=0`/`101`. Criterion **a** holds: listing/creating/editing/archiving and stock updates use only the documented `docs/openapi.yaml` endpoints. Criterion **b** holds: loading skeletons, empty catalog and filtered-empty panels, client validation plus server `422`/`409` field mapping, archive conflict messages, guest `401` routing, and recoverable network-error panels with retry. Criterion **c** holds: every field has a visible or programmatic label, dialogs move focus in, trap Tab, close on Escape, and restore focus, tables switch to labeled narrow-screen cards at the documented breakpoint, and actions meet minimum target sizes (source-verified; no browser E2E on this machine — the same accepted limitation as AUTH-003). Criterion **d** holds: tests assert behavior through the mocked HTTP layer only (no backend internals), covering list states, filters, pagination, archive confirm/refresh/conflict, form validation and `422`/`409` mapping, the unsaved-changes guard, category search and lifecycle, and inventory validation. Documented deviations: the sidebar lists only implemented sections (Orders arrives with ORD-003 in Phase 2); the category lifecycle follows the authoritative contract rather than the older `PATCH` note (corrected above); category search/status filtering runs client-side because the API returns the full list. Images are demo URLs only (no upload) and stock is managed exclusively in Inventory, both stated in the UI copy. Tracked by [PR #43](https://github.com/Averon-Labs/eshop-verse/pull/43), which targets `develop`.
 
 ## Phase 2 — Cart, Checkout, and Orders
 

@@ -1,61 +1,129 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/*
+ * EShop Verse Admin design tokens (docs/DESIGN_SYSTEM.md).
+ *
+ * Tailwind v4 CSS-first configuration: the token values live in this file,
+ * `@theme inline` maps them to utilities, and the `.dark` block re-declares
+ * the raw values for deep OLED dark mode. Change tokens here, not in page
+ * code, so the admin stays on the shared coral/neutral palette.
+ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: 240 10% 98%;      /* #F5F6F7 Clean Canvas */
+  --foreground: 0 0% 9%;          /* #161616 Deep Ink */
+  --card: 0 0% 100%;              /* #FFFFFF Crisp Card */
+  --card-foreground: 0 0% 9%;
+  --primary: 356 89% 72%;         /* #F7767E Brand Coral */
+  --primary-foreground: 0 0% 9%;
+  --secondary: 262 41% 52%;       /* #7651B5 Brand Lavender */
+  --secondary-foreground: 0 0% 100%;
+  --muted: 240 5% 95%;            /* #F1F1F3 */
+  --muted-foreground: 0 0% 42%;   /* #6B6B6B */
+  --accent: 186 54% 34%;          /* #287E87 Brand Aqua */
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 71% 41%;       /* #B3261E Error */
+  --destructive-foreground: 0 0% 100%;
+  --border: 240 6% 86%;           /* #D8D8DE Hairline Border */
+  --input: 240 6% 86%;
+  --ring: 356 89% 72%;
+  --radius: 1rem;
+}
+
+/* Deep Space & OLED Dark Mode */
+.dark {
+  --background: 0 0% 0%;          /* #000000 Pitch Black OLED */
+  --foreground: 240 5% 95%;       /* #F0F0F4 */
+  --card: 240 4% 5%;              /* #0D0D0E Deep Dark Surface */
+  --card-foreground: 240 5% 95%;
+  --primary: 356 100% 85%;        /* #FFB3B8 Luminous Coral */
+  --primary-foreground: 352 68% 22%; /* #5F121C */
+  --secondary: 256 100% 87%;      /* #D0BCFF Luminous Lavender */
+  --secondary-foreground: 260 59% 28%;
+  --muted: 240 4% 12%;            /* #1A1C20 */
+  --muted-foreground: 228 11% 79%;/* #C4C6D0 */
+  --accent: 186 55% 67%;          /* #7BD0D9 Luminous Aqua */
+  --accent-foreground: 185 100% 11%;
+  --destructive: 6 100% 84%;      /* #FFB4AB */
+  --destructive-foreground: 356 100% 21%;
+  --border: 223 10% 20%;          /* #2D3037 Hairline Stroke */
+  --input: 223 10% 20%;
+  --ring: 356 100% 85%;
+}
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --font-sans: "Lato", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 2rem;
+
+  --shadow-glow: 0 0 50px -10px rgba(247, 118, 126, 0.25);
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.12);
+
+  --animate-fade-in: fadeIn 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-scale-in: scaleIn 200ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
 
 @layer base {
-  :root {
-    --background: 240 10% 98%;      /* #F5F6F7 Clean Canvas */
-    --foreground: 0 0% 9%;          /* #161616 Deep Ink */
-    --card: 0 0% 100%;              /* #FFFFFF Crisp Card */
-    --card-foreground: 0 0% 9%;
-    --primary: 356 89% 72%;         /* #F7767E Brand Coral */
-    --primary-foreground: 0 0% 9%;
-    --secondary: 262 41% 52%;       /* #7651B5 Brand Lavender */
-    --secondary-foreground: 0 0% 100%;
-    --muted: 240 5% 95%;            /* #F1F1F3 */
-    --muted-foreground: 0 0% 42%;   /* #6B6B6B */
-    --accent: 186 54% 34%;          /* #287E87 Brand Aqua */
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 71% 41%;       /* #B3261E Error */
-    --destructive-foreground: 0 0% 100%;
-    --border: 240 6% 86%;           /* #D8D8DE Hairline Border */
-    --input: 240 6% 86%;
-    --ring: 356 89% 72%;
-    --radius: 1rem;
-  }
-
-  /* Deep Space & OLED Dark Mode */
-  .dark {
-    --background: 0 0% 0%;          /* #000000 Pitch Black OLED */
-    --foreground: 240 5% 95%;       /* #F0F0F4 */
-    --card: 240 4% 5%;              /* #0D0D0E Deep Dark Surface */
-    --card-foreground: 240 5% 95%;
-    --primary: 356 100% 85%;        /* #FFB3B8 Luminous Coral */
-    --primary-foreground: 352 68% 22%; /* #5F121C */
-    --secondary: 256 100% 87%;      /* #D0BCFF Luminous Lavender */
-    --secondary-foreground: 260 59% 28%;
-    --muted: 240 4% 12%;            /* #1A1C20 */
-    --muted-foreground: 228 11% 79%;/* #C4C6D0 */
-    --accent: 186 55% 67%;          /* #7BD0D9 Luminous Aqua */
-    --accent-foreground: 185 100% 11%;
-    --destructive: 6 100% 84%;      /* #FFB4AB */
-    --destructive-foreground: 356 100% 21%;
-    --border: 223 10% 20%;          /* #2D3037 Hairline Stroke */
-    --input: 223 10% 20%;
-    --ring: 356 100% 85%;
-  }
-
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   /* Vercel standard: Tabular figures for data tables, metrics, inventory */
-  table, .tabular-nums {
+  table,
+  .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
 }
@@ -85,7 +153,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
+  *,
+  ::before,
+  ::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

@@ -247,6 +247,8 @@ They document local development servers on purpose; the production-like origin i
 |-----------|---------------------------|
 | Runtime | **Node.js 24.17.0** with **npm 11.17.0** (Vite 8 requires Node `^20.19.0 \|\| >=22.12.0`) |
 | UI | **React 19.3.1** + **React DOM 19.3.1** (`@types/react` / `@types/react-dom` 19.3.0) |
+| Styling | **Tailwind CSS 4.3.3** with `@tailwindcss/vite` 4.3.3 — CSS-first configuration in `src/globals.css` (`@theme inline` tokens, `@custom-variant dark`); no `tailwind.config.ts`. Tailwind v3 was rejected during AUTH-003 because its toolchain carried unfixed npm audit advisories |
+| Routing | **react-router-dom 7.18.4** — `/login` plus the authenticated shell routes `/products`, `/products/new`, `/products/:productId/edit`, `/categories`, and `/inventory` |
 | Language | **TypeScript 6.0.3** (`strict`, `noEmit` type-check) |
 | Build/dev server | **Vite 8.3.4** with `@vitejs/plugin-react` 6.1.2 |
 | Tests | **Vitest 5.0.5** (jsdom environment) + **React Testing Library 16.3.3** + `@testing-library/dom` 10.4.2 + `@testing-library/jest-dom` 7.0.1, `src/setupTests.ts` |
@@ -282,30 +284,42 @@ npm run preview                # serve the production build locally
 
 **Local SPA/API origin arrangement (Sanctum cookies and CSRF):**
 
+- Open the SPA as `http://localhost:5173` and point `VITE_API_BASE_URL` at a `localhost` API
+  origin — do not mix `localhost` and `127.0.0.1`, because the `SameSite=Lax` session cookie is
+  only sent within one site.
 - The Vite dev server is pinned to `http://localhost:5173` (`strictPort`). The backend's
   `SANCTUM_STATEFUL_DOMAINS` already lists `localhost:5173` and `localhost:5174`, so the stateful
   `eshop_admin_session` cookie is accepted for the SPA origin.
+- Cross-origin cookie/CSRF traffic is accepted only for the documented local origins: the
+  backend's `config/cors.php` allows `http://localhost:5173` and `http://localhost:5174` with
+  `supports_credentials: true` (the `CORS_ALLOWED_ORIGINS` variable overrides the list). Requests
+  from any other origin receive no CORS approval.
 - The API origin comes from `VITE_API_BASE_URL` (template: `admin/.env.example`; local override:
   `.env.local`, git-ignored). Default: `http://localhost:8000/api/v1`. No credential, key, or
   secret belongs in this file or anywhere in the admin source.
-- Requests that carry session/CSRF state (login, logout, mutations in AUTH-003) must be sent with
-  `credentials: 'include'` so `eshop_admin_session` and `XSRF-TOKEN` cookies travel, and must echo
-  the `XSRF-TOKEN` cookie in the `X-XSRF-TOKEN` header. Tokens are never written to
-  `localStorage`. FND-003 only defines this arrangement; no product or auth endpoint is called yet.
+- Requests that carry session/CSRF state (login, logout, mutations) are sent with
+  `credentials: 'include'` so `eshop_admin_session` and `XSRF-TOKEN` cookies travel, and echo the
+  `XSRF-TOKEN` cookie in the `X-XSRF-TOKEN` header. Tokens are never written to `localStorage`;
+  the SPA derives its auth state from `GET /admin/auth/session`.
+- If port 8000 is occupied locally, run the API on another port (for example
+  `php artisan serve --port=8010`) and update `VITE_API_BASE_URL` accordingly.
 
-**Verification status (2026-10-16, FND-003 clean-install rehearsal):**
+**Verification status (2026-10-16, AUTH-003 + CAT-004 on the admin SPA):**
 
 | Command (from `admin/`) | Result |
 |-------------------------|--------|
-| `npm ci` (after `rm -rf node_modules`) | ✔ exit 0 — 192 packages installed from the committed `package-lock.json`; `npm audit` reports 0 vulnerabilities |
-| `npm run typecheck` | ✔ exit 0, no errors (includes the pre-existing `src/components/*.tsx`) |
+| `npm ci` + `npm audit` | ✔ install clean; `npm audit` reports 0 vulnerabilities after the Tailwind v4 migration |
+| `npm run typecheck` | ✔ exit 0, no errors |
 | `npm run lint` | ✔ exit 0, no warnings or errors |
-| `npm test` | ✔ 1 test file, 2 tests passed (`App` — shell render and test-isolation guard) |
-| `npm run build` | ✔ exit 0 — `dist/index.html` + one JS bundle |
+| `npm test` | ✔ 8 test files, 58 tests passed (session lifecycle, products, categories, inventory) |
+| `npm run build` | ✔ exit 0 — `dist/` with one CSS (~35 kB) and one JS (~326 kB) bundle |
 | `npm run dev` + `GET http://localhost:5173/` | ✔ HTTP 200, Vite dev server on port 5173 |
 
 Vitest runs without globals, so `src/setupTests.ts` calls `afterEach(cleanup)` explicitly to keep
-React Testing Library renders isolated between tests.
+React Testing Library renders isolated between tests. The Vitest config caps parallel workers and
+raises the per-test timeout for slow handset hardware, and `setupTests.ts` sets RTL's
+`asyncUtilTimeout` to 5000 ms; these only extend waits for genuinely slow environments, they do not
+weaken assertions.
 
 ---
 
