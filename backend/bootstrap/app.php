@@ -23,6 +23,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // AUTH-003/CAT-004: the admin SPA is a first-party browser client.
+        // Guests must always receive the contracted 401 JSON instead of a
+        // redirect attempt to a non-existent `login` route, which would
+        // surface as a 500 on requests that do not send an Accept header.
+        $middleware->redirectGuestsTo(fn (): ?string => null);
+
         // QUAL-003: x-rate-limit-classes `global` (300/min/ip) applies to
         // every operation, on top of the narrower per-operation limiters
         // declared on individual routes in routes/api.php.
