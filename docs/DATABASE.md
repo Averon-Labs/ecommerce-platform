@@ -58,11 +58,19 @@ Product images are separate rows so each product can have an ordered image set. 
 | id | Primary Key | |
 | name | String | Required |
 | sort_order | Integer | |
+<<<<<<< HEAD
+| status | Enum | active, archived |
+=======
 | status | Enum (`active`, `archived`) | Category lifecycle; implemented in the Backend catalog migrations (CAT-001) with archive/restore endpoints (CAT-003) |
+>>>>>>> develop
 | created_at | Timestamp | |
 | updated_at | Timestamp | |
 
+<<<<<<< HEAD
+Categories are flat in the first release; hierarchical categories are deferred. Archive lifecycle is supported (destructive deletion is refused if products remain).
+=======
 Categories are flat in the first release; hierarchical categories are deferred. Categories are archived and restored, never deleted (decision OPEN-2, closed 2026-10-11 in `docs/openapi.yaml`); archiving is refused while non-archived products still reference the category.
+>>>>>>> develop
 
 ### Inventory
 

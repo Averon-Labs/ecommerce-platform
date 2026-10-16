@@ -3,5 +3,6 @@
     <!-- Dark application theme (soft charcoal, eye-friendly contrast) -->
     <style name="Theme.EShopVerse" parent="Base.Theme.EShopVerse">
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 </resources>
