@@ -51,7 +51,7 @@ This document highlights the key cross-component dependencies where work in one 
 
 | Admin Task | Requires | Notes |
 |------------|----------|-------|
-| FND-003 | None | Can start immediately |
+| FND-003 | None | **Complete (2026-10-16):** React 19 + TypeScript 6 + Vite 8 admin app initialized with a committed lockfile, Vitest/React Testing Library tests, ESLint, and the documented Sanctum SPA origin; verification record in `docs/ADMIN_ROADMAP.md` |
 
 ---
 
@@ -149,7 +149,7 @@ Backend FND-004 (OpenAPI Contract)
 
 ### For Admin Developer (Your Colleague)
 
-1. **Phase 0:** Start FND-003 immediately.
+1. **Phase 0:** FND-003 is complete (2026-10-16) — the React app is initialized and verified (record in `docs/ADMIN_ROADMAP.md`).
 2. **Phase 1:** Wait for Backend FND-002, FND-004, and coordinate on AUTH-003 backend portion. Then wait for Backend CAT-003 before doing CAT-004.
 3. **Phase 2:** Wait for Backend ORD-001 before starting ORD-003.
 
@@ -206,7 +206,7 @@ These decisions are listed in Android roadmap but may need input from Backend/Ad
 ### What Admin Colleague Should Focus On
 
 **Right now (Phase 0):**
-- 🔨 FND-003 — React initialization (start immediately)
+- ✅ FND-003 — React initialization (complete 2026-10-16; verification record in `docs/ADMIN_ROADMAP.md`)
 
 **Phase 1:**
 - ⏸️ Wait for Backend FND-002, FND-004

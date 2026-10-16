@@ -16,7 +16,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 ### Step 1 — FND-003 — Initialize the admin application and local workflow
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** none
 
@@ -36,13 +36,15 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **Acceptance criteria:**
 
-- [ ] **a.** Select supported stable tooling and commit the package lockfile; use the agreed Vitest and React Testing Library strategy or document a reviewed equivalent.
-- [ ] **b.** Configure the API origin without committing credentials and document the local SPA/API origin arrangement needed for Sanctum cookies and CSRF.
-- [ ] **c.** Provide a minimal app and a passing behavior-oriented test.
-- [ ] **d.** Record and verify exact install, development, type-check/lint, test, and production-build commands in `docs/DEVELOPMENT.md`.
-- [ ] **e.** Do not call or implement product endpoints before FND-004 is reviewed.
+- [x] **a.** Select supported stable tooling and commit the package lockfile; use the agreed Vitest and React Testing Library strategy or document a reviewed equivalent.
+- [x] **b.** Configure the API origin without committing credentials and document the local SPA/API origin arrangement needed for Sanctum cookies and CSRF.
+- [x] **c.** Provide a minimal app and a passing behavior-oriented test.
+- [x] **d.** Record and verify exact install, development, type-check/lint, test, and production-build commands in `docs/DEVELOPMENT.md`.
+- [x] **e.** Do not call or implement product endpoints before FND-004 is reviewed.
 
 **Verification:** clean dependency install, baseline UI test, static checks, and production build.
+
+**Verification record (2026-10-16):** re-verified end to end at commit `0df6e2a`, then re-run after the test-isolation fix in `6091651`. From `admin/`: `rm -rf node_modules dist && npm ci` installed 192 packages from the committed `package-lock.json` with `npm audit` reporting 0 vulnerabilities; `npm run typecheck`, `npm run lint`, `npm test` (1 file, 2 tests), and `npm run build` (`dist/index.html` + one JS bundle) passed; `npm run dev` answered `GET http://localhost:5173/` with HTTP 200. Exact commands and outcomes are recorded in `docs/DEVELOPMENT.md`. During the recheck, React Testing Library cleanup was made explicit in `admin/src/setupTests.ts` because Vitest runs without globals — renders otherwise leaked between tests in the same file — and a second `App` test now guards that isolation. Criterion **b** is confirmed against `backend/.env.example` (`SANCTUM_STATEFUL_DOMAINS` lists `localhost:5173` and `127.0.0.1:5173`); criterion **e** holds — the app calls no product or auth endpoint.
 
 ## Phase 1 — Accounts and Catalog
 
