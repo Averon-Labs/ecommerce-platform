@@ -1,7 +1,7 @@
 # CI Workflow — EShop Verse
 #
-# CI currently validates repository structure and runs the Android build,
-# lint, and JVM unit-test checks. Other components are added when initialized.
+# CI validates repository structure and runs the Android and Backend checks.
+# The admin job is added when that component is initialized.
 
 name: CI
 
@@ -66,18 +66,69 @@ jobs:
         working-directory: android
         run: ./gradlew --no-daemon testDebugUnitTest
 
-  # Uncomment and configure when Backend project is initialized:
-  # backend:
-  #   name: Backend Build & Test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v7
-  #     - uses: shivammathur/setup-php@v2
-  #       with:
-  #         php-version: '8.2'
-  #     - name: Install Dependencies
-  #       working-directory: backend
-  #       run: composer install --no-progress
-  #     - name: Test
-  #       working-directory: backend
-  #       run: vendor/bin/phpunit
+  backend:
+    name: Backend Build & Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: eshopverse_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: curl, fileinfo, mbstring, openssl, pdo_mysql, mysqli, zip
+          coverage: none
+
+      - name: Install Dependencies
+        working-directory: backend
+        run: composer install --no-interaction --no-progress
+
+      - name: Create environment file
+        working-directory: backend
+        run: cp .env.example .env
+
+      - name: Generate application key
+        working-directory: backend
+        run: php artisan key:generate
+
+      - name: Validate and audit dependencies
+        working-directory: backend
+        run: |
+          composer validate --strict
+          composer audit
+
+      - name: Style check
+        working-directory: backend
+        run: vendor/bin/pint --test
+
+      # phpunit.xml hard-wires DB_DATABASE=eshopverse_test, so these tests
+      # only ever touch the disposable service database above.
+      - name: Run tests
+        working-directory: backend
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: '3306'
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan test
+
+      - name: Lint OpenAPI contract
+        run: npx --yes "@redocly/cli@2.62.1" lint docs/openapi.yaml
