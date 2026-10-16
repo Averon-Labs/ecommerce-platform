@@ -12,5 +12,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.ts'],
+    // jsdom startup is expensive on handset hardware; cap workers to reduce
+    // CPU contention and give slower devices room to settle each test.
+    maxWorkers: 4,
+    testTimeout: 20000,
   },
 });

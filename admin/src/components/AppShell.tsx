@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
+import type { MouseEvent as ReactMouseEvent } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
+import { ConfirmDialog } from './ConfirmDialog';
+import { NavigationGuardProvider, useNavigationGuard } from './NavigationGuard';
 
 function ProductsIcon() {
   return (
@@ -80,6 +83,8 @@ const NAV_ITEMS = [
   { to: '/inventory', label: 'Inventory', icon: <InventoryIcon /> },
 ];
 
+type NavClickHandler = (event: ReactMouseEvent<HTMLAnchorElement>, to: string) => void;
+
 function navLinkClasses({ isActive }: { isActive: boolean }): string {
   return [
     'flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors',
@@ -90,11 +95,25 @@ function navLinkClasses({ isActive }: { isActive: boolean }): string {
   ].join(' ');
 }
 
-function SectionNav({ onNavigate }: { onNavigate?: () => void }) {
+function SectionNav({
+  onNavigate,
+  onItemClick,
+}: {
+  onNavigate?: () => void;
+  onItemClick?: NavClickHandler;
+}) {
   return (
     <nav aria-label="Admin sections" className="space-y-1 p-3">
       {NAV_ITEMS.map((item) => (
-        <NavLink key={item.to} to={item.to} className={navLinkClasses} onClick={onNavigate}>
+        <NavLink
+          key={item.to}
+          to={item.to}
+          className={navLinkClasses}
+          onClick={(event) => {
+            onNavigate?.();
+            onItemClick?.(event, item.to);
+          }}
+        >
           {item.icon}
           {item.label}
         </NavLink>
@@ -107,12 +126,25 @@ function SectionNav({ onNavigate }: { onNavigate?: () => void }) {
  * Admin shell: static 200–248px sidebar on tablet and desktop, drawer below
  * 768px, top bar with the account menu, and a content area capped at 1440px
  * (docs/DESIGN_SYSTEM.md — Admin Web).
+ *
+ * The shell also asks before leaving a page with unsaved changes: editing
+ * pages report their dirty state through the navigation guard.
  */
 export function AppShell() {
+  return (
+    <NavigationGuardProvider>
+      <AppShellLayout />
+    </NavigationGuardProvider>
+  );
+}
+
+function AppShellLayout() {
   const { user, signOut } = useAuth();
+  const { isBlocked, setBlocked } = useNavigationGuard();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [pendingPath, setPendingPath] = useState<string | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerButtonRef = useRef<HTMLButtonElement>(null);
   const drawerLinkRef = useRef<HTMLAnchorElement>(null);
@@ -174,6 +206,19 @@ export function AppShell() {
     navigate('/login', { replace: true });
   }
 
+  function handleNavClick(event: ReactMouseEvent<HTMLAnchorElement>, to: string) {
+    if (!isBlocked || event.defaultPrevented) {
+      return;
+    }
+
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+
+    event.preventDefault();
+    setPendingPath(to);
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <a
@@ -188,7 +233,7 @@ export function AppShell() {
           <span className="text-base font-bold tracking-tight">EShop Verse Admin</span>
         </div>
         <div className="flex-1 overflow-y-auto">
-          <SectionNav />
+          <SectionNav onItemClick={handleNavClick} />
         </div>
       </aside>
 
@@ -232,7 +277,7 @@ export function AppShell() {
               <div
                 role="menu"
                 aria-label="Account"
-                className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 rounded-2xl border border-border bg-card p-2 shadow-glass animate-fade-in"
+                className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 animate-fade-in rounded-2xl border border-border bg-card p-2 shadow-glass"
               >
                 <div className="px-3 py-2">
                   <p className="text-sm font-semibold">{displayName}</p>
@@ -268,7 +313,7 @@ export function AppShell() {
             role="dialog"
             aria-modal="true"
             aria-label="Admin navigation"
-            className="absolute inset-y-0 left-0 w-72 max-w-[85vw] overflow-y-auto border-r border-border bg-card shadow-glass animate-fade-in"
+            className="absolute inset-y-0 left-0 w-72 max-w-[85vw] animate-fade-in overflow-y-auto border-r border-border bg-card shadow-glass"
           >
             <div className="flex h-16 items-center justify-between border-b border-border px-4">
               <span className="text-base font-bold tracking-tight">EShop Verse Admin</span>
@@ -288,11 +333,30 @@ export function AppShell() {
                 drawerLinkRef.current = node?.querySelector('a') ?? null;
               }}
             >
-              <SectionNav onNavigate={() => setDrawerOpen(false)} />
+              <SectionNav
+                onNavigate={() => setDrawerOpen(false)}
+                onItemClick={handleNavClick}
+              />
             </div>
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={pendingPath !== null}
+        title="Discard unsaved changes?"
+        description="This page has unsaved changes. Leave the page and discard them?"
+        confirmLabel="Discard changes"
+        onCancel={() => setPendingPath(null)}
+        onConfirm={() => {
+          const target = pendingPath;
+          setPendingPath(null);
+          setBlocked(false);
+          if (target) {
+            navigate(target);
+          }
+        }}
+      />
     </div>
   );
 }

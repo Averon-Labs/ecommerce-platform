@@ -4,7 +4,10 @@ import { RequireAdmin } from './auth/RequireAdmin';
 import { AppShell } from './components/AppShell';
 import LoginPage from './pages/LoginPage';
 import { NotFoundPage } from './pages/NotFoundPage';
-import { SectionPlaceholder } from './pages/SectionPlaceholder';
+import CategoriesPage from './pages/categories/CategoriesPage';
+import InventoryPage from './pages/inventory/InventoryPage';
+import ProductFormPage from './pages/products/ProductFormPage';
+import ProductsPage from './pages/products/ProductsPage';
 
 export default function App() {
   return (
@@ -15,9 +18,11 @@ export default function App() {
           <Route element={<RequireAdmin />}>
             <Route element={<AppShell />}>
               <Route index element={<Navigate to="/products" replace />} />
-              <Route path="products" element={<SectionPlaceholder title="Products" />} />
-              <Route path="categories" element={<SectionPlaceholder title="Categories" />} />
-              <Route path="inventory" element={<SectionPlaceholder title="Inventory" />} />
+              <Route path="products" element={<ProductsPage />} />
+              <Route path="products/new" element={<ProductFormPage />} />
+              <Route path="products/:productId/edit" element={<ProductFormPage />} />
+              <Route path="categories" element={<CategoriesPage />} />
+              <Route path="inventory" element={<InventoryPage />} />
             </Route>
           </Route>
           <Route path="*" element={<NotFoundPage />} />
