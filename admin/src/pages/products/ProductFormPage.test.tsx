@@ -200,4 +200,53 @@ describe('ProductFormPage (A-03)', () => {
 
     expect(await screen.findByText('No products yet')).toBeInTheDocument();
   });
+
+  it('server_validation_maps_422_details_to_fields_and_preserves_values', async () => {
+    mockApi([
+      sessionRoute(),
+      categoryListRoute(),
+      {
+        method: 'GET',
+        path: '/admin/products/7',
+        handler: () => jsonResponse(200, { data: product({ id: 7 }) }),
+      },
+      {
+        method: 'PUT',
+        path: '/admin/products/7',
+        handler: () =>
+          jsonResponse(422, {
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'One or more request fields are invalid.',
+              details: [
+                {
+                  field: 'name',
+                  message: 'The name field must not be greater than 160 characters.',
+                },
+                { field: 'price', message: 'The price field must be a valid amount.' },
+              ],
+            },
+          }),
+      },
+    ]);
+    window.history.pushState({}, '', '/products/7/edit');
+
+    render(<App />);
+
+    await screen.findByRole('heading', { level: 1, name: 'Edit product' });
+    await waitFor(() => expect(screen.getByLabelText('Name')).toHaveValue('Aurora Desk Lamp'));
+
+    fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'Renamed Lamp' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    expect(
+      await screen.findByText('The name field must not be greater than 160 characters.'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('The price field must be a valid amount.')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Check the highlighted fields and try again.',
+    );
+    // The failure is recoverable: entered values are preserved for the retry.
+    expect(screen.getByLabelText('Name')).toHaveValue('Renamed Lamp');
+  });
 });

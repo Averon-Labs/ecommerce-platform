@@ -153,4 +153,107 @@ describe('CategoriesPage (A-04)', () => {
       expect(within(table).getByText('Active')).toBeInTheDocument();
     });
   });
+
+  it('category_status_filter_shows_only_archived_categories', async () => {
+    mockApi([
+      sessionRoute(),
+      categoryListRoute(() =>
+        jsonResponse(200, {
+          data: [
+            category(),
+            category({ id: 2, name: 'Outdoor', sortOrder: 1, status: 'archived', productCount: 0 }),
+          ],
+        }),
+      ),
+    ]);
+
+    render(<App />);
+
+    await screen.findByRole('table', { name: 'Categories' });
+    fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'archived' } });
+
+    const table = screen.getByRole('table', { name: 'Categories' });
+    expect(within(table).getByText('Outdoor')).toBeInTheDocument();
+    expect(within(table).queryByText('Lighting')).not.toBeInTheDocument();
+  });
+
+  it('categories_empty_state_offers_add_category', async () => {
+    mockApi([sessionRoute(), categoryListRoute(() => jsonResponse(200, { data: [] }))]);
+
+    render(<App />);
+
+    const emptyTitle = await screen.findByText('No categories yet');
+    expect(
+      within(emptyTitle.parentElement as HTMLElement).getByRole('button', {
+        name: 'Add category',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('category_form_client_validation_blocks_name_and_sort_order_boundaries', async () => {
+    const fetchMock = mockApi([
+      sessionRoute(),
+      categoryListRoute(() => jsonResponse(200, { data: [category()] })),
+    ]);
+
+    render(<App />);
+
+    await screen.findByRole('table', { name: 'Categories' });
+    fireEvent.click(screen.getByRole('button', { name: 'Add category' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Add category' });
+
+    fireEvent.change(within(dialog).getByLabelText('Display order'), {
+      target: { value: '10000' },
+    });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(await screen.findByText('Name is required.')).toBeInTheDocument();
+    expect(screen.getByText('Enter a whole number between 0 and 9999.')).toBeInTheDocument();
+
+    fireEvent.change(within(dialog).getByLabelText('Name'), { target: { value: 'Valid Name' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }));
+    expect(screen.getByText('Enter a whole number between 0 and 9999.')).toBeInTheDocument();
+
+    expect(
+      fetchMock.mock.calls.filter(
+        ([, init]) => (init as RequestInit | undefined)?.method === 'POST',
+      ),
+    ).toHaveLength(0);
+  });
+
+  it('update_category_maps_422_details_to_the_name_field', async () => {
+    mockApi([
+      sessionRoute(),
+      categoryListRoute(() => jsonResponse(200, { data: [category()] })),
+      {
+        method: 'PUT',
+        path: '/admin/categories/1',
+        handler: () =>
+          jsonResponse(422, {
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'One or more request fields are invalid.',
+              details: [
+                {
+                  field: 'name',
+                  message: 'The name field must not be greater than 80 characters.',
+                },
+              ],
+            },
+          }),
+      },
+    ]);
+
+    render(<App />);
+
+    const table = await screen.findByRole('table', { name: 'Categories' });
+    fireEvent.click(within(table).getByRole('button', { name: 'Edit Lighting' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Edit Lighting' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }));
+
+    expect(
+      await screen.findByText('The name field must not be greater than 80 characters.'),
+    ).toBeInTheDocument();
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('Check the highlighted fields.');
+  });
 });

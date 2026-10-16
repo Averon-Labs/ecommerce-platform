@@ -191,4 +191,69 @@ describe('ProductsPage (A-02)', () => {
 
     expect(await screen.findByText('The product is already archived.')).toBeInTheDocument();
   });
+
+  it('products_category_and_status_filters_are_sent_to_the_api', async () => {
+    const urls: string[] = [];
+    mockApi([
+      sessionRoute(),
+      categoryListRoute([category(), category({ id: 2, name: 'Outdoor', status: 'archived' })]),
+      productsRoute((request) => {
+        urls.push(request.url);
+        if (request.url.includes('categoryId=1') && request.url.includes('status=active')) {
+          return jsonResponse(200, { data: [product()], pagination: pagination(1, 20, 1, 1) });
+        }
+        return jsonResponse(200, { data: [], pagination: pagination() });
+      }),
+    ]);
+
+    render(<App />);
+
+    expect(await screen.findByText('No products yet')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('Category'), { target: { value: '1' } });
+    fireEvent.change(screen.getByLabelText('Status'), { target: { value: 'active' } });
+
+    const table = await findProductsTable();
+    expect(within(table).getByText('Aurora Desk Lamp')).toBeInTheDocument();
+    expect(
+      urls.some((url) => url.includes('categoryId=1') && url.includes('status=active')),
+    ).toBe(true);
+  });
+
+  it('products_pagination_follows_api_metadata', async () => {
+    const urls: string[] = [];
+    mockApi([
+      sessionRoute(),
+      categoryListRoute([]),
+      productsRoute((request) => {
+        urls.push(request.url);
+        if (request.url.includes('page=2')) {
+          return jsonResponse(200, {
+            data: [product({ id: 6, name: 'Second Page Lamp' })],
+            pagination: pagination(2, 20, 21, 2),
+          });
+        }
+        return jsonResponse(200, { data: [product()], pagination: pagination(1, 20, 21, 2) });
+      }),
+    ]);
+
+    render(<App />);
+
+    await findProductsTable();
+    const firstNav = await screen.findByRole('navigation', { name: 'Pagination' });
+    expect(within(firstNav).getByText('Page 1 of 2')).toBeInTheDocument();
+    expect(within(firstNav).getByText('21 products')).toBeInTheDocument();
+    expect(within(firstNav).getByRole('button', { name: 'Previous' })).toBeDisabled();
+
+    fireEvent.click(within(firstNav).getByRole('button', { name: 'Next' }));
+
+    await waitFor(() => {
+      const table = screen.getByRole('table', { name: 'Products' });
+      expect(within(table).getByText('Second Page Lamp')).toBeInTheDocument();
+    });
+    const secondNav = screen.getByRole('navigation', { name: 'Pagination' });
+    expect(within(secondNav).getByText('Page 2 of 2')).toBeInTheDocument();
+    expect(within(secondNav).getByRole('button', { name: 'Next' })).toBeDisabled();
+    expect(urls.some((url) => url.includes('page=2'))).toBe(true);
+  });
 });

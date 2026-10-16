@@ -112,6 +112,18 @@ describe('InventoryPage (A-05)', () => {
       ),
     ).toHaveLength(0);
 
+    fireEvent.change(within(dialog).getByLabelText('New quantity'), {
+      target: { value: '1000001' },
+    });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Save quantity' }));
+
+    expect(await screen.findByText('Keep the quantity to 1000000 or less.')).toBeInTheDocument();
+    expect(
+      fetchMock.mock.calls.filter(
+        ([, init]) => (init as RequestInit | undefined)?.method === 'PATCH',
+      ),
+    ).toHaveLength(0);
+
     fireEvent.change(within(dialog).getByLabelText('New quantity'), { target: { value: '10' } });
     fireEvent.click(within(dialog).getByRole('button', { name: 'Save quantity' }));
 
@@ -123,6 +135,76 @@ describe('InventoryPage (A-05)', () => {
       const table = screen.getByRole('table', { name: 'Inventory' });
       expect(within(table).getByText('10')).toBeInTheDocument();
     });
+
+    // The API receives the resulting quantity, never a delta.
+    const patchCall = fetchMock.mock.calls.find(
+      ([, init]) => (init as RequestInit | undefined)?.method === 'PATCH',
+    );
+    expect(patchCall).toBeDefined();
+    expect(JSON.parse(String((patchCall?.[1] as RequestInit).body))).toEqual({ quantity: 10 });
+  });
+
+  it('inventory_error_state_retries_and_recovers', async () => {
+    let calls = 0;
+    mockApi([
+      sessionRoute(),
+      inventoryRoute(() => {
+        calls += 1;
+        return calls === 1
+          ? jsonResponse(500, {
+              error: {
+                code: 'INTERNAL_ERROR',
+                message: 'The server failed to handle the request.',
+              },
+            })
+          : jsonResponse(200, { data: [inventoryRow()], pagination: pagination(1, 20, 1, 1) });
+      }),
+    ]);
+
+    render(<App />);
+
+    expect(await screen.findByText('Inventory could not be loaded')).toBeInTheDocument();
+    expect(screen.getByText('The server failed to handle the request.')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+
+    const table = await findInventoryTable();
+    expect(within(table).getByText('Aurora Desk Lamp')).toBeInTheDocument();
+  });
+
+  it('adjust_stock_surfaces_server_rejection_without_closing_the_dialog', async () => {
+    mockApi([
+      sessionRoute(),
+      inventoryRoute(() =>
+        jsonResponse(200, { data: [inventoryRow()], pagination: pagination(1, 20, 1, 1) }),
+      ),
+      {
+        method: 'PATCH',
+        path: '/admin/inventory/5',
+        handler: () =>
+          jsonResponse(422, {
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'The quantity field must be at least 0.',
+              details: [{ field: 'quantity', message: 'The quantity field must be at least 0.' }],
+            },
+          }),
+      },
+    ]);
+
+    render(<App />);
+
+    const table = await findInventoryTable();
+    fireEvent.click(
+      within(table).getByRole('button', { name: 'Adjust stock for Aurora Desk Lamp' }),
+    );
+    const dialog = await screen.findByRole('dialog', { name: /adjust stock/i });
+    fireEvent.change(within(dialog).getByLabelText('New quantity'), { target: { value: '3' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Save quantity' }));
+
+    expect(await screen.findByText('The quantity field must be at least 0.')).toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: /adjust stock/i })).toBeInTheDocument();
+    expect(within(dialog).getByLabelText('New quantity')).toHaveValue(3);
   });
 
   it('inventory_empty_state_links_to_add_product', async () => {
