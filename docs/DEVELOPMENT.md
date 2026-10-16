@@ -297,12 +297,15 @@ npm run preview                # serve the production build locally
 
 | Command (from `admin/`) | Result |
 |-------------------------|--------|
-| `npm ci` (after `rm -rf node_modules`) | ✔ exit 0 — 192 packages installed from the committed `package-lock.json` |
+| `npm ci` (after `rm -rf node_modules`) | ✔ exit 0 — 192 packages installed from the committed `package-lock.json`; `npm audit` reports 0 vulnerabilities |
 | `npm run typecheck` | ✔ exit 0, no errors (includes the pre-existing `src/components/*.tsx`) |
 | `npm run lint` | ✔ exit 0, no warnings or errors |
-| `npm test` | ✔ 1 test file, 1 test passed (`App` — `renders_admin_shell_shows_title_and_api_origin`) |
+| `npm test` | ✔ 1 test file, 2 tests passed (`App` — shell render and test-isolation guard) |
 | `npm run build` | ✔ exit 0 — `dist/index.html` + one JS bundle |
 | `npm run dev` + `GET http://localhost:5173/` | ✔ HTTP 200, Vite dev server on port 5173 |
+
+Vitest runs without globals, so `src/setupTests.ts` calls `afterEach(cleanup)` explicitly to keep
+React Testing Library renders isolated between tests.
 
 ---
 
