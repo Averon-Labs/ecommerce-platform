@@ -241,11 +241,68 @@ They document local development servers on purpose; the production-like origin i
 
 ### Admin Dashboard
 
-1. Install the pinned Node.js/npm dependencies.
-2. Configure the API origin for the local Laravel server.
-3. Run the documented development, lint, and test commands.
+**Selected stack (roadmap task FND-003):**
 
-> Exact commands will be documented when the React application and test configuration are initialized.
+| Component | Selected version / choice |
+|-----------|---------------------------|
+| Runtime | **Node.js 24.17.0** with **npm 11.17.0** (Vite 8 requires Node `^20.19.0 \|\| >=22.12.0`) |
+| UI | **React 19.3.1** + **React DOM 19.3.1** (`@types/react` / `@types/react-dom` 19.3.0) |
+| Language | **TypeScript 6.0.3** (`strict`, `noEmit` type-check) |
+| Build/dev server | **Vite 8.3.4** with `@vitejs/plugin-react` 6.1.2 |
+| Tests | **Vitest 5.0.5** (jsdom environment) + **React Testing Library 16.3.3** + `@testing-library/dom` 10.4.2 + `@testing-library/jest-dom` 7.0.1, `src/setupTests.ts` |
+| Static check | **ESLint 10.12.0** flat config (`eslint.config.js`) with `@eslint/js` and **typescript-eslint 8.71.2** |
+| Package manager | **npm** — `admin/package-lock.json` is committed; install with `npm ci` |
+
+**Prerequisites:** Node.js 20.19+ (22.12+) and npm on `PATH`.
+
+**Admin commands** (run from `admin/`):
+
+```bash
+# Clean dependency install from the committed package-lock.json
+npm ci
+
+# First-time local configuration (optional — the default origin is used when absent)
+cp .env.example .env.local     # PowerShell: Copy-Item .env.example .env.local
+
+# Development server (forced to http://localhost:5173)
+npm run dev
+
+# Type-check / static check
+npm run typecheck              # tsc --noEmit
+npm run lint                   # eslint .
+
+# Tests (Vitest + React Testing Library, jsdom)
+npm test
+npm run test:watch
+
+# Production build (runs the type-check first, output in dist/)
+npm run build
+npm run preview                # serve the production build locally
+```
+
+**Local SPA/API origin arrangement (Sanctum cookies and CSRF):**
+
+- The Vite dev server is pinned to `http://localhost:5173` (`strictPort`). The backend's
+  `SANCTUM_STATEFUL_DOMAINS` already lists `localhost:5173` and `localhost:5174`, so the stateful
+  `eshop_admin_session` cookie is accepted for the SPA origin.
+- The API origin comes from `VITE_API_BASE_URL` (template: `admin/.env.example`; local override:
+  `.env.local`, git-ignored). Default: `http://localhost:8000/api/v1`. No credential, key, or
+  secret belongs in this file or anywhere in the admin source.
+- Requests that carry session/CSRF state (login, logout, mutations in AUTH-003) must be sent with
+  `credentials: 'include'` so `eshop_admin_session` and `XSRF-TOKEN` cookies travel, and must echo
+  the `XSRF-TOKEN` cookie in the `X-XSRF-TOKEN` header. Tokens are never written to
+  `localStorage`. FND-003 only defines this arrangement; no product or auth endpoint is called yet.
+
+**Verification status (2026-10-16, FND-003 clean-install rehearsal):**
+
+| Command (from `admin/`) | Result |
+|-------------------------|--------|
+| `npm ci` (after `rm -rf node_modules`) | ✔ exit 0 — 192 packages installed from the committed `package-lock.json` |
+| `npm run typecheck` | ✔ exit 0, no errors (includes the pre-existing `src/components/*.tsx`) |
+| `npm run lint` | ✔ exit 0, no warnings or errors |
+| `npm test` | ✔ 1 test file, 1 test passed (`App` — `renders_admin_shell_shows_title_and_api_origin`) |
+| `npm run build` | ✔ exit 0 — `dist/index.html` + one JS bundle |
+| `npm run dev` + `GET http://localhost:5173/` | ✔ HTTP 200, Vite dev server on port 5173 |
 
 ---
 
