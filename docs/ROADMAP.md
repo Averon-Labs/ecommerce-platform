@@ -255,6 +255,8 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 **Phase 2 exit criteria:** a signed-in customer can complete the sample purchase flow through the API and database, including explicit simulated success/failure and safe duplicate submission; the customer can view the order and an admin can manage its status. Required ownership, stock, payment-state, and regression checks pass.
 
+**Component status (2026-10-17):** the Admin Phase 2 step is complete — ORD-003 delivered the admin order list/detail and server-permitted status transitions (82 admin tests in 10 files; verification record in `docs/ADMIN_ROADMAP.md`; [PR #44](https://github.com/Averon-Labs/eshop-verse/pull/44) open for review), and the backend portion (CART-001, ORD-001) has been complete since 2026-10-15. The project Phase 2 gate still waits on the Android customer order-history step (ORD-002).
+
 
 ## Phase 3 — Quality and Portfolio Delivery
 
