@@ -265,7 +265,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 1 — QUAL-001 — Cross-component purchase-flow regression
 
-**Status:** `[~]` (backend contribution delivered 2026-10-14 — recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
+**Status:** `[~]` (backend contribution delivered 2026-10-14 — recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; admin contribution delivered 2026-10-17 — recorded in [ADMIN_ROADMAP.md](ADMIN_ROADMAP.md) Phase 3; Android contribution pending)
 
 **Depends on:** AUTH-002, CAT-002, CART-002, CHECK-001, ORD-002
 
@@ -282,7 +282,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 2 — QUAL-002 — Accessibility and UI quality pass
 
-**Status:** `[~]` (backend contribution delivered 2026-10-14 — recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
+**Status:** `[~]` (backend contribution delivered 2026-10-14 — recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; admin contribution delivered 2026-10-17 — recorded in [ADMIN_ROADMAP.md](ADMIN_ROADMAP.md) Phase 3; Android contribution pending)
 
 **Depends on:** DES-001, CAT-002, CAT-004, CART-002, CHECK-001, ORD-002, ORD-003
 
@@ -298,7 +298,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 3 — QUAL-003 — Security and privacy review
 
-**Status:** `[~]` (backend contribution delivered 2026-10-14 — findings record in [SECURITY_REVIEW.md](SECURITY_REVIEW.md), global rate limiter fixed; recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
+**Status:** `[~]` (backend contribution delivered 2026-10-14 — findings record in [SECURITY_REVIEW.md](SECURITY_REVIEW.md), global rate limiter fixed; recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; admin contribution delivered 2026-10-17 — findings A-1–A-6 in [SECURITY_REVIEW.md](SECURITY_REVIEW.md), recorded in [ADMIN_ROADMAP.md](ADMIN_ROADMAP.md) Phase 3; Android contribution pending)
 
 **Depends on:** AUTH-001, AUTH-003, CAT-003, CART-001, ORD-001, ORD-003
 
@@ -315,7 +315,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 4 — QUAL-004 — Demo data and portfolio handoff guide
 
-**Status:** `[~]` (backend contribution delivered 2026-10-14 — handoff guide in [HANDOFF.md](HANDOFF.md); recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
+**Status:** `[~]` (backend contribution delivered 2026-10-14 — handoff guide in [HANDOFF.md](HANDOFF.md); recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; admin contribution delivered 2026-10-17 — admin walkthrough in [HANDOFF.md](HANDOFF.md), recorded in [ADMIN_ROADMAP.md](ADMIN_ROADMAP.md) Phase 3; Android contribution pending)
 
 **Depends on:** FND-002, FND-003, CAT-001, AUTH-003, ORD-001
 
@@ -332,7 +332,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 5 — QUAL-005 — Clean-checkout release rehearsal
 
-**Status:** `[~]` (backend contribution delivered 2026-10-14, re-verified on a fresh clean checkout 2026-10-15 — commands and outcomes in [DEVELOPMENT.md](DEVELOPMENT.md); recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
+**Status:** `[~]` (backend contribution delivered 2026-10-14, re-verified on a fresh clean checkout 2026-10-15 — commands and outcomes in [DEVELOPMENT.md](DEVELOPMENT.md); recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; admin contribution delivered 2026-10-17 — clean-checkout rehearsal of `a15def7` in [DEVELOPMENT.md](DEVELOPMENT.md), recorded in [ADMIN_ROADMAP.md](ADMIN_ROADMAP.md) Phase 3; Android contribution and the admin CI job (FND-005) pending)
 
 **Depends on:** FND-005, QUAL-001, QUAL-002, QUAL-003, QUAL-004
 

@@ -138,9 +138,11 @@ Supported agents include Claude Code, OpenAI Codex, Google Gemini/Antigravity, G
 
 **Phase 0 — Foundation**
 
-The first-release product scope and engineering workflow are documented. Feature completion has not yet been verified.
+The first-release product scope and engineering workflow are documented. Feature completion has not yet been verified for the full product: the backend is complete and verified, the admin dashboard has committed its Phase 3 quality contributions for review, and the Android customer app is completing its Phase 2 steps.
 
 **Backend API: ✅ complete and verified (2026-10-15).** All Backend Roadmap Phases 0–3 are delivered — customer auth, catalog, cart, checkout/orders with idempotency, simulated payment, and the admin session/catalog/inventory/order APIs — with 153 passing tests (2062 assertions), clean style and dependency audits. See [docs/BACKEND_ROADMAP.md](docs/BACKEND_ROADMAP.md), [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md), and [docs/HANDOFF.md](docs/HANDOFF.md).
+
+**Admin dashboard: Phases 0–2 merged; Phase 3 quality contributions committed (pending independent verification).** React 19 + TypeScript 6 + Vite 8 SPA with Sanctum session auth and the product/category/inventory/order screens; the admin portions of QUAL-001–QUAL-005 (regression evidence, accessibility and contrast fixes, security review, handoff walkthrough, clean-checkout rehearsal) are recorded in [docs/ADMIN_ROADMAP.md](docs/ADMIN_ROADMAP.md) Phase 3, with the reviewer walkthrough in [docs/HANDOFF.md](docs/HANDOFF.md).
 
 Use the relevant component roadmap to execute and report component work. Use [docs/ROADMAP.md](docs/ROADMAP.md) for cross-component tasks and final project/release validation only.
 

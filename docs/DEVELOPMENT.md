@@ -248,7 +248,7 @@ They document local development servers on purpose; the production-like origin i
 | Runtime | **Node.js 24.17.0** with **npm 11.17.0** (Vite 8 requires Node `^20.19.0 \|\| >=22.12.0`) |
 | UI | **React 19.3.1** + **React DOM 19.3.1** (`@types/react` / `@types/react-dom` 19.3.0) |
 | Styling | **Tailwind CSS 4.3.3** with `@tailwindcss/vite` 4.3.3 — CSS-first configuration in `src/globals.css` (`@theme inline` tokens, `@custom-variant dark`); no `tailwind.config.ts`. Tailwind v3 was rejected during AUTH-003 because its toolchain carried unfixed npm audit advisories |
-| Routing | **react-router-dom 7.18.4** — `/login` plus the authenticated shell routes `/products`, `/products/new`, `/products/:productId/edit`, `/categories`, and `/inventory` |
+| Routing | **react-router-dom 7.18.4** — `/login` plus the authenticated shell routes `/products`, `/products/new`, `/products/:productId/edit`, `/categories`, `/inventory`, `/orders`, and `/orders/:orderId` |
 | Language | **TypeScript 6.0.3** (`strict`, `noEmit` type-check) |
 | Build/dev server | **Vite 8.3.4** with `@vitejs/plugin-react` 6.1.2 |
 | Tests | **Vitest 5.0.5** (jsdom environment) + **React Testing Library 16.3.3** + `@testing-library/dom` 10.4.2 + `@testing-library/jest-dom` 7.0.1, `src/setupTests.ts` |
@@ -276,6 +276,9 @@ npm run lint                   # eslint .
 # Tests (Vitest + React Testing Library, jsdom)
 npm test
 npm run test:watch
+
+# WCAG 2.2 contrast check for the admin light-theme tokens (no dependencies)
+npm run check:contrast
 
 # Production build (runs the type-check first, output in dist/)
 npm run build
@@ -343,6 +346,25 @@ Live admin order probes (disposable dev data) confirmed the session handshake, g
 list filters/pagination, `409 INVALID_TRANSITION` for invalid moves, and the documented
 `confirmed → processing → shipped → delivered` and `pending_payment → cancelled` transitions;
 details are recorded in the ORD-003 verification record in `docs/ADMIN_ROADMAP.md`.
+
+**Verification status (2026-10-17, QUAL-005 clean-checkout rehearsal on the admin SPA):**
+
+Rehearsed from a clean checkout of commit `a15def7` (`git worktree add --detach <tmp> a15def7`
+— no `node_modules`, no `dist`, no `.env.local`), repeating the exact commands documented above:
+
+| Command (from `admin/` of the clean checkout) | Result |
+|-----------------------------------------------|--------|
+| `npm ci` | ✔ clean install from the committed `package-lock.json`; 0 vulnerabilities |
+| `npm run typecheck` | ✔ exit 0, no errors |
+| `npm run lint` | ✔ exit 0, no warnings or errors |
+| `npm run check:contrast` | ✔ all 17 WCAG 2.2 token pairs pass |
+| `npm test` | ✔ 10 test files, 82 tests passed |
+| `npm run build` | ✔ exit 0 — `dist/` with one CSS (~37 kB) and one JS (~345 kB) bundle |
+| `npm run preview` + HTTP smoke | ✔ `/` → 200, `/fonts/lato-regular.ttf` → 200, `/fonts/Lato-OFL.txt` → 200, and the served HTML contains no third-party font reference |
+
+The checked-in workflow (`.github/workflows/ci.yml`) currently runs only the repository-structure,
+Android, and backend jobs; adding the admin job and recording its verified run is part of the
+pending project task **FND-005** (CI workflow changes require human approval).
 
 ---
 
