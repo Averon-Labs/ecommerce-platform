@@ -112,8 +112,35 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
 
 ---
 
-### Phase 3: Final Verification & Delivery (Completed)
-- [x] **Unit Tests:** `./gradlew testDebugUnitTest` passing 100% (26 actionable tasks executed cleanly).
-- [x] **Android Lint:** `./gradlew :app:lintDebug` passing with 0 errors.
-- [x] **Git Remote Sync:** Pushed branch `feature/android-pinterest-redesign` to `origin`.
-- [x] **Pull Request Ready:** [Create Pull Request on GitHub](https://github.com/Averon-Labs/eshop-verse/compare/develop...feature/android-pinterest-redesign?expand=1)
+### Phase 4: UI Refinements & User Edits
+- [x] **Step 12: Remove Top Toolbar across App Shell**
+  - Removed `AppBarLayout` and `MaterialToolbar` from `activity_main.xml`.
+  - Removed `appbar_scrolling_view_behavior` from `content_main.xml`.
+  - Updated `MainActivity.java` window insets listener to apply status bar padding directly to root, removed ActionBar registration and options menu inflation.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [ ] **Step 13: Replace 'E' Letter with Sun/Moon Icon in Circular Theme Toggle on Home**
+  - Update `layout_theme_toggle` in `fragment_home.xml` and `HomeFragment.java` to replace the "E" TextView with an ImageView showing `ic_dark_mode` / `ic_light_mode`.
+  - Preserve the circular border and container styling.
+  - Wire toggle action and reflect current Day/Night mode.
+- [ ] **Step 14: Adjust Home Hero Banner Light Mode Palette to Warm Cream with High-Contrast Text**
+  - Update `bg_hero_editorial.xml` to use Soft Cream (`@color/color_soft_cream` `#F0E8D9`) or Soft Sage in light mode instead of dark green.
+  - Retain dark slate `#202720` in dark mode.
+  - Verify and update text colors inside the hero banner (`tv_hero_title`, `tv_hero_subtitle`, `btn_hero_cta`) to high-contrast Ink (`@color/color_ink` `#212621`) and Botanical Green button.
+- [ ] **Step 15: Redesign Explore Screen Product Cards to Match Figma (Node `1:58`)**
+  - Match Figma Explore product card structure and styling (`item_product_card.xml` / explore grid).
+- [ ] **Step 16: Synchronize Home Mood Circles with Explore Tags & Direct Navigation**
+  - Synchronize categories/tags between Home circular chips and Explore filter chips (exact same labels, count, and order).
+  - Make horizontal chips scrollable if dynamic, and tapping a chip navigates to Explore with that category/tag pre-selected.
+- [ ] **Step 17: Account Screen Direct Sign-In on Guest State**
+  - If user is not signed in (guest), show the Sign In view directly rather than a separate greeting prompt, allowing instant login and a link to create an account.
+- [ ] **Step 18: Add 'Continue with Google' Button with Google Logo to Auth Screens**
+  - Add Google logo vector drawable `ic_google_logo.xml`.
+  - Add 52dp pill "Continue with Google" button to `fragment_sign_in.xml` and `fragment_register.xml`.
+
+---
+
+### Phase 5: Verification, Git Remote Sync & Pull Request
+- [ ] **Unit Tests:** `./gradlew testDebugUnitTest` passing 100%.
+- [ ] **Android Lint:** `./gradlew :app:lintDebug` passing with 0 errors.
+- [ ] **Git Remote Sync & PR:** Commit, push to `origin/feature/android-pinterest-redesign`, and verify PR status.
+
