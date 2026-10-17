@@ -265,7 +265,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 1 — QUAL-001 — Cross-component purchase-flow regression
 
-**Status:** `[~]` (backend contribution delivered 2026-10-14 — recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
+**Status:** `[~]` (backend contribution delivered 2026-10-14 — recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; admin contribution delivered 2026-10-17 — recorded in [ADMIN_ROADMAP.md](ADMIN_ROADMAP.md) Phase 3; Android contribution pending)
 
 **Depends on:** AUTH-002, CAT-002, CART-002, CHECK-001, ORD-002
 
