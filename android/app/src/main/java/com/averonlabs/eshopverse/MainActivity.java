@@ -9,6 +9,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         // Insets handling: left/right to root, top to AppBarLayout, bottom to BottomNavigationView and content
+        // Insets handling: left/right to root, top to AppBarLayout, bottom margin to floating card and content
         ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
@@ -55,7 +57,14 @@ public class MainActivity extends AppCompatActivity {
 
             v.setPadding(bars.left, 0, bars.right, 0);
             binding.appBarLayout.setPadding(0, bars.top, 0, 0);
-            binding.bottomNav.setPadding(0, 0, 0, bars.bottom);
+
+            // Dynamically position floating pill card above system navigation bars
+            if (binding.cardBottomNav.getLayoutParams() instanceof CoordinatorLayout.LayoutParams) {
+                CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) binding.cardBottomNav.getLayoutParams();
+                int baseMargin = getResources().getDimensionPixelSize(R.dimen.nav_floating_margin_bottom);
+                lp.bottomMargin = baseMargin + bars.bottom;
+                binding.cardBottomNav.setLayoutParams(lp);
+            }
 
             updateContentBottomPadding();
             return insets;
@@ -84,12 +93,12 @@ public class MainActivity extends AppCompatActivity {
                         || destId == R.id.exploreFragment
                         || destId == R.id.cartFragment
                         || destId == R.id.accountFragment;
-                binding.bottomNav.setVisibility(isTopLevel ? View.VISIBLE : View.GONE);
+                binding.cardBottomNav.setVisibility(isTopLevel ? View.VISIBLE : View.GONE);
                 updateContentBottomPadding();
             });
         }
 
-        binding.bottomNav.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+        binding.cardBottomNav.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             updateContentBottomPadding();
         });
 
@@ -125,10 +134,13 @@ public class MainActivity extends AppCompatActivity {
         }
         int imeBottom = lastIme != null ? lastIme.bottom : 0;
         int systemBottom = lastSystemBars != null ? lastSystemBars.bottom : 0;
-        int bottomNavHeight = (binding.bottomNav != null && binding.bottomNav.getVisibility() == View.VISIBLE)
-                ? binding.bottomNav.getHeight()
-                : 0;
-        int baseBottom = Math.max(bottomNavHeight, systemBottom);
+        int floatingNavHeight = 0;
+        if (binding.cardBottomNav != null && binding.cardBottomNav.getVisibility() == View.VISIBLE) {
+            int cardH = binding.cardBottomNav.getHeight();
+            int baseMargin = getResources().getDimensionPixelSize(R.dimen.nav_floating_margin_bottom);
+            floatingNavHeight = cardH + baseMargin + systemBottom + getResources().getDimensionPixelSize(R.dimen.spacing_sm);
+        }
+        int baseBottom = Math.max(floatingNavHeight, systemBottom);
         int finalPadding = Math.max(baseBottom, imeBottom);
 
         binding.contentMain.navHostFragmentContentMain.setPadding(0, 0, 0, finalPadding);

@@ -1,86 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand anchors sampled approximately from the approved visual reference. -->
-    <color name="brand_coral">#F7767E</color>
-    <color name="brand_coral_strong">#B92F3D</color>
-    <color name="brand_lavender">#7651B5</color>
-    <color name="brand_aqua">#287E87</color>
+    <!-- Figma MUSE Design System Botanical & Warm Neutrals tokens -->
+    <color name="color_botanical_green">#385740</color>
+    <color name="color_deep_olive">#303E31</color>
+    <color name="color_warm_ivory">#F5F2EA</color>
+    <color name="color_soft_cream">#F0E8D9</color>
+    <color name="color_sandstone">#E8DEC7</color>
+    <color name="color_terracotta">#D4A894</color>
+    <color name="color_natural_taupe">#C7B596</color>
+    <color name="color_ink">#212621</color>
+    <color name="color_muted_olive">#6E7268</color>
+    <color name="color_soft_sage">#E6EBE4</color>
+    <color name="color_luminous_sage">#A8C5A4</color>
+    <color name="color_pure_white">#FFFFFF</color>
 
-    <!-- Material 3 light color roles. Paired on-colors meet WCAG AA for normal text. -->
-    <color name="m3_primary">#F7767E</color>
-    <color name="m3_on_primary">#161616</color>
-    <color name="m3_primary_container">#FFF0F1</color>
-    <color name="m3_on_primary_container">#8D2531</color>
-    <color name="m3_secondary">#7651B5</color>
+    <!-- Brand anchors (retained for backward compatibility) -->
+    <color name="brand_coral">#385740</color>
+    <color name="brand_coral_strong">#303E31</color>
+    <color name="brand_lavender">#C7B596</color>
+    <color name="brand_aqua">#D4A894</color>
+
+    <!-- Material 3 light color roles matching Figma MUSE Palette -->
+    <color name="m3_primary">#385740</color>
+    <color name="m3_on_primary">#FFFFFF</color>
+    <color name="m3_primary_container">#E6EBE4</color>
+    <color name="m3_on_primary_container">#212621</color>
+    <color name="m3_secondary">#303E31</color>
     <color name="m3_on_secondary">#FFFFFF</color>
-    <color name="m3_secondary_container">#EEE7F7</color>
-    <color name="m3_on_secondary_container">#392653</color>
-    <color name="m3_tertiary">#287E87</color>
+    <color name="m3_secondary_container">#E8DEC7</color>
+    <color name="m3_on_secondary_container">#212621</color>
+    <color name="m3_tertiary">#D4A894</color>
     <color name="m3_on_tertiary">#FFFFFF</color>
-    <color name="m3_tertiary_container">#DDF3F4</color>
-    <color name="m3_on_tertiary_container">#164E53</color>
-    <color name="m3_error">#B3261E</color>
+    <color name="m3_tertiary_container">#F0E8D9</color>
+    <color name="m3_on_tertiary_container">#212621</color>
+    <color name="m3_error">#BA1A1A</color>
     <color name="m3_on_error">#FFFFFF</color>
-    <color name="m3_error_container">#FCEEEE</color>
-    <color name="m3_on_error_container">#8C1D18</color>
-    <color name="m3_background">#F5F6F7</color>
-    <color name="m3_on_background">#161616</color>
+    <color name="m3_error_container">#FFDAD6</color>
+    <color name="m3_on_error_container">#410002</color>
+    <color name="m3_background">#F5F2EA</color>
+    <color name="m3_on_background">#212621</color>
     <color name="m3_surface">#FFFFFF</color>
-    <color name="m3_on_surface">#161616</color>
-    <color name="m3_surface_variant">#F1F1F3</color>
-    <color name="m3_on_surface_variant">#6B6B6B</color>
+    <color name="m3_on_surface">#212621</color>
+    <color name="m3_surface_variant">#E8DEC7</color>
+    <color name="m3_on_surface_variant">#6E7268</color>
     <color name="m3_surface_container_lowest">#FFFFFF</color>
-    <color name="m3_surface_container_low">#FAFAFB</color>
-    <color name="m3_surface_container">#F5F6F7</color>
-    <color name="m3_surface_container_high">#EFF0F2</color>
-    <color name="m3_surface_container_highest">#E7E8EA</color>
-    <color name="m3_outline">#767676</color>
-    <color name="m3_outline_variant">#D8D8DE</color>
-    <color name="m3_surface_tint">#F7767E</color>
-    <color name="m3_inverse_surface">#28242C</color>
-    <color name="m3_inverse_on_surface">#F7F1FA</color>
-    <color name="m3_inverse_primary">#FFB6BC</color>
+    <color name="m3_surface_container_low">#FAF8F2</color>
+    <color name="m3_surface_container">#F5F2EA</color>
+    <color name="m3_surface_container_high">#F0E8D9</color>
+    <color name="m3_surface_container_highest">#E8DEC7</color>
+    <color name="m3_outline">#C7B596</color>
+    <color name="m3_outline_variant">#E4E0D7</color>
+    <color name="m3_surface_tint">#385740</color>
+    <color name="m3_inverse_surface">#202720</color>
+    <color name="m3_inverse_on_surface">#F5F2EA</color>
+    <color name="m3_inverse_primary">#A8C5A4</color>
     <color name="m3_scrim">#000000</color>
 
-    <!-- Decorative product tile backings only; never use these for status or small text. -->
-    <color name="product_surface_lime">#EFF5C8</color>
-    <color name="product_surface_blush">#F8E3E3</color>
-    <color name="product_surface_aqua">#DDF3F4</color>
-    <color name="product_surface_lavender">#F0E5F7</color>
+    <!-- Circular mood category tile backings from Figma -->
+    <color name="mood_home">#E6EBE4</color>
+    <color name="mood_fashion">#F5EBE6</color>
+    <color name="mood_objects">#E8DEC7</color>
+    <color name="mood_beauty">#F0E8D9</color>
+
+    <!-- Legacy product tile backings mapped to warm earthy palette -->
+    <color name="product_surface_lime">#E6EBE4</color>
+    <color name="product_surface_blush">#F5EBE6</color>
+    <color name="product_surface_aqua">#E8DEC7</color>
+    <color name="product_surface_lavender">#F0E8D9</color>
 
     <!-- Status semantic pairs. StatusBadgeView always includes the status label. -->
     <color name="status_success">#256B4B</color>
     <color name="status_success_container">#E8F3ED</color>
     <color name="status_warning">#8A5300</color>
     <color name="status_warning_container">#FBF1E3</color>
-    <color name="status_error">#B3261E</color>
-    <color name="status_error_container">#FCEEEE</color>
+    <color name="status_error">#BA1A1A</color>
+    <color name="status_error_container">#FFDAD6</color>
     <color name="status_neutral">#505050</color>
-    <color name="status_neutral_container">#EFF0F2</color>
+    <color name="status_neutral_container">#E8DEC7</color>
 
     <!-- Existing semantic names retained for current layout callers. -->
-    <color name="brand_coral_tint">#FFF0F1</color>
-    <color name="canvas_background">#F5F6F7</color>
+    <color name="brand_coral_tint">#E6EBE4</color>
+    <color name="canvas_background">#F5F2EA</color>
     <color name="surface_color">#FFFFFF</color>
-    <color name="text_primary_ink">#161616</color>
-    <color name="text_secondary">#6B6B6B</color>
+    <color name="text_primary_ink">#212621</color>
+    <color name="text_secondary">#6E7268</color>
     <color name="neutral_dark">#505050</color>
-    <color name="outline_color">#767676</color>
+    <color name="outline_color">#C7B596</color>
     <color name="success_color">#256B4B</color>
     <color name="warning_color">#8A5300</color>
-    <color name="error_color">#B3261E</color>
+    <color name="error_color">#BA1A1A</color>
 
     <!-- Semantic aliases matching Design System tokens -->
-    <color name="surface_container_low">#FAFAFB</color>
-    <color name="border_hairline">#D8D8DE</color>
+    <color name="surface_container_low">#FAF8F2</color>
+    <color name="border_hairline">#E4E0D7</color>
     <color name="surface_white">#FFFFFF</color>
-    <color name="text_secondary_muted">#6B6B6B</color>
+    <color name="text_secondary_muted">#6E7268</color>
 
-    <!-- Luxury Accents & Glass Translucency (from my-ui-ux-skill) -->
+    <!-- Floating Navigation & Translucency -->
+    <color name="nav_floating_bg">#FFFFFF</color>
+    <color name="nav_floating_stroke">#E4E0D7</color>
     <color name="glass_white_15">#26FFFFFF</color>
     <color name="glass_white_30">#4DFFFFFF</color>
-    <color name="glass_dark_40">#66111827</color>
-    <color name="glass_dark_stroke">#33374151</color>
-    <color name="glow_indigo_start">#4D4F46E5</color>
-    <color name="glow_violet_start">#4D8B5CF6</color>
+    <color name="glass_dark_40">#66151A16</color>
+    <color name="glass_dark_stroke">#33394339</color>
+    <color name="glow_indigo_start">#4D385740</color>
+    <color name="glow_violet_start">#4DD4A894</color>
 </resources>

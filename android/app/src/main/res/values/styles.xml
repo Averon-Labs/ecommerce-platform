@@ -2,7 +2,7 @@
 <resources>
     <style name="ShapeAppearance.EShopVerse.Card" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/corner_sm</item>
+        <item name="cornerSize">@dimen/corner_card_pinterest</item>
     </style>
     <style name="ShapeAppearance.EShopVerse.Panel" parent="">
         <item name="cornerFamily">rounded</item>
@@ -22,7 +22,8 @@
         <item name="itemIconTint">@color/navigation_item_tint</item>
         <item name="itemTextColor">@color/navigation_item_tint</item>
         <item name="itemActiveIndicatorStyle">@style/Widget.EShopVerse.BottomNavigation.Indicator</item>
-        <item name="android:background">?attr/colorSurface</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="elevation">0dp</item>
     </style>
     <style name="Widget.EShopVerse.BottomNavigation.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@color/m3_primary_container</item>

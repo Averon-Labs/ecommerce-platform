@@ -12,8 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.averonlabs.eshopverse.R;
 import com.averonlabs.eshopverse.catalog.CatalogListViewModel;
@@ -69,7 +69,8 @@ public class ExploreFragment extends Fragment {
     }
 
     private void setupProductGrid() {
-        GridLayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
+        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
         binding.rvProducts.setLayoutManager(layoutManager);
 
         gridAdapter = new ProductGridAdapter(this::onProductClicked);
@@ -81,7 +82,8 @@ public class ExploreFragment extends Fragment {
                 if (dy > 0) {
                     int visibleCount = layoutManager.getChildCount();
                     int totalCount = layoutManager.getItemCount();
-                    int firstVisible = layoutManager.findFirstVisibleItemPosition();
+                    int[] firstVisibleItems = layoutManager.findFirstVisibleItemPositions(null);
+                    int firstVisible = (firstVisibleItems != null && firstVisibleItems.length > 0) ? firstVisibleItems[0] : 0;
 
                     if ((visibleCount + firstVisible) >= totalCount - 4) {
                         catalogViewModel.loadNextPage();

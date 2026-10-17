@@ -24,8 +24,8 @@ All user-facing copy is English. Customer price and total displays use en-US USD
 
 ### App shell and navigation
 
-- Use one Material 3 app theme, one contextual top app bar, and a four-item bottom navigation: **Home**, **Explore**, **Cart**, **Account**. Show an item-count badge on Cart when nonzero.
-- Keep bottom navigation visible on the four top-level destinations. Hide it on focused checkout/auth/detail steps when it would compete with the task; use normal Android back navigation.
+- Use one Material 3 app theme, one contextual top app bar, and a four-item **Floating Pill Bottom Navigation**: **Home**, **Explore**, **Cart**, **Account** wrapped in an elevated (8dp) 28dp-radius floating card with 16dp bottom and 24dp side margins. Show an item-count badge on Cart when nonzero.
+- Keep floating bottom navigation visible on the four top-level destinations. Hide it on focused checkout/auth/detail steps when it would compete with the task; use normal Android back navigation.
 - Home top bar shows the text wordmark **EShop Verse**, a search entry point, and a profile/account icon. Use initials rather than inventing a profile photo when the API has no avatar.
 - Use a 16dp horizontal content gutter, 12dp card/grid gaps, and sticky bottom actions only when the page needs a primary action. Respect system bars and keyboard insets.
 - The reference's heart, discount sticker, shoe size/color selectors, and FAB are not copied: wishlist, discounts, and product variants are not part of the first-release model; actions use the appropriate Material 3 button or navigation item.
@@ -38,8 +38,8 @@ All user-facing copy is English. Customer price and total displays use en-US USD
 
 | ID | Screen | Structure and primary behavior |
 |----|--------|--------------------------------|
-| M-01 | Home | Use the existing catalog-browsing entry points defined for CAT-002. Product-forward asymmetric Bento grid layout: top featured product banner/hero (wide 2-col, 180dp) anchored over dual 1-column square category cards (140dp) with `bg_bento_item.xml`, hairline borders, and spring touch feedback. |
-| M-02 | Explore / all products | Screen title, search field, horizontal category pill chips (`bg_pill_button.xml`), supported sort control, and responsive 2-column Bento product grid. Cards show product image, name, and USD price, with availability only when the API provides it. Tapping a product opens M-05; do not add ratings, favorite hearts, or a card-level add action. |
+| M-01 | Home | Editorial & Pinterest-style Discover layout per Figma: top brand header ("EShop Verse" / "MUSE.", tagline, avatar initial "A", theme toggle); 22dp rounded pill search bar; Editorial Hero Banner ("Make room for beautiful things", "Objects with soul. Made to last.", and pill CTA button "SHOP THE EDIT ↗"); horizontal circular mood category chips ("Home", "Fashion", "Objects", "Beauty"); and "Trending this week" 2-column Pinterest staggered masonry grid with 16dp rounded product cards. |
+| M-02 | Explore / all products | Screen title, 22dp pill search field, horizontal category pill chips (`bg_pill_button.xml`), supported sort control, and responsive 2-column Pinterest Staggered Masonry product grid (StaggeredGridLayoutManager). Cards show product image with natural aspect ratio, name in Ink typography, and formatted USD price. Tapping a product opens M-05. |
 | M-03 | Search results | Search field retains the query; result count only when returned by pagination metadata; sort menu uses API-supported options; results reuse M-02 cards. Empty results explain that no match was found and offer **Clear search** plus category browsing. |
 | M-04 | Category products | Category title, optional one-line description only if the API supplies it, sort control, and the same product grid. Empty category state links back to Explore. |
 | M-05 | Product details | Large edge-to-edge product image/gallery when multiple seeded URLs exist; product name and USD price; concise description; stock/availability; quantity stepper only when available; sticky coral **Add to cart** action. No size/color/variant selectors unless the product model is explicitly extended later. |

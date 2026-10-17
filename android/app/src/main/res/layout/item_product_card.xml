@@ -9,7 +9,12 @@
     android:layout_margin="@dimen/spacing_xs"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?attr/selectableItemBackground">
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="@dimen/corner_card_pinterest"
+    app:cardElevation="@dimen/elevation_level_1"
+    app:cardBackgroundColor="?attr/colorSurface"
+    app:strokeColor="@color/border_hairline"
+    app:strokeWidth="@dimen/stroke_hairline">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,8 +22,9 @@
         android:orientation="vertical">
 
         <FrameLayout
+            android:id="@+id/container_image"
             android:layout_width="match_parent"
-            android:layout_height="148dp">
+            android:layout_height="160dp">
 
             <ImageView
                 android:id="@+id/iv_product_image"
