@@ -298,7 +298,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 3 — QUAL-003 — Security and privacy review
 
-**Status:** `[~]` (backend contribution delivered 2026-10-14 — findings record in [SECURITY_REVIEW.md](SECURITY_REVIEW.md), global rate limiter fixed; recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
+**Status:** `[~]` (backend contribution delivered 2026-10-14 — findings record in [SECURITY_REVIEW.md](SECURITY_REVIEW.md), global rate limiter fixed; recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; admin contribution delivered 2026-10-17 — findings A-1–A-6 in [SECURITY_REVIEW.md](SECURITY_REVIEW.md), recorded in [ADMIN_ROADMAP.md](ADMIN_ROADMAP.md) Phase 3; Android contribution pending)
 
 **Depends on:** AUTH-001, AUTH-003, CAT-003, CART-001, ORD-001, ORD-003
 
