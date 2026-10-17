@@ -109,7 +109,7 @@ function navLinkClasses({ isActive }: { isActive: boolean }): string {
     'flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition-colors',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
     isActive
-      ? 'bg-primary/10 text-primary'
+      ? 'bg-primary-strong/10 text-primary-strong'
       : 'text-muted-foreground hover:bg-muted hover:text-foreground',
   ].join(' ');
 }

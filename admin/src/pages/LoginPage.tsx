@@ -127,7 +127,7 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">EShop Verse</p>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-strong">EShop Verse</p>
           <h1 className="mt-2 text-2xl font-bold tracking-tight">Admin sign in</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Use your administrator account. Customers sign in from the mobile app.

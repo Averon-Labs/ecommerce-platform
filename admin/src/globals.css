@@ -7,7 +7,37 @@
  * `@theme inline` maps them to utilities, and the `.dark` block re-declares
  * the raw values for deep OLED dark mode. Change tokens here, not in page
  * code, so the admin stays on the shared coral/neutral palette.
+ *
+ * Lato is self-hosted from `public/fonts/` (SIL OFL, license alongside the
+ * files) so typography never requires a third-party runtime request
+ * (ADR-002 consequence). `--primary-strong` is the ADR-002 darker coral
+ * (#B92F3D) required for text/icons and focus indicators on light surfaces,
+ * where brand coral #F7767E falls below WCAG 2.2 contrast minimums.
  */
+
+@font-face {
+  font-family: "Lato";
+  src: url("/fonts/lato-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/fonts/lato-semibold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Lato";
+  src: url("/fonts/lato-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -18,6 +48,7 @@
   --card-foreground: 0 0% 9%;
   --primary: 356 89% 72%;         /* #F7767E Brand Coral */
   --primary-foreground: 0 0% 9%;
+  --primary-strong: 354 59.5% 45.5%; /* #B92F3D Darker Coral (ADR-002) */
   --secondary: 262 41% 52%;       /* #7651B5 Brand Lavender */
   --secondary-foreground: 0 0% 100%;
   --muted: 240 5% 95%;            /* #F1F1F3 */
@@ -28,7 +59,7 @@
   --destructive-foreground: 0 0% 100%;
   --border: 240 6% 86%;           /* #D8D8DE Hairline Border */
   --input: 240 6% 86%;
-  --ring: 356 89% 72%;
+  --ring: 354 59.5% 45.5%;
   --radius: 1rem;
 }
 
@@ -40,6 +71,7 @@
   --card-foreground: 240 5% 95%;
   --primary: 356 100% 85%;        /* #FFB3B8 Luminous Coral */
   --primary-foreground: 352 68% 22%; /* #5F121C */
+  --primary-strong: 356 100% 85%; /* #FFB3B8 (high contrast on dark) */
   --secondary: 256 100% 87%;      /* #D0BCFF Luminous Lavender */
   --secondary-foreground: 260 59% 28%;
   --muted: 240 4% 12%;            /* #1A1C20 */
@@ -60,6 +92,7 @@
   --color-card-foreground: hsl(var(--card-foreground));
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-strong: hsl(var(--primary-strong));
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
   --color-muted: hsl(var(--muted));
