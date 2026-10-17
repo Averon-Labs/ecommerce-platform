@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import CategoriesPage from './pages/categories/CategoriesPage';
 import InventoryPage from './pages/inventory/InventoryPage';
+import OrderDetailPage from './pages/orders/OrderDetailPage';
+import OrdersPage from './pages/orders/OrdersPage';
 import ProductFormPage from './pages/products/ProductFormPage';
 import ProductsPage from './pages/products/ProductsPage';
 
@@ -23,6 +25,8 @@ export default function App() {
               <Route path="products/:productId/edit" element={<ProductFormPage />} />
               <Route path="categories" element={<CategoriesPage />} />
               <Route path="inventory" element={<InventoryPage />} />
+              <Route path="orders" element={<OrdersPage />} />
+              <Route path="orders/:orderId" element={<OrderDetailPage />} />
             </Route>
           </Route>
           <Route path="*" element={<NotFoundPage />} />

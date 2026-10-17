@@ -321,6 +321,29 @@ raises the per-test timeout for slow handset hardware, and `setupTests.ts` sets 
 `asyncUtilTimeout` to 5000 ms; these only extend waits for genuinely slow environments, they do not
 weaken assertions.
 
+**Verification status (2026-10-17, ORD-003 on the admin SPA):**
+
+| Command (from `admin/`) | Result |
+|-------------------------|--------|
+| `npm run typecheck` | ✔ exit 0, no errors |
+| `npm run lint` | ✔ exit 0, no warnings or errors |
+| `npm test` | ✔ 10 test files, 82 tests passed (adds order list/detail behavior tests and the load-sensitivity fixes) |
+| `npm run build` | ✔ exit 0 — `dist/` with one CSS (~36 kB) and one JS (~345 kB) bundle |
+| `php artisan test --filter="AdminOrder|Order"` (from `backend/`) | ✔ 41 tests, 719 assertions, 0 failures |
+
+On this Android/Termux host, **PHP 8.5.1's built-in server can fail to start with
+`Cannot create lock - Permission denied (13)`** (including via `php artisan serve`, and even with
+`php -n`). Start it with opcache disabled from a writable working directory instead:
+
+```bash
+php -d opcache.enable=0 -d opcache.enable_cli=0 -S 127.0.0.1:8000 -t /abs/path/to/backend/public
+```
+
+Live admin order probes (disposable dev data) confirmed the session handshake, guest `401`s,
+list filters/pagination, `409 INVALID_TRANSITION` for invalid moves, and the documented
+`confirmed → processing → shipped → delivered` and `pending_payment → cancelled` transitions;
+details are recorded in the ORD-003 verification record in `docs/ADMIN_ROADMAP.md`.
+
 ---
 
 ## Task and Agent Guidance

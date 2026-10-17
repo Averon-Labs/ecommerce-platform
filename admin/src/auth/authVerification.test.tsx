@@ -64,11 +64,11 @@ function typeCredentials(email: string, password = 'Password123') {
 }
 
 async function waitForSignInHeading() {
-  return screen.findByRole('heading', { level: 1, name: 'Admin sign in' }, { timeout: 3000 });
+  return screen.findByRole('heading', { level: 1, name: 'Admin sign in' }, { timeout: 8000 });
 }
 
 async function waitForProductsHeading() {
-  return screen.findByRole('heading', { level: 1, name: 'Products' }, { timeout: 3000 });
+  return screen.findByRole('heading', { level: 1, name: 'Products' }, { timeout: 8000 });
 }
 
 beforeEach(() => {

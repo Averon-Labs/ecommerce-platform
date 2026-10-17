@@ -149,9 +149,7 @@ Backend FND-004 (OpenAPI Contract)
 
 ### For Admin Developer (Your Colleague)
 
-1. **Phase 0:** FND-003 is complete (2026-10-16) — the React app is initialized and verified (record in `docs/ADMIN_ROADMAP.md`).
-2. **Phase 1:** Wait for Backend FND-002, FND-004, and coordinate on AUTH-003 backend portion. Then wait for Backend CAT-003 before doing CAT-004.
-3. **Phase 2:** Wait for Backend ORD-001 before starting ORD-003.
+**Status 2026-10-17: ✅ Admin Roadmap Phases 0–2 are complete — no admin step remains open.** FND-003 (2026-10-16), AUTH-003 and CAT-004 (2026-10-16, merged via PR #43), and ORD-003 (2026-10-17, [PR #44](https://github.com/Averon-Labs/eshop-verse/pull/44) open for review) all carry verification records in `docs/ADMIN_ROADMAP.md` with criteria a–d PASS and live API probes. The remaining admin-adjacent work is the Phase 3 QUAL-00x component contributions, whose canonical entries live in `docs/ROADMAP.md`.
 
 ---
 
@@ -205,18 +203,13 @@ These decisions are listed in Android roadmap but may need input from Backend/Ad
 
 ### What Admin Colleague Should Focus On
 
-**Right now (Phase 0):**
-- ✅ FND-003 — React initialization (complete 2026-10-16; verification record in `docs/ADMIN_ROADMAP.md`)
+**✅ Complete — Admin Roadmap Phases 0–2 delivered (verification records in `docs/ADMIN_ROADMAP.md`):**
 
-**Phase 1:**
-- ⏸️ Wait for Backend FND-002, FND-004
-- 🔨 AUTH-003 UI portion (coordinate with Backend dev on backend portion)
-- ⏸️ Wait for Backend CAT-003
-- 🔨 CAT-004
+- **Phase 0:** ✅ FND-003 — React initialization (complete 2026-10-16)
+- **Phase 1:** ✅ AUTH-003 (Sanctum stateful session auth) and ✅ CAT-004 (catalog, categories, inventory screens) — complete 2026-10-16, merged via [PR #43](https://github.com/Averon-Labs/eshop-verse/pull/43); 58 tests in 8 files
+- **Phase 2:** ✅ ORD-003 — admin order management (list, detail snapshots, server-permitted status transitions) — complete 2026-10-17; 82 tests in 10 files, live API probes passed; [PR #44](https://github.com/Averon-Labs/eshop-verse/pull/44) open for review
 
-**Phase 2:**
-- ⏸️ Wait for Backend ORD-001
-- 🔨 ORD-003
+**Next:** Phase 3 QUAL-00x component contributions — canonical tasks in `docs/ROADMAP.md`.
 
 ---
 
