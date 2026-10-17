@@ -1,6 +1,6 @@
 # Portfolio Handoff Guide — EShop Verse
 
-A short, reviewer-facing guide to set up and evaluate the **backend API** of the EShop Verse portfolio demo from a clean checkout. Commands are copied from [`DEVELOPMENT.md`](DEVELOPMENT.md); that document holds the full detail and the verified command outputs.
+A short, reviewer-facing guide to set up and evaluate the **EShop Verse portfolio demo** — backend API, Android customer app, and React admin dashboard — from a clean checkout. Commands are copied from [`DEVELOPMENT.md`](DEVELOPMENT.md); that document holds the full detail and the verified command outputs.
 
 > **Payment is simulated and this is not a production system.** No payment provider is contacted and no card data is ever requested, accepted, logged, or stored. See [`SECURITY.md`](SECURITY.md) § Portfolio Demo Boundaries and [`SECURITY_REVIEW.md`](SECURITY_REVIEW.md).
 
@@ -84,7 +84,7 @@ An end-to-end regression test exercises exactly this journey against the seeded 
 
 ## Component status
 
-This guide covers both the **backend REST API** and the native **Android customer application**. The React admin dashboard is a separate component whose walkthrough is contributed by its own task work.
+This guide covers the **backend REST API**, the native **Android customer application**, and the **React admin dashboard**.
 
 ---
 
@@ -215,4 +215,68 @@ Every screen is engineered with clear state handling via `StateContainerView`:
 4. **Error & Offline State:**
    - Network failure or server error prompts display user-friendly copy and a clear *"Retry"* button.
    - Safe retry semantics: mutations are never duplicated automatically upon transport retry.
+
+---
+
+## Admin Dashboard
+
+### What this component is
+
+A React 19 + TypeScript + Vite single-page dashboard for store operations, styled with Tailwind CSS 4 on the shared coral/neutral design system (self-hosted Lato). It talks to the backend through the admin REST endpoints only, authenticating with the first-party Laravel Sanctum session (HttpOnly cookie + echoed `XSRF-TOKEN`; no token in browser storage). The shell is a static sidebar at `≥768px` and a drawer below it; the four sections cover the first-release scope: products, categories, inventory, and orders.
+
+### Clean setup (Admin)
+
+Prerequisites: **Node.js 20.19+ (22.12+) and npm**, plus the backend running and seeded (see above).
+
+```powershell
+Set-Location admin
+npm ci                              # uses the committed package-lock.json
+Copy-Item .env.example .env.local   # only if the API is not at http://localhost:8000/api/v1
+npm run dev                         # http://localhost:5173 (port is pinned)
+```
+
+Open the SPA at `http://localhost:5173` with the backend on `http://localhost:8000`; the checked-in backend defaults already accept that origin (`SANCTUM_STATEFUL_DOMAINS`, `config/cors.php`). Do not mix `localhost` and `127.0.0.1` — the `SameSite=Lax` session cookie only travels within one site. Full origin arrangement: [`DEVELOPMENT.md`](DEVELOPMENT.md) § Admin Dashboard.
+
+Admin checks (from `admin/`):
+
+```powershell
+npm run typecheck        # tsc --noEmit
+npm run lint             # eslint .
+npm test                 # Vitest + React Testing Library behavior tests
+npm run check:contrast   # WCAG 2.2 check for the admin token pairs
+npm run build            # type-check + production build (dist/)
+```
+
+### Admin account
+
+| Role | Sign-in | Password | Notes |
+|------|---------|----------|-------|
+| Administrator | `demo-admin@eshopverse.test` | from `DEMO_ADMIN_PASSWORD` in `backend/.env` (random per-install if unset) | Local-only; the SPA has no self-registration — accounts are provisioned by the backend seed. |
+
+### Screen-by-Screen Walkthrough (A-01 through A-07)
+
+| ID | Screen | How to reach it | Key behaviors |
+|----|--------|-----------------|---------------|
+| **A-01** | **Admin sign in** | Open `http://localhost:5173` | Email + password with inline validation; throttle messages carry the retry hint; non-admin or expired sessions show a notice. |
+| **A-02** | **Products** | Sidebar: **Products** | Search plus category/status filters, API pagination, row actions **Edit**/**Archive** (confirmation), responsive table-to-card layout on narrow screens. |
+| **A-03** | **Create/edit product** | **Add product** / row **Edit** | Grouped form (name, description, USD price, optional SKU, category, status, ordered demo image URLs with preview); unsaved-change guard; stock is managed in A-05, not here. |
+| **A-04** | **Categories** | Sidebar: **Categories** | Create/edit, archive/restore; archiving is refused with the server's conflict message while active products remain assigned. |
+| **A-05** | **Inventory** | Sidebar: **Inventory** | Product/SKU/quantity/availability table; **Adjust stock** dialog validates a nonnegative integer; quantity zero reads **Out of stock** in catalog views. |
+| **A-06** | **Orders** | Sidebar: **Orders** | Search by reference or customer, status/date filters, API pagination, payment badge, responsive rows. |
+| **A-07** | **Order details** | Open any order in A-06 | Immutable item/address snapshots, simulated payment outcome, server timeline, and a status action offering only the transitions the API currently allows; the view refreshes from the server after a change. |
+
+### Admin workflows
+
+- **Catalog:** add an active product, edit its price, then archive it; create a category and try archiving it while a product still uses it to see the conflict message.
+- **Inventory:** adjust a product's stock — zero quantity renders **Out of stock** wherever the product is listed.
+- **Orders:** complete a simulated purchase (Android app or the API steps above) and, as the administrator, move the paid order through **Processing → Shipped → Delivered**. A `pending_payment` order can be cancelled instead. Invalid transitions are rejected by the server with `409 INVALID_TRANSITION`; the UI offers only the allowed moves.
+- **Reset:** `php artisan migrate:fresh --seed` (above) rebuilds the store and the admin account together.
+
+### Known limitations (Admin)
+
+- **Demo image URLs only** — no binary upload; product images are ordered URL strings with previews.
+- **Stock lives in Inventory (A-05)** and is never edited on the product form.
+- Desktop widths are the primary target; narrow screens fall back to the documented labelled card lists.
+- Dark-mode tokens exist but the first release exposes no theme toggle; deferred by product scope: analytics/overview, customer administration, CMS, and wishlist.
+- Local development runs over loopback HTTP; the session cookie gains `Secure` only in a TLS deployment (see [`SECURITY_REVIEW.md`](SECURITY_REVIEW.md) § Accepted non-production limitations).
 

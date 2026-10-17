@@ -315,7 +315,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 4 — QUAL-004 — Demo data and portfolio handoff guide
 
-**Status:** `[~]` (backend contribution delivered 2026-10-14 — handoff guide in [HANDOFF.md](HANDOFF.md); recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
+**Status:** `[~]` (backend contribution delivered 2026-10-14 — handoff guide in [HANDOFF.md](HANDOFF.md); recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; admin contribution delivered 2026-10-17 — admin walkthrough in [HANDOFF.md](HANDOFF.md), recorded in [ADMIN_ROADMAP.md](ADMIN_ROADMAP.md) Phase 3; Android contribution pending)
 
 **Depends on:** FND-002, FND-003, CAT-001, AUTH-003, ORD-001
 

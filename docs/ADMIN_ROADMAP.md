@@ -201,6 +201,8 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **Component contribution:** Verify admin setup, demo roles, workflows, and limitations in the handoff guide.
 
+**Contribution record (2026-10-17):** added the **Admin Dashboard** chapter to [`HANDOFF.md`](HANDOFF.md) — what the component is, clean setup (`npm ci`, optional `.env.local`, `npm run dev` on the pinned `http://localhost:5173`, the local origin arrangement), the admin checks including the new `npm run check:contrast`, the administrator demo account (local-only, from `DEMO_ADMIN_PASSWORD`; no self-registration), a screen-by-screen walkthrough for A-01–A-07 with routes and key behaviors, three guided workflows (catalog archive/conflict, inventory adjust/out-of-stock, order `Processing → Shipped → Delivered` plus `pending_payment → cancelled` and `409 INVALID_TRANSITION`), and the admin known limitations (demo image URLs only, stock in A-05, card fallback at narrow widths, no theme toggle, deferred analytics/customer-admin/CMS/wishlist scope, loopback HTTP). The intro and component-status notes now state that the guide covers all three components. Commands mirror the verified [`DEVELOPMENT.md`](DEVELOPMENT.md) § Admin Dashboard; no credential or secret is written into the guide (criterion **b**). The canonical QUAL-004 task stays `[~]` pending its Android contribution.
+
 ### Step 5 — QUAL-005 — Component contribution
 
 **Canonical task:** [QUAL-005 in the Project Roadmap](ROADMAP.md). The task scope, status, acceptance criteria, and verification record live only in that canonical entry.
