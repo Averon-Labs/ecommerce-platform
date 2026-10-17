@@ -332,7 +332,7 @@ Task steps are component-specific: see [Android](ANDROID_ROADMAP.md), [Backend](
 
 ### Step 5 — QUAL-005 — Clean-checkout release rehearsal
 
-**Status:** `[~]` (backend contribution delivered 2026-10-14, re-verified on a fresh clean checkout 2026-10-15 — commands and outcomes in [DEVELOPMENT.md](DEVELOPMENT.md); recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; Android and admin contributions pending)
+**Status:** `[~]` (backend contribution delivered 2026-10-14, re-verified on a fresh clean checkout 2026-10-15 — commands and outcomes in [DEVELOPMENT.md](DEVELOPMENT.md); recorded in [BACKEND_ROADMAP.md](BACKEND_ROADMAP.md) Phase 3; admin contribution delivered 2026-10-17 — clean-checkout rehearsal of `a15def7` in [DEVELOPMENT.md](DEVELOPMENT.md), recorded in [ADMIN_ROADMAP.md](ADMIN_ROADMAP.md) Phase 3; Android contribution and the admin CI job (FND-005) pending)
 
 **Depends on:** FND-005, QUAL-001, QUAL-002, QUAL-003, QUAL-004
 
