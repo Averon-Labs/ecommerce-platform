@@ -97,6 +97,7 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
             binding.tvProductName.setText(product.getName());
             String formattedPrice = MoneyFormat.format(product.getPriceMoney());
             binding.tvProductPrice.setFormattedPrice(formattedPrice);
+            binding.tvProductPrice.setTextColor(androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.color_botanical_green));
 
             // Organic Pinterest masonry staggered heights based on product ID
             int[] staggeredHeights = {150, 195, 170, 220, 185};

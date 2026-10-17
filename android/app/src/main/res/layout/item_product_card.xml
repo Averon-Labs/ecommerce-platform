@@ -6,13 +6,13 @@
     style="@style/Widget.EShopVerse.Card.Product"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/spacing_xs"
+    android:layout_margin="6dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
     app:cardCornerRadius="@dimen/corner_card_pinterest"
-    app:cardElevation="@dimen/elevation_level_1"
-    app:cardBackgroundColor="?attr/colorSurface"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@color/surface_white"
     app:strokeColor="@color/border_hairline"
     app:strokeWidth="@dimen/stroke_hairline">
 
@@ -24,7 +24,8 @@
         <FrameLayout
             android:id="@+id/container_image"
             android:layout_width="match_parent"
-            android:layout_height="160dp">
+            android:layout_height="160dp"
+            android:background="@color/color_soft_sage">
 
             <ImageView
                 android:id="@+id/iv_product_image"
@@ -49,25 +50,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="@dimen/spacing_sm"
-            android:paddingVertical="@dimen/spacing_sm">
+            android:paddingHorizontal="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="12dp">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_product_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
+                android:letterSpacing="-0.01"
+                android:lineSpacingExtra="2dp"
                 android:maxLines="2"
-                android:minLines="2"
-                android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
-                android:textColor="@color/text_primary_ink"
+                android:minLines="1"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="@color/color_ink"
+                android:textStyle="bold"
                 tools:text="Classic Leather Sneaker" />
 
             <com.averonlabs.eshopverse.core.ui.view.PriceTextView
                 android:id="@+id/tv_product_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_xs"
+                android:layout_marginTop="4dp"
+                android:letterSpacing="0.01"
+                android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textColor="@color/color_botanical_green"
+                android:textStyle="bold"
                 tools:text="$89.99" />
 
         </LinearLayout>

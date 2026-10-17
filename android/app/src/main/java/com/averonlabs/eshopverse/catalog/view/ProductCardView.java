@@ -55,6 +55,7 @@ public class ProductCardView extends MaterialCardView {
         nameView.setText(product.getName());
         String formattedPrice = MoneyFormat.format(product.getPriceMoney());
         priceView.setFormattedPrice(formattedPrice);
+        priceView.setTextColor(androidx.core.content.ContextCompat.getColor(getContext(), R.color.color_botanical_green));
 
         String stockLabel;
         if (!product.isInStock()) {

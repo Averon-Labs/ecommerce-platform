@@ -129,8 +129,11 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Updated `card_hero_editorial` in `fragment_home.xml` with `@color/color_hero_banner` background and `@color/color_hero_banner_stroke` border.
   - Adjusted text colors: `tv_hero_curation` to `@color/color_botanical_green` (AAA contrast), `tv_hero_title` to `@color/color_ink`, `tv_hero_subtitle` to `@color/color_muted_olive`, and `btn_hero_cta` text to `?attr/colorOnPrimary`.
   - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
-- [ ] **Step 15: Redesign Explore Screen Product Cards to Match Figma (Node `1:58`)**
-  - Match Figma Explore product card structure and styling (`item_product_card.xml` / explore grid).
+- [x] **Step 15: Redesign Explore Screen Product Cards to Match Figma (Node `1:58`)**
+  - Updated `item_product_card.xml`: 0dp flat elevation, hairline border (`@color/border_hairline`), 16dp rounded corners (`@dimen/corner_card_pinterest`), soft sage image backing (`@color/color_soft_sage`), bold ink product title with natural 1-2 line wrapping, and signature botanical green price (`@color/color_botanical_green`).
+  - Updated `PriceTextView.java` to support explicit XML `android:textColor` overrides.
+  - Updated `ProductGridAdapter.java` and `ProductCardView.java` to bind botanical green price text dynamically.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
 - [ ] **Step 16: Synchronize Home Mood Circles with Explore Tags & Direct Navigation**
   - Synchronize categories/tags between Home circular chips and Explore filter chips (exact same labels, count, and order).
   - Make horizontal chips scrollable if dynamic, and tapping a chip navigates to Explore with that category/tag pre-selected.
