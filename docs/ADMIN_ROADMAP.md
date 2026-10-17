@@ -171,6 +171,8 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **Project phase gate:** see [Phase 3 in the Project Roadmap](ROADMAP.md).
 
+**Phase contribution PR:** all five steps of this phase ship together on `feature/admin-phase-3` — [PR #47](https://github.com/Averon-Labs/eshop-verse/pull/47) targets `develop`, is open for review, and is never merged automatically.
+
 ### Step 1 — QUAL-001 — Component contribution
 
 **Canonical task:** [QUAL-001 in the Project Roadmap](ROADMAP.md). The task scope, status, acceptance criteria, and verification record live only in that canonical entry.
