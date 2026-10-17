@@ -141,8 +141,12 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Configured navigation arguments (`categoryId`, `categoryName`) on `action_homeFragment_to_exploreFragment` in `nav_main.xml`.
   - Updated `ExploreFragment.java` with `handleIncomingArguments()` to automatically select the passed category chip and filter the product catalog immediately upon navigation.
   - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
-- [ ] **Step 17: Account Screen Direct Sign-In on Guest State**
-  - If user is not signed in (guest), show the Sign In view directly rather than a separate greeting prompt, allowing instant login and a link to create an account.
+- [x] **Step 17: Account Screen Direct Sign-In on Guest State**
+  - Replaced guest welcome greeting card in `fragment_account.xml` with direct Sign-In Bento Card including email input, password input with toggle, forgot password action, botanical green Sign-In pill CTA, and "Create Account" text link.
+  - Updated `AccountFragment.java` to manage direct login via `AuthViewModel`, binding input validation errors, lockout timers, progress indicator, and instant session transition upon login/sign-out.
+  - Added navigation actions in `nav_main.xml` from `accountFragment` to `registerFragment` and `requestPasswordResetFragment`.
+  - Updated instrumentation test `SignInFlowTest.java` to test direct sign-in on `accountFragment`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
 - [ ] **Step 18: Add 'Continue with Google' Button with Google Logo to Auth Screens**
   - Add Google logo vector drawable `ic_google_logo.xml`.
   - Add 52dp pill "Continue with Google" button to `fragment_sign_in.xml` and `fragment_register.xml`.
