@@ -29,6 +29,15 @@
         android:name="com.averonlabs.eshopverse.shell.ExploreFragment"
         android:label="@string/explore_title"
         tools:layout="@layout/fragment_explore">
+        <argument
+            android:name="categoryId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+        <argument
+            android:name="categoryName"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
         <action
             android:id="@+id/action_exploreFragment_to_searchResultsFragment"
             app:destination="@id/searchResultsFragment" />

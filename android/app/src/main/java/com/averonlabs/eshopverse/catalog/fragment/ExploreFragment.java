@@ -64,8 +64,24 @@ public class ExploreFragment extends Fragment {
 
         observeViewModel();
 
+        handleIncomingArguments();
+
         catalogViewModel.loadFirstPage();
         categoryViewModel.loadCategories();
+    }
+
+    private void handleIncomingArguments() {
+        Bundle args = getArguments();
+        if (args != null && args.containsKey("categoryId")) {
+            long categoryId = args.getLong("categoryId", -1);
+            if (categoryId != -1) {
+                categoryViewModel.selectCategory(categoryId);
+                catalogViewModel.setCategoryId(categoryId);
+            } else {
+                categoryViewModel.selectCategory(null);
+                catalogViewModel.setCategoryId(null);
+            }
+        }
     }
 
     private void setupProductGrid() {
@@ -181,6 +197,9 @@ public class ExploreFragment extends Fragment {
                     long catId = (long) category.getId();
                     boolean isSelected = currentSelected != null && currentSelected == catId;
                     chip.setChecked(isSelected);
+                    if (isSelected) {
+                        binding.rvCategories.post(() -> binding.rvCategories.smoothScrollToPosition(position));
+                    }
                     chip.setOnClickListener(v -> {
                         if (isSelected) {
                             categoryViewModel.selectCategory(null);

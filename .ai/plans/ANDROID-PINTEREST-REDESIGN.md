@@ -134,9 +134,13 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Updated `PriceTextView.java` to support explicit XML `android:textColor` overrides.
   - Updated `ProductGridAdapter.java` and `ProductCardView.java` to bind botanical green price text dynamically.
   - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
-- [ ] **Step 16: Synchronize Home Mood Circles with Explore Tags & Direct Navigation**
-  - Synchronize categories/tags between Home circular chips and Explore filter chips (exact same labels, count, and order).
-  - Make horizontal chips scrollable if dynamic, and tapping a chip navigates to Explore with that category/tag pre-selected.
+- [x] **Step 16: Synchronize Home Mood Circles with Explore Tags & Direct Navigation**
+  - Created `item_category_mood_circle.xml` with 56dp circular frame (`@drawable/bg_circular_category`), icon, and label.
+  - Replaced static category layout in `fragment_home.xml` with horizontal `rv_home_categories` RecyclerView.
+  - Updated `HomeFragment.java` to observe `CategoryViewModel.getCategoriesState()`, rendering exact same categories (and 'All' at index 0) in identical order and labels as Explore.
+  - Configured navigation arguments (`categoryId`, `categoryName`) on `action_homeFragment_to_exploreFragment` in `nav_main.xml`.
+  - Updated `ExploreFragment.java` with `handleIncomingArguments()` to automatically select the passed category chip and filter the product catalog immediately upon navigation.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
 - [ ] **Step 17: Account Screen Direct Sign-In on Guest State**
   - If user is not signed in (guest), show the Sign In view directly rather than a separate greeting prompt, allowing instant login and a link to create an account.
 - [ ] **Step 18: Add 'Continue with Google' Button with Google Logo to Auth Screens**
