@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -164,6 +165,7 @@ public class CartFragment extends Fragment {
         binding.tvCartSubtotal.setFormattedPrice(MoneyFormat.format(cart.getSubtotalMoney()));
         binding.tvCartShipping.setFormattedPrice(MoneyFormat.format(cart.getShippingMoney()));
         binding.tvCartTotal.setFormattedPrice(MoneyFormat.format(cart.getTotalMoney()));
+        binding.tvCartTotal.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_botanical_green));
 
         // Continue to checkout enabled ONLY when cart is non-empty and no line is unavailable (§D.4)
         boolean hasUnavailable = false;

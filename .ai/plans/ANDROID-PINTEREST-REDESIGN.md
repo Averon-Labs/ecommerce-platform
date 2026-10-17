@@ -72,6 +72,9 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
 ---
 
 ### Phase 2: Feature Screens Redesign (Figma Screens)
+> **App Identity & Refactoring Guideline (User Instruction):**
+> The Figma template represents the visual UI/UX language (colors, bento layout, pill navigation, tactile cards), but the application is **EShop Verse**. All titles, brand wordmarks, subtitles, headers, and domain models must strictly reflect **EShop Verse** rather than placeholder template names (e.g. "MUSE"). Screens and components must be refactored to align with real project entities and architecture.
+
 - [x] **Step 8: Redesign Explore / Search Screen (`02 — Explore / Search` - Node `1:58`)**
   - Canvas background: Warm Ivory (`#F5F2EA` in light, `#151A16` in dark).
   - Search input: 22dp pill styling matching MUSE (`bg_pill_search.xml` / `corner_search_pill`).
@@ -85,9 +88,12 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Tactile card container for quantity stepper (`layout_quantity`) with `@dimen/corner_card_pinterest`.
   - Sticky elevated bottom action bar with 52dp botanical green pill "Add to Bag" button (`@dimen/corner_pill`), status notice, and delivery note matching Figma (`Free shipping on orders over $100`).
   - Unit tests (`./gradlew testDebugUnitTest`) and lint (`./gradlew :app:lintDebug`) verified with 0 errors.
-- [ ] **Step 10: Redesign Shopping Bag / Cart Screen (`05 — Shopping bag / Checkout` - Node `1:201`)**
-  - Cart item cards with tactile surface and rounded styling.
-  - Order summary container and pill checkout CTA.
+- [x] **Step 10: Redesign Shopping Bag / Cart Screen (`05 — Shopping bag / Checkout` - Node `1:201`)**
+  - Canvas background: Warm Ivory (`#F5F2EA` light, `#151A16` dark).
+  - Editorial header: EShop Verse brand subtitle and "Your Bag" title.
+  - Cart line items: 16dp rounded card (`@dimen/corner_card_pinterest`) with 12dp rounded image container, bold ink product title, and botanical green line total.
+  - Order summary Bento card: 20dp rounded corners (`@dimen/corner_bento`), hairline border, and 52dp botanical green pill checkout CTA button (`@dimen/corner_pill`).
+  - Scroll container: 120dp bottom padding ensuring content floats cleanly above the 28dp pill bottom navigation bar.
 - [ ] **Step 11: Redesign Account & Authentication Screens (`06`, `07`, `08`, `09`)**
   - Signed-in profile card and guest banner.
   - Form fields with 22dp pill inputs and filled primary buttons.

@@ -4,31 +4,68 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/state_container_cart"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/canvas_background">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_cart_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingBottom="120dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="@dimen/spacing_xl">
+            android:orientation="vertical">
+
+            <!-- Editorial Page Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="@dimen/spacing_md"
+                android:paddingEnd="@dimen/spacing_md"
+                android:paddingTop="@dimen/spacing_lg"
+                android:paddingBottom="@dimen/spacing_sm">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.08"
+                    android:text="@string/cart_brand_subtitle"
+                    android:textAllCaps="true"
+                    android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                    android:textColor="@color/text_secondary"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xs"
+                    android:text="@string/cart_screen_title"
+                    android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
+                    android:textColor="@color/text_primary_ink"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
 
             <!-- Has Issues Notice Banner (Shown when cart.hasIssues()) -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_cart_issues"
-                style="@style/Widget.EShopVerse.Card.Panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/spacing_md"
-                android:layout_marginTop="@dimen/spacing_md"
+                android:layout_marginTop="@dimen/spacing_xs"
                 android:layout_marginEnd="@dimen/spacing_md"
+                android:layout_marginBottom="@dimen/spacing_sm"
+                app:cardCornerRadius="@dimen/corner_card_pinterest"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/status_error"
+                app:strokeWidth="1dp"
                 android:visibility="gone"
-                app:cardBackgroundColor="@color/m3_error_container"
+                app:cardBackgroundColor="@color/status_error_container"
                 tools:visibility="visible">
 
                 <com.google.android.material.textview.MaterialTextView
@@ -38,7 +75,7 @@
                     android:padding="@dimen/spacing_md"
                     android:text="@string/cart_items_issues_notice"
                     android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
-                    android:textColor="@color/m3_on_error_container" />
+                    android:textColor="@color/status_error" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -49,21 +86,25 @@
                 android:layout_height="wrap_content"
                 android:nestedScrollingEnabled="false"
                 android:paddingStart="@dimen/spacing_md"
-                android:paddingTop="@dimen/spacing_md"
+                android:paddingTop="@dimen/spacing_xs"
                 android:paddingEnd="@dimen/spacing_md"
                 tools:itemCount="2"
                 tools:listitem="@layout/item_cart_line" />
 
-            <!-- Order Summary Card -->
+            <!-- Order Summary Bento Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_cart_summary"
-                style="@style/Widget.EShopVerse.Card.Panel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/spacing_md"
                 android:layout_marginTop="@dimen/spacing_md"
                 android:layout_marginEnd="@dimen/spacing_md"
-                android:layout_marginBottom="@dimen/spacing_md">
+                android:layout_marginBottom="@dimen/spacing_md"
+                app:cardCornerRadius="@dimen/corner_bento"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/m3_outline_variant"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@color/surface_color">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -71,10 +112,19 @@
                     android:orientation="vertical"
                     android:padding="@dimen/spacing_md">
 
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/cart_summary_heading"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                        android:textColor="@color/text_primary_ink"
+                        android:textStyle="bold" />
+
                     <!-- Subtotal Row -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_md"
                         android:orientation="horizontal">
 
                         <com.google.android.material.textview.MaterialTextView
@@ -128,6 +178,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
                         android:orientation="horizontal">
 
                         <com.google.android.material.textview.MaterialTextView
@@ -135,25 +186,31 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="@string/cart_total_label"
-                            android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
-                            android:textColor="@color/text_primary_ink" />
+                            android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                            android:textColor="@color/text_primary_ink"
+                            android:textStyle="bold" />
 
                         <com.averonlabs.eshopverse.core.ui.view.PriceTextView
                             android:id="@+id/tv_cart_total"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
+                            android:textColor="@color/color_botanical_green"
+                            android:textStyle="bold"
                             tools:text="$184.98" />
 
                     </LinearLayout>
 
-                    <!-- Continue to Checkout Button -->
+                    <!-- Continue to Checkout Button (Botanical Green Pill) -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_cart_checkout"
                         style="@style/Widget.EShopVerse.Button.Filled"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/touch_target_min"
+                        android:layout_height="52dp"
                         android:layout_marginTop="@dimen/spacing_lg"
+                        android:backgroundTint="@color/color_botanical_green"
+                        android:textColor="@color/m3_on_primary"
+                        app:cornerRadius="@dimen/corner_pill"
                         android:text="@string/cart_action_checkout" />
 
                 </LinearLayout>
