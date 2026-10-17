@@ -118,10 +118,11 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Removed `appbar_scrolling_view_behavior` from `content_main.xml`.
   - Updated `MainActivity.java` window insets listener to apply status bar padding directly to root, removed ActionBar registration and options menu inflation.
   - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
-- [ ] **Step 13: Replace 'E' Letter with Sun/Moon Icon in Circular Theme Toggle on Home**
-  - Update `layout_theme_toggle` in `fragment_home.xml` and `HomeFragment.java` to replace the "E" TextView with an ImageView showing `ic_dark_mode` / `ic_light_mode`.
-  - Preserve the circular border and container styling.
-  - Wire toggle action and reflect current Day/Night mode.
+- [x] **Step 13: Replace 'E' Letter with Sun/Moon Icon in Circular Theme Toggle on Home**
+  - Replaced the "E" TextView in `fragment_home.xml` with `ImageView iv_theme_toggle_icon` (22dp, centered) inside the 40dp circular frame (`btn_profile_avatar`).
+  - Updated `HomeFragment.java` with `updateThemeIcon()` dynamically loading `ic_light_mode` (in dark theme) or `ic_dark_mode` (in light theme).
+  - Wired circular button click to `ThemeManager.toggleTheme(requireContext())`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
 - [ ] **Step 14: Adjust Home Hero Banner Light Mode Palette to Warm Cream with High-Contrast Text**
   - Update `bg_hero_editorial.xml` to use Soft Cream (`@color/color_soft_cream` `#F0E8D9`) or Soft Sage in light mode instead of dark green.
   - Retain dark slate `#202720` in dark mode.

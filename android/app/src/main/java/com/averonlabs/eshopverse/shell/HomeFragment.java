@@ -48,9 +48,17 @@ public class HomeFragment extends Fragment {
 
         setupTrendingGrid();
         setupClickListeners();
+        updateThemeIcon();
         observeViewModel();
 
         catalogViewModel.loadFirstPage();
+    }
+
+    private void updateThemeIcon() {
+        if (binding == null || !isAdded()) return;
+        boolean isDark = ThemeManager.isDarkMode(requireContext());
+        binding.ivThemeToggleIcon.setImageResource(isDark ? R.drawable.ic_light_mode : R.drawable.ic_dark_mode);
+        binding.btnProfileAvatar.setContentDescription(getString(isDark ? R.string.theme_dark_desc : R.string.theme_light_desc));
     }
 
     private void setupTrendingGrid() {
@@ -72,9 +80,10 @@ public class HomeFragment extends Fragment {
         // Trending See All button: navigate to Explore
         binding.btnTrendingViewAll.setOnClickListener(v -> navigateToExplore());
 
-        // Profile Avatar button: quick theme toggle
+        // Theme toggle button in circular frame
         binding.btnProfileAvatar.setOnClickListener(v -> {
             ThemeManager.toggleTheme(requireContext());
+            updateThemeIcon();
         });
 
         // Category circular chips:

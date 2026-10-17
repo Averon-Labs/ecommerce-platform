@@ -53,25 +53,25 @@
 
             </LinearLayout>
 
-            <!-- Theme Toggle / Profile Initial Circle -->
+            <!-- Theme Toggle / Day-Night Mode Icon in Circular Frame -->
             <FrameLayout
                 android:id="@+id/btn_profile_avatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="@drawable/bg_circular_category"
                 android:clickable="true"
-                android:contentDescription="@string/action_account"
+                android:contentDescription="@string/theme_light_desc"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <ImageView
+                    android:id="@+id/iv_theme_toggle_icon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
                     android:layout_gravity="center"
-                    android:text="E"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="@color/color_botanical_green"
-                    android:textStyle="bold" />
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_dark_mode"
+                    app:tint="@color/color_botanical_green" />
 
             </FrameLayout>
 
