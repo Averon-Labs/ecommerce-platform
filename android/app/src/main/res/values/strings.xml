@@ -22,4 +22,19 @@
         <item quantity="one">%d item in cart</item>
         <item quantity="other">%d items in cart</item>
     </plurals>
+    <!-- Pinterest / MUSE Home Editorial Strings -->
+    <string name="home_brand_wordmark">EShop Verse</string>
+    <string name="home_tagline">Curated lifestyle &amp; design</string>
+    <string name="home_search_hint">Search curated pieces...</string>
+    <string name="home_hero_curation">SEASONAL EDIT</string>
+    <string name="home_hero_title">Make room for beautiful things</string>
+    <string name="home_hero_subtitle">Objects with soul. Made to last.</string>
+    <string name="home_hero_cta">EXPLORE THE EDIT ↗</string>
+    <string name="home_trending_title">Trending this week</string>
+    <string name="home_view_all">See all</string>
+    <string name="home_category_all">All</string>
+    <string name="home_category_home">Home</string>
+    <string name="home_category_fashion">Fashion</string>
+    <string name="home_category_objects">Objects</string>
+    <string name="home_category_beauty">Beauty</string>
 </resources>

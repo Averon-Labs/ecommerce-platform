@@ -30,6 +30,8 @@
 
     <!-- Product Detail Controls & Actions -->
     <string name="catalog_label_quantity">Quantity</string>
+    <string name="catalog_label_description">Description</string>
+    <string name="catalog_shipping_notice">Free shipping on orders over $100</string>
     <string name="catalog_action_add_to_cart">Add to cart</string>
     <string name="catalog_add_to_cart_unavailable">Add to cart will be available in the cart release.</string>
     <string name="catalog_action_explore">Explore all products</string>

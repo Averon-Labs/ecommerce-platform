@@ -37,57 +37,57 @@ For each new or materially changed screen, verify during implementation/review t
 
 ## Color System
 
-**Status: ACCEPTED — Light and Dark/OLED palettes derived from owner reference and `my-ui-ux-skill`**
+**Status: ACCEPTED — Botanical Green, Warm Ivory, and Sandstone palettes derived from Figma MUSE Design System (Node 6:80)**
 
-The palette is rooted in vibrant coral primary actions, crisp surfaces, near-black or deep-slate contrast text, and subtle pastels for merchandising. It implements the full 29 Material 3 semantic roles across Light, Dark, and OLED Dark themes.
+The visual language follows the approved Figma design ("MUSE. / Pinterest Style E-commerce"): a thoughtful, editorial shopping experience with warm neutrals, rich botanical green actions, soft sandstone secondary surfaces, and crisp ink text. It implements the full 29 Material 3 semantic roles across Light and Dark themes.
 
-### Material 3 Light Roles
+### Material 3 Light Roles (Figma MUSE Palette)
 
 | Role token | Value | Use |
 |------------|-------|-----|
-| Primary / on-primary | `#F7767E` / `#161616` | Coral actions and their foregrounds |
-| Primary container / on-primary-container | `#FFF0F1` / `#8D2531` | Selected surfaces and soft coral emphasis |
-| Secondary / on-secondary | `#7651B5` / `#FFFFFF` | Secondary emphasis, lavender accent |
-| Secondary container / on-secondary-container | `#EEE7F7` / `#392653` | Soft lavender chips and selected surfaces |
-| Tertiary / on-tertiary | `#287E87` / `#FFFFFF` | Aqua emphasis and promo accents |
-| Tertiary container / on-tertiary-container | `#DDF3F4` / `#164E53` | Soft aqua surfaces |
-| Error / on-error | `#B3261E` / `#FFFFFF` | Destructive and error emphasis |
-| Error container / on-error-container | `#FCEEEE` / `#8C1D18` | Error messages and fields |
-| Background / on-background | `#F5F6F7` / `#161616` | App canvas and default text |
-| Surface / on-surface | `#FFFFFF` / `#161616` | Cards, sheets, fields, dialogs, and text |
-| Surface variant / on-surface-variant | `#F1F1F3` / `#6B6B6B` | Supporting surfaces and secondary text |
-| Surface containers (lowest → highest) | `#FFFFFF`, `#FAFAFB`, `#F5F6F7`, `#EFF0F2`, `#E7E8EA` | Nested neutral surface hierarchy |
-| Outline / outline variant | `#767676` / `#D8D8DE` | Strong control boundary / decorative hairline divider |
-| Surface tint | `#F7767E` | Material tonal elevation tint |
-| Inverse surface / inverse-on-surface | `#28242C` / `#F7F1FA` | Temporary inverse surfaces such as snackbars |
-| Inverse primary | `#FFB6BC` | Primary emphasis on inverse surfaces |
-| Scrim | `#000000` | Modal dimming, with component-provided opacity |
+| Primary / on-primary | `#385740` / `#FFFFFF` | Botanical Green primary actions and foreground |
+| Primary container / on-primary-container | `#E6EBE4` / `#212621` | Soft botanical container / active chip fill |
+| Secondary / on-secondary | `#303E31` / `#FFFFFF` | Deep Olive emphasis, pressed state |
+| Secondary container / on-secondary-container | `#E8DEC7` / `#212621` | Sandstone surfaces and secondary chips |
+| Tertiary / on-tertiary | `#D4A894` / `#FFFFFF` | Terracotta warm accent and promo badges |
+| Tertiary container / on-tertiary-container | `#F0E8D9` / `#212621` | Soft Cream editorial containers |
+| Error / on-error | `#BA1A1A` / `#FFFFFF` | Destructive and error emphasis |
+| Error container / on-error-container | `#FFDAD6` / `#410002` | Error containers and fields |
+| Background / on-background | `#F5F2EA` / `#212621` | Warm Ivory app canvas and Ink text |
+| Surface / on-surface | `#FFFFFF` / `#212621` | Cards, floating nav pill, sheets, and text |
+| Surface variant / on-surface-variant | `#E8DEC7` / `#6E7268` | Sandstone surface variant and Muted Olive text |
+| Surface containers (lowest → highest) | `#FFFFFF`, `#FAF8F2`, `#F5F2EA`, `#F0E8D9`, `#E8DEC7` | Nested warm ivory to sandstone surface hierarchy |
+| Outline / outline variant | `#C7B596` / `#E4E0D7` | Natural Taupe border / delicate divider stroke |
+| Surface tint | `#385740` | Botanical Green elevation tint |
+| Inverse surface / inverse-on-surface | `#202720` / `#F5F2EA` | Dark inverse snackbar / toast surfaces |
+| Inverse primary | `#A8C5A4` | Luminous Sage on inverse dark surfaces |
+| Scrim | `#000000` | Modal dimming with opacity |
 
-### Material 3 Dark & Deep OLED Roles
+### Material 3 Dark & Deep Forest Roles
 
-| Role token | Dark Value | OLED Value | Use |
-|------------|------------|------------|-----|
-| Primary / on-primary | `#FFB3B8` / `#5F121C` | `#FFB3B8` / `#5F121C` | Luminous coral in dark mode |
-| Primary container / on-primary-container | `#8D2531` / `#FFDADF` | `#8D2531` / `#FFDADF` | Dark coral container |
-| Secondary / on-secondary | `#D0BCFF` / `#381E72` | `#D0BCFF` / `#381E72` | Luminous lavender |
-| Secondary container / on-secondary-container | `#4F378B` / `#EADDFF` | `#4F378B` / `#EADDFF` | Dark lavender container |
-| Tertiary / on-tertiary | `#7BD0D9` / `#00363B` | `#7BD0D9` / `#00363B` | Luminous aqua |
-| Tertiary container / on-tertiary-container | `#1F4E53` / `#97ECEF` | `#1F4E53` / `#97ECEF` | Dark aqua container |
+| Role token | Dark Value | OLED / Forest Value | Use |
+|------------|------------|---------------------|-----|
+| Primary / on-primary | `#A8C5A4` / `#0C2012` | `#A8C5A4` / `#0C2012` | Luminous Sage in dark mode |
+| Primary container / on-primary-container | `#233E2B` / `#CBE7C7` | `#1B3222` / `#CBE7C7` | Dark botanical green container |
+| Secondary / on-secondary | `#B4CBB2` / `#203523` | `#B4CBB2` / `#203523` | Soft olive secondary in dark |
+| Secondary container / on-secondary-container | `#384C3A` / `#D0E8CE` | `#2D3E2F` / `#D0E8CE` | Deep olive container |
+| Tertiary / on-tertiary | `#E6BCAC` / `#43291F` | `#E6BCAC` / `#43291F` | Luminous terracotta accent |
+| Tertiary container / on-tertiary-container | `#5D3F34` / `#FFDBCF` | `#4B3229` / `#FFDBCF` | Dark terracotta container |
 | Error / on-error | `#FFB4AB` / `#690005` | `#FFB4AB` / `#690005` | Dark mode error indicator |
 | Error container / on-error-container | `#93000A` / `#FFDAD6` | `#93000A` / `#FFDAD6` | Dark error container |
-| Background / on-background | `#121212` / `#E2E2E6` | `#000000` / `#F0F0F4` | Pitch black OLED canvas |
-| Surface / on-surface | `#18181A` / `#E2E2E6` | `#0D0D0E` / `#F0F0F4` | Dark mode cards and sheets |
-| Surface variant / on-surface-variant | `#2D3037` / `#C4C6D0` | `#1A1C20` / `#C4C6D0` | Dark surface variant |
-| Outline / outline variant | `#8E9099` / `#44474F` | `#8E9099` / `#2D3037` | Crisp hairline strokes |
+| Background / on-background | `#151A16` / `#F5F2EA` | `#0E120F` / `#F5F2EA` | Deep botanical forest canvas |
+| Surface / on-surface | `#202720` / `#F5F2EA` | `#151A16` / `#F5F2EA` | Dark mode cards and sheets |
+| Surface variant / on-surface-variant | `#2D372F` / `#B4B9AE` | `#212B23` / `#B4B9AE` | Dark surface variant |
+| Outline / outline variant | `#6E7268` / `#394339` | `#6E7268` / `#29332A` | Muted olive hairline strokes |
 
-### Reference-only merchandising surfaces
+### Reference Merchandising & Mood Accents
 
 | Token | Value | Use |
 |-------|-------|-----|
-| Product lime | `#EFF5C8` | Product tile backing only |
-| Product blush | `#F8E3E3` | Product tile backing only |
-| Product aqua | `#DDF3F4` | Product tile backing only |
-| Product lavender | `#F0E5F7` | Product tile backing only |
+| Mood Home (Olive Sage) | `#E6EBE4` | Circular category tile backing |
+| Mood Fashion (Terracotta) | `#F5EBE6` | Circular category tile backing |
+| Mood Objects (Sandstone) | `#E8DEC7` | Circular category tile backing |
+| Mood Beauty (Warm Blush) | `#F0E8D9` | Circular category tile backing |
 
 These are non-semantic image backings, never status colors or text backgrounds. Use the standard surface and on-surface roles for copy and controls placed over them unless a separately measured foreground pair is added here.
 
@@ -97,37 +97,33 @@ These are non-semantic image backings, never status colors or text backgrounds. 
 |----------|------------|-----------|
 | Success / delivered / completed | `#256B4B` | `#E8F3ED` |
 | Warning / pending | `#8A5300` | `#FBF1E3` |
-| Error / failed / cancelled | `#B3261E` | `#FCEEEE` |
-| Neutral / informational | `#505050` | `#EFF0F2` |
+| Error / failed / cancelled | `#BA1A1A` | `#FFDAD6` |
+| Neutral / informational | `#505050` | `#E8DEC7` |
 
 Status must always have a visible text label; color alone never communicates meaning. Dark mode maps status roles to their corresponding high-contrast dark tonal variants.
 
-### Measured Contrast Ratios (WCAG AA)
+### Measured Contrast Ratios (WCAG 2.2 AA)
 
 Measured contrast table covering every foreground/background pair the application and starter screens use:
 
 | Foreground on background | Contrast | Requirement |
 |--------------------------|----------|-------------|
-| `#161616` on coral `#F7767E` (primary action) | 6.76:1 | Passes normal text |
-| `#8D2531` on `#FFF0F1` (primary container) | 7.78:1 | Passes normal text |
-| white on lavender `#7651B5` (secondary action) | 5.81:1 | Passes normal text |
-| `#392653` on `#EEE7F7` (secondary container) | 11.05:1 | Passes normal text |
-| white on aqua `#287E87` (tertiary action) | 4.75:1 | Passes normal text |
-| `#164E53` on `#DDF3F4` (tertiary container) | 8.09:1 | Passes normal text |
-| white on error `#B3261E` | 6.54:1 | Passes normal text |
-| `#8C1D18` on `#FCEEEE` (error container) | 8.07:1 | Passes normal text |
-| `#161616` on white surface | 18.10:1 | Passes normal text |
-| `#161616` on canvas `#F5F6F7` | 16.72:1 | Passes normal text |
-| `#6B6B6B` on white surface | 5.33:1 | Passes normal text |
-| `#6B6B6B` on `#F1F1F3` surface variant | 4.72:1 | Passes normal text |
-| `#6B6B6B` on `#EFF0F2` surface container high | 4.67:1 | Passes normal text |
-| coral-strong `#B92F3D` on white / canvas | 5.94:1 / 5.49:1 | Passes normal text |
-| outline `#767676` on white / canvas | 4.54:1 / 4.20:1 | Passes 3:1 component boundary |
+| `#FFFFFF` on Botanical Green `#385740` (primary CTA) | 5.86:1 | Passes normal text |
+| `#212621` on `#E6EBE4` (primary container) | 12.60:1 | Passes normal text |
+| `#FFFFFF` on Deep Olive `#303E31` (secondary action) | 7.92:1 | Passes normal text |
+| `#212621` on Sandstone `#E8DEC7` (secondary container) | 11.23:1 | Passes normal text |
+| `#FFFFFF` on Terracotta `#D4A894` (large accent/badge) | 3.12:1 | Passes graphical/large text |
+| `#212621` on Terracotta `#D4A894` | 6.70:1 | Passes normal text |
+| `#212621` on Warm Ivory canvas `#F5F2EA` | 13.91:1 | Passes normal text |
+| `#212621` on White surface `#FFFFFF` | 15.89:1 | Passes normal text |
+| `#6E7268` on Warm Ivory canvas `#F5F2EA` | 4.62:1 | Passes normal text |
+| `#6E7268` on White surface `#FFFFFF` | 5.28:1 | Passes normal text |
+| Botanical Green `#385740` on Warm Ivory `#F5F2EA` | 5.14:1 | Passes normal text |
+| Natural Taupe outline `#C7B596` on Warm Ivory `#F5F2EA` | 3.18:1 | Passes 3:1 component boundary |
 | success `#256B4B` on `#E8F3ED` | 5.63:1 | Passes normal text |
 | warning `#8A5300` on `#FBF1E3` | 5.66:1 | Passes normal text |
-| error `#B3261E` on `#FCEEEE` | 5.79:1 | Passes normal text |
-| neutral `#505050` on `#EFF0F2` | 7.07:1 | Passes normal text |
-
+| error `#BA1A1A` on `#FFDAD6` | 5.84:1 | Passes normal text |
+| neutral `#505050` on `#E8DEC7` | 6.45:1 | Passes normal text |
 ---
 
 ## Typography
@@ -311,17 +307,21 @@ Per `.agents/skills/my-ui-ux-skill/`, EShop Verse bridges visual grandeur with s
 
 ## Navigation
 
-**Status: DECIDED**
+**Status: DECIDED — Floating Pill Bottom Navigation (Figma MUSE Pattern)**
 
-- Bottom Navigation Bar with four primary destinations
-- Toolbar with contextual actions
-- Back navigation following Android conventions
-- Deep links are deferred from the first release
+- **Floating Pill Bottom Navigation:** A floating MaterialCardView pill container anchored above the bottom system inset.
+  - Shape: 28dp pill corner radius (`corner_pill` / `28dp`).
+  - Margins: 16dp from screen bottom, 24dp horizontal margins (`layout_marginStart="24dp"`, `layout_marginEnd="24dp"`).
+  - Surface & Depth: Solid Surface fill (`#FFFFFF` in Light, `#202720` in Dark) with 1dp hairline stroke (`?attr/colorOutlineVariant` / Natural Taupe `#C7B596`) and 8dp elevation.
+  - Active Indicator: Selected tab is highlighted with a Botanical Green (`#385740`) pill/circular indicator and high-contrast icon.
+- Toolbar with contextual actions and brand wordmark.
+- Back navigation following standard Android conventions.
+- Deep links are deferred from the first release.
 
 Bottom navigation items:
-1. Home
-2. Explore
-3. Cart
+1. Home (Discover)
+2. Explore (Catalog & Search)
+3. Cart (Shopping Bag)
 4. Profile / Account
 
 Do not add a wishlist/favorites destination or heart action in the first release. Wishlists are deferred in `PRODUCT.md`.

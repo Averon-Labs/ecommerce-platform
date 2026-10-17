@@ -5,7 +5,7 @@
     android:id="@+id/state_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorSurface">
+    android:background="@color/canvas_background">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/content_detail"
@@ -16,41 +16,55 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingBottom="100dp">
+            android:paddingBottom="130dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Image Gallery ViewPager2 -->
-                <FrameLayout
+                <!-- Image Gallery Container (MUSE Editorial Rounded Bento Card) -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="280dp">
+                    android:layout_height="320dp"
+                    android:layout_marginStart="@dimen/spacing_md"
+                    android:layout_marginEnd="@dimen/spacing_md"
+                    android:layout_marginTop="@dimen/spacing_md"
+                    app:cardCornerRadius="@dimen/corner_bento"
+                    app:cardElevation="0dp"
+                    app:strokeColor="@color/m3_outline_variant"
+                    app:strokeWidth="1dp"
+                    app:cardBackgroundColor="@color/surface_color">
 
-                    <androidx.viewpager2.widget.ViewPager2
-                        android:id="@+id/vp_product_images"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent">
 
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/tv_image_indicator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|end"
-                        android:layout_margin="@dimen/spacing_md"
-                        android:background="@drawable/bg_status_badge"
-                        android:paddingStart="@dimen/spacing_sm"
-                        android:paddingEnd="@dimen/spacing_sm"
-                        android:paddingTop="@dimen/spacing_xs"
-                        android:paddingBottom="@dimen/spacing_xs"
-                        android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
-                        android:textColor="@color/text_primary_ink"
-                        android:visibility="gone"
-                        tools:text="1 / 3"
-                        tools:visibility="visible" />
+                        <androidx.viewpager2.widget.ViewPager2
+                            android:id="@+id/vp_product_images"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
 
-                </FrameLayout>
+                        <com.google.android.material.textview.MaterialTextView
+                            android:id="@+id/tv_image_indicator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:layout_margin="@dimen/spacing_md"
+                            android:background="@drawable/bg_pill_search"
+                            android:paddingStart="@dimen/spacing_sm"
+                            android:paddingEnd="@dimen/spacing_sm"
+                            android:paddingTop="@dimen/spacing_xs"
+                            android:paddingBottom="@dimen/spacing_xs"
+                            android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                            android:textColor="@color/text_primary_ink"
+                            android:visibility="gone"
+                            tools:text="1 / 3"
+                            tools:visibility="visible" />
+
+                    </FrameLayout>
+
+                </com.google.android.material.card.MaterialCardView>
 
                 <!-- Product Information -->
                 <LinearLayout
@@ -59,14 +73,32 @@
                     android:orientation="vertical"
                     android:padding="@dimen/spacing_md">
 
+                    <!-- Category tag / Breadcrumb in uppercase -->
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/tv_product_category"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.08"
+                        android:textAllCaps="true"
+                        android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                        android:textColor="@color/text_secondary"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:text="HOME OBJECTS / LIGHTING"
+                        tools:visibility="visible" />
+
+                    <!-- Product Name -->
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/tv_product_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_xs"
                         android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
                         android:textColor="@color/text_primary_ink"
-                        tools:text="Classic Leather Sneaker" />
+                        android:textStyle="bold"
+                        tools:text="Soft Glow Table Lamp" />
 
+                    <!-- Price & Stock Badge Row -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -79,7 +111,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="@style/TextAppearance.EShopVerse.PageTitle"
-                            tools:text="$89.99" />
+                            android:textColor="@color/color_botanical_green"
+                            android:textStyle="bold"
+                            tools:text="$89.00" />
 
                         <com.averonlabs.eshopverse.core.ui.view.StatusBadgeView
                             android:id="@+id/badge_stock"
@@ -98,23 +132,24 @@
                         android:layout_marginBottom="@dimen/spacing_md"
                         android:background="@color/m3_outline_variant" />
 
-                    <!-- Description -->
+                    <!-- Description Section -->
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Description"
+                        android:text="@string/catalog_label_description"
                         android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
-                        android:textColor="@color/text_primary_ink" />
+                        android:textColor="@color/text_primary_ink"
+                        android:textStyle="bold" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/tv_product_description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_xs"
-                        android:lineSpacingMultiplier="1.2"
+                        android:lineSpacingMultiplier="1.3"
                         android:textAppearance="@style/TextAppearance.EShopVerse.Body"
                         android:textColor="@color/text_secondary"
-                        tools:text="Premium full-grain leather sneaker with cushioned insole and rubber outsole." />
+                        tools:text="A warm, sculptural accent that brings a soft glow to slow mornings and quiet evenings." />
 
                     <!-- Divider -->
                     <View
@@ -124,28 +159,43 @@
                         android:layout_marginBottom="@dimen/spacing_md"
                         android:background="@color/m3_outline_variant" />
 
-                    <!-- Quantity Stepper Section -->
-                    <LinearLayout
+                    <!-- Quantity Section -->
+                    <com.google.android.material.card.MaterialCardView
                         android:id="@+id/layout_quantity"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        app:cardCornerRadius="@dimen/corner_card_pinterest"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/m3_outline_variant"
+                        app:strokeWidth="1dp"
+                        app:cardBackgroundColor="@color/surface_color">
 
-                        <com.google.android.material.textview.MaterialTextView
-                            android:layout_width="0dp"
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="@string/catalog_label_quantity"
-                            android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
-                            android:textColor="@color/text_primary_ink" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
+                            android:paddingStart="@dimen/spacing_md"
+                            android:paddingEnd="@dimen/spacing_md"
+                            android:paddingTop="@dimen/spacing_sm"
+                            android:paddingBottom="@dimen/spacing_sm">
 
-                        <com.averonlabs.eshopverse.core.ui.view.QuantityStepperView
-                            android:id="@+id/stepper_quantity"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="@string/catalog_label_quantity"
+                                android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                                android:textColor="@color/text_primary_ink" />
 
-                    </LinearLayout>
+                            <com.averonlabs.eshopverse.core.ui.view.QuantityStepperView
+                                android:id="@+id/stepper_quantity"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
 
@@ -153,39 +203,63 @@
 
         </androidx.core.widget.NestedScrollView>
 
-        <!-- Sticky Bottom Action Bar -->
-        <LinearLayout
+        <!-- Sticky Bottom Action Bar (Floating Pill / Elevated Surface) -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:background="?attr/colorSurface"
-            android:elevation="@dimen/elevation_level_3"
-            android:orientation="vertical"
-            android:paddingStart="@dimen/spacing_md"
-            android:paddingEnd="@dimen/spacing_md"
-            android:paddingTop="@dimen/spacing_sm"
-            android:paddingBottom="@dimen/spacing_md">
+            app:cardElevation="8dp"
+            app:cardCornerRadius="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/canvas_background">
 
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/tv_add_to_cart_notice"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="@string/catalog_add_to_cart_unavailable"
-                android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
-                android:textColor="@color/text_secondary"
-                android:visibility="gone"
-                tools:visibility="visible" />
+                android:orientation="vertical"
+                android:paddingStart="@dimen/spacing_md"
+                android:paddingEnd="@dimen/spacing_md"
+                android:paddingTop="@dimen/spacing_sm"
+                android:paddingBottom="@dimen/spacing_md">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_add_to_cart"
-                style="@style/Widget.EShopVerse.Button.Filled"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_xs"
-                android:text="@string/catalog_action_add_to_cart" />
+                <!-- Notice / Unavailable label -->
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_add_to_cart_notice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/catalog_add_to_cart_unavailable"
+                    android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                    android:textColor="@color/text_secondary"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
 
-        </LinearLayout>
+                <!-- Add to bag button (Botanical Green Pill) -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_add_to_cart"
+                    style="@style/Widget.EShopVerse.Button.Filled"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="@dimen/spacing_xs"
+                    android:backgroundTint="@color/color_botanical_green"
+                    android:textColor="@color/m3_on_primary"
+                    app:cornerRadius="@dimen/corner_pill"
+                    android:text="@string/catalog_action_add_to_cart" />
+
+                <!-- Delivery Note matching Figma: Free shipping on orders over $100 -->
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/tv_delivery_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xs"
+                    android:gravity="center"
+                    android:text="@string/catalog_shipping_notice"
+                    android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                    android:textColor="@color/text_secondary" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

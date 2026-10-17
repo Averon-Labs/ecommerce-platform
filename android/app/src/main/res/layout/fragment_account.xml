@@ -15,7 +15,9 @@
             android:id="@+id/scroll_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:clipToPadding="false"
+            android:fillViewport="true"
+            android:paddingBottom="120dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -23,10 +25,21 @@
                 android:orientation="vertical"
                 android:padding="@dimen/spacing_lg">
 
+                <!-- Editorial Brand Header -->
+                <TextView
+                    android:id="@+id/tv_account_brand_subtitle"
+                    style="@style/TextAppearance.EShopVerse.Overline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.15"
+                    android:text="ESHOP VERSE"
+                    android:textColor="@color/color_muted_olive" />
+
                 <TextView
                     android:id="@+id/tv_account_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xs"
                     android:layout_marginBottom="@dimen/spacing_lg"
                     android:text="@string/auth_account_title"
                     android:textAppearance="@style/TextAppearance.EShopVerse.LargeTitle"
@@ -39,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- Customer Info Card -->
+                    <!-- Customer Info Bento Card -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/card_customer_info"
                         style="@style/Widget.EShopVerse.Card.Panel"
@@ -50,38 +63,64 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal"
                             android:padding="@dimen/spacing_md">
 
-                            <TextView
-                                android:id="@+id/tv_user_name"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="@dimen/spacing_xs"
-                                android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
-                                android:textColor="@color/text_primary_ink"
-                                tools:text="Jane Doe" />
+                            <!-- Circular Avatar Container in Soft Sage -->
+                            <FrameLayout
+                                android:layout_width="60dp"
+                                android:layout_height="60dp"
+                                android:layout_marginEnd="@dimen/spacing_md"
+                                android:background="@drawable/bg_avatar_circle">
 
-                            <TextView
-                                android:id="@+id/tv_user_email"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginBottom="@dimen/spacing_sm"
-                                android:textAppearance="@style/TextAppearance.EShopVerse.Body"
-                                android:textColor="@color/text_secondary"
-                                tools:text="jane.doe@example.com" />
+                                <ImageView
+                                    android:layout_width="32dp"
+                                    android:layout_height="32dp"
+                                    android:layout_gravity="center"
+                                    android:contentDescription="@string/nav_account"
+                                    android:src="@drawable/ic_account"
+                                    app:tint="@color/color_botanical_green" />
+                            </FrameLayout>
 
-                            <TextView
-                                android:id="@+id/tv_user_role"
-                                style="@style/Widget.EShopVerse.Badge.Status"
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="Customer"
-                                android:textColor="@color/status_neutral" />
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tv_user_name"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="@dimen/spacing_xs"
+                                    android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                                    android:textColor="@color/text_primary_ink"
+                                    tools:text="Jane Doe" />
+
+                                <TextView
+                                    android:id="@+id/tv_user_email"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="@dimen/spacing_sm"
+                                    android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                                    android:textColor="@color/text_secondary"
+                                    tools:text="jane.doe@example.com" />
+
+                                <TextView
+                                    android:id="@+id/tv_user_role"
+                                    style="@style/Widget.EShopVerse.Badge.Status"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_status_badge"
+                                    android:backgroundTint="@color/color_soft_sage"
+                                    android:text="Customer"
+                                    android:textColor="@color/color_botanical_green" />
+                            </LinearLayout>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Edit Profile Card -->
+                    <!-- Edit Profile Bento Card -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/card_edit_profile"
                         style="@style/Widget.EShopVerse.Card.Panel"
@@ -93,16 +132,24 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:padding="@dimen/spacing_md">
+                            android:padding="@dimen/spacing_lg">
 
                             <TextView
                                 android:id="@+id/tv_edit_profile_heading"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginBottom="@dimen/spacing_md"
                                 android:text="Profile Details"
                                 android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
                                 android:textColor="@color/text_primary_ink" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/spacing_xs"
+                                android:layout_marginBottom="@dimen/spacing_md"
+                                android:text="Update your name and account info"
+                                android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                                android:textColor="@color/text_secondary" />
 
                             <com.google.android.material.textfield.TextInputLayout
                                 android:id="@+id/til_first_name"
@@ -142,7 +189,7 @@
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/btn_save_profile"
-                                style="@style/Widget.EShopVerse.Button.Outlined"
+                                style="@style/Widget.EShopVerse.Button.Filled"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="@string/auth_action_save_profile" />
@@ -159,15 +206,15 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Sign Out Button -->
+                    <!-- Sign Out Pill Button -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_sign_out"
                         style="@style/Widget.EShopVerse.Button.Outlined"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/auth_action_sign_out"
-                        app:strokeColor="@color/m3_error"
-                        android:textColor="@color/m3_error" />
+                        android:textColor="@color/m3_error"
+                        app:strokeColor="@color/m3_error" />
 
                 </LinearLayout>
 
@@ -180,29 +227,72 @@
                     android:visibility="gone"
                     tools:visibility="visible">
 
-                    <TextView
-                        android:id="@+id/tv_guest_prompt"
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_guest_welcome"
+                        style="@style/Widget.EShopVerse.Card.Panel"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_lg"
-                        android:text="@string/auth_guest_prompt"
-                        android:textAppearance="@style/TextAppearance.EShopVerse.Body"
-                        android:textColor="@color/text_secondary" />
+                        android:layout_marginBottom="@dimen/spacing_lg">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_guest_sign_in"
-                        style="@style/Widget.EShopVerse.Button.Filled"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/spacing_md"
-                        android:text="@string/auth_action_sign_in" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
+                            android:padding="@dimen/spacing_lg">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_guest_register"
-                        style="@style/Widget.EShopVerse.Button.Outlined"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/auth_action_register" />
+                            <FrameLayout
+                                android:layout_width="72dp"
+                                android:layout_height="72dp"
+                                android:layout_marginBottom="@dimen/spacing_md"
+                                android:background="@drawable/bg_avatar_circle">
+
+                                <ImageView
+                                    android:layout_width="36dp"
+                                    android:layout_height="36dp"
+                                    android:layout_gravity="center"
+                                    android:contentDescription="@string/nav_account"
+                                    android:src="@drawable/ic_account"
+                                    app:tint="@color/color_botanical_green" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:id="@+id/tv_guest_title"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/spacing_xs"
+                                android:gravity="center"
+                                android:text="Welcome to EShop Verse"
+                                android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                                android:textColor="@color/text_primary_ink" />
+
+                            <TextView
+                                android:id="@+id/tv_guest_prompt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/spacing_lg"
+                                android:gravity="center"
+                                android:text="@string/auth_guest_prompt"
+                                android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                                android:textColor="@color/text_secondary" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_guest_sign_in"
+                                style="@style/Widget.EShopVerse.Button.Filled"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="@dimen/spacing_md"
+                                android:text="@string/auth_action_sign_in" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_guest_register"
+                                style="@style/Widget.EShopVerse.Button.Outlined"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/auth_action_register" />
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
 

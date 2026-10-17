@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?attr/colorSurface">
+    android:background="@color/canvas_background">
 
     <!-- Search Bar & Controls Header -->
     <LinearLayout
@@ -25,7 +25,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="@string/catalog_search_hint"
-            app:startIconDrawable="@android:drawable/ic_menu_search"
+            app:boxBackgroundColor="@color/surface_white"
+            app:boxCornerRadiusBottomEnd="@dimen/corner_search_pill"
+            app:boxCornerRadiusBottomStart="@dimen/corner_search_pill"
+            app:boxCornerRadiusTopEnd="@dimen/corner_search_pill"
+            app:boxCornerRadiusTopStart="@dimen/corner_search_pill"
+            app:boxStrokeColor="@color/border_hairline"
+            app:startIconDrawable="@drawable/ic_search"
+            app:startIconTint="@color/color_muted_olive"
             app:endIconMode="clear_text">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -42,11 +49,16 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_sort"
             style="@style/Widget.EShopVerse.Button.Icon"
-            android:layout_width="@dimen/touch_target_min"
-            android:layout_height="@dimen/touch_target_min"
-            android:layout_marginStart="@dimen/spacing_xs"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="@dimen/spacing_sm"
+            android:backgroundTint="@color/surface_white"
             android:contentDescription="@string/catalog_cd_sort_button"
-            app:icon="@drawable/ic_sort" />
+            app:cornerRadius="@dimen/corner_pill"
+            app:icon="@drawable/ic_sort"
+            app:iconTint="@color/color_botanical_green"
+            app:strokeColor="@color/border_hairline"
+            app:strokeWidth="@dimen/stroke_hairline" />
 
     </LinearLayout>
 
@@ -79,7 +91,7 @@
             android:paddingStart="@dimen/spacing_md_sm"
             android:paddingEnd="@dimen/spacing_md_sm"
             android:paddingTop="@dimen/spacing_xs"
-            android:paddingBottom="@dimen/spacing_md"
+            android:paddingBottom="100dp"
             tools:listitem="@layout/item_product_card" />
 
     </com.averonlabs.eshopverse.core.ui.view.StateContainerView>

@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -114,6 +115,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartItemViewHo
             // Unit Price and Line Total formatted with server-authoritative money
             binding.tvCartItemUnitPrice.setFormattedPrice(MoneyFormat.format(item.getUnitPriceMoney()));
             binding.tvCartLineTotal.setFormattedPrice(MoneyFormat.format(item.getLineTotalMoney()));
+            binding.tvCartLineTotal.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.color_botanical_green));
 
             // Thumbnail Image
             Glide.with(itemView.getContext())

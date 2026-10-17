@@ -26,13 +26,28 @@
         android:id="@+id/content_main"
         layout="@layout/content_main" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_nav"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:fitsSystemWindows="false"
-        app:elevation="@dimen/elevation_level_2"
-        app:menu="@menu/bottom_nav_menu" />
+        android:layout_marginStart="@dimen/nav_floating_margin_horizontal"
+        android:layout_marginEnd="@dimen/nav_floating_margin_horizontal"
+        android:layout_marginBottom="@dimen/nav_floating_margin_bottom"
+        app:cardCornerRadius="@dimen/nav_floating_radius"
+        app:cardElevation="@dimen/nav_floating_elevation"
+        app:cardBackgroundColor="@color/nav_floating_bg"
+        app:strokeColor="@color/nav_floating_stroke"
+        app:strokeWidth="@dimen/stroke_hairline">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_nav"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="false"
+            app:elevation="0dp"
+            app:menu="@menu/bottom_nav_menu" />
+
+    </com.google.android.material.card.MaterialCardView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

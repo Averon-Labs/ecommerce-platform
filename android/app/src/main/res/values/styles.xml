@@ -2,15 +2,19 @@
 <resources>
     <style name="ShapeAppearance.EShopVerse.Card" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/corner_sm</item>
+        <item name="cornerSize">@dimen/corner_card_pinterest</item>
     </style>
     <style name="ShapeAppearance.EShopVerse.Panel" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">@dimen/corner_md</item>
+        <item name="cornerSize">@dimen/corner_bento</item>
     </style>
     <style name="ShapeAppearance.EShopVerse.Pill" parent="">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/corner_pill</item>
+    </style>
+    <style name="ShapeAppearance.EShopVerse.InputPill" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/corner_search_pill</item>
     </style>
 
     <style name="Widget.EShopVerse.Toolbar" parent="Widget.Material3.Toolbar">
@@ -22,7 +26,8 @@
         <item name="itemIconTint">@color/navigation_item_tint</item>
         <item name="itemTextColor">@color/navigation_item_tint</item>
         <item name="itemActiveIndicatorStyle">@style/Widget.EShopVerse.BottomNavigation.Indicator</item>
-        <item name="android:background">?attr/colorSurface</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="elevation">0dp</item>
     </style>
     <style name="Widget.EShopVerse.BottomNavigation.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@color/m3_primary_container</item>
@@ -31,14 +36,14 @@
     <style name="Widget.EShopVerse.Button.Filled" parent="Widget.Material3.Button">
         <item name="backgroundTint">?attr/colorPrimary</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
-        <item name="android:minHeight">@dimen/touch_target_min</item>
-        <item name="cornerRadius">@dimen/corner_xs</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="cornerRadius">@dimen/corner_pill</item>
     </style>
     <style name="Widget.EShopVerse.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
         <item name="strokeColor">?attr/colorOutline</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:minHeight">@dimen/touch_target_min</item>
-        <item name="cornerRadius">@dimen/corner_xs</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="cornerRadius">@dimen/corner_pill</item>
     </style>
     <style name="Widget.EShopVerse.Button.Text" parent="Widget.Material3.Button.TextButton">
         <item name="android:textColor">?attr/colorPrimary</item>
@@ -54,7 +59,7 @@
         <item name="boxStrokeColor">@color/text_input_stroke</item>
         <item name="boxStrokeErrorColor">@color/m3_error</item>
         <item name="hintTextColor">?attr/colorOnSurfaceVariant</item>
-        <item name="shapeAppearance">@style/ShapeAppearance.EShopVerse.Card</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.EShopVerse.InputPill</item>
     </style>
     <style name="Widget.EShopVerse.TextInputLayout.Error" parent="Widget.EShopVerse.TextInputLayout.Outlined">
         <item name="errorTextColor">?attr/colorError</item>
@@ -70,12 +75,18 @@
     <style name="Widget.EShopVerse.Card.Product" parent="Widget.Material3.CardView.Elevated">
         <item name="shapeAppearance">@style/ShapeAppearance.EShopVerse.Card</item>
         <item name="cardElevation">@dimen/elevation_level_1</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@color/border_hairline</item>
+        <item name="cardBackgroundColor">@color/surface_white</item>
     </style>
     <style name="Widget.EShopVerse.Card.Order" parent="Widget.EShopVerse.Card.Product" />
     <style name="Widget.EShopVerse.Card.Category" parent="Widget.EShopVerse.Card.Product" />
     <style name="Widget.EShopVerse.Card.Panel" parent="Widget.Material3.CardView.Elevated">
         <item name="shapeAppearance">@style/ShapeAppearance.EShopVerse.Panel</item>
         <item name="cardElevation">@dimen/elevation_level_1</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="strokeColor">@color/border_hairline</item>
+        <item name="cardBackgroundColor">@color/surface_white</item>
     </style>
 
     <style name="Widget.EShopVerse.Chip.Filter" parent="Widget.Material3.Chip.Filter">

@@ -3,26 +3,41 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_cart_item"
-    style="@style/Widget.EShopVerse.Card.Product"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/spacing_sm">
+    android:layout_marginBottom="@dimen/spacing_md_sm"
+    app:cardCornerRadius="@dimen/corner_card_pinterest"
+    app:cardElevation="0dp"
+    app:strokeColor="@color/m3_outline_variant"
+    app:strokeWidth="1dp"
+    app:cardBackgroundColor="@color/surface_color">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/spacing_md">
 
-        <!-- Product Thumbnail -->
-        <ImageView
-            android:id="@+id/iv_cart_item_image"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:contentDescription="@null"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_image_placeholder"
+        <!-- Product Thumbnail in Rounded Container -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_thumbnail_container"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="@color/product_surface_lime"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/iv_cart_item_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_image_placeholder" />
+
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Product Name -->
         <com.google.android.material.textview.MaterialTextView
@@ -35,8 +50,9 @@
             android:maxLines="2"
             android:textAppearance="@style/TextAppearance.EShopVerse.Body"
             android:textColor="@color/text_primary_ink"
+            android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@id/btn_cart_remove"
-            app:layout_constraintStart_toEndOf="@id/iv_cart_item_image"
+            app:layout_constraintStart_toEndOf="@id/card_thumbnail_container"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Classic Leather Sneaker in Midnight Blue" />
 
@@ -61,7 +77,7 @@
             android:layout_marginTop="@dimen/spacing_xs"
             android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
             android:textColor="@color/text_secondary"
-            app:layout_constraintStart_toEndOf="@id/iv_cart_item_image"
+            app:layout_constraintStart_toEndOf="@id/card_thumbnail_container"
             app:layout_constraintTop_toBottomOf="@id/tv_cart_item_name"
             tools:text="$89.99" />
 
@@ -74,7 +90,7 @@
             android:layout_marginTop="@dimen/spacing_xs"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/iv_cart_item_image"
+            app:layout_constraintStart_toEndOf="@id/card_thumbnail_container"
             app:layout_constraintTop_toBottomOf="@id/tv_cart_item_unit_price">
 
             <!-- Price changed warning -->
@@ -118,7 +134,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/spacing_md"
             android:layout_marginTop="@dimen/spacing_sm"
-            app:layout_constraintStart_toEndOf="@id/iv_cart_item_image"
+            app:layout_constraintStart_toEndOf="@id/card_thumbnail_container"
             app:layout_constraintTop_toBottomOf="@id/layout_cart_item_warnings" />
 
         <!-- Line Total -->
@@ -127,7 +143,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
-            android:textColor="@color/text_primary_ink"
+            android:textColor="@color/color_botanical_green"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="@id/stepper_cart_quantity"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/stepper_cart_quantity"

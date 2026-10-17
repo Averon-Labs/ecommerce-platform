@@ -35,4 +35,11 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
+    <style name="TextAppearance.EShopVerse.Overline" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:fontFamily">@font/lato_bold</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.12</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/color_muted_olive</item>
+    </style>
 </resources>

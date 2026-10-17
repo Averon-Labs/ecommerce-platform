@@ -98,6 +98,14 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
             String formattedPrice = MoneyFormat.format(product.getPriceMoney());
             binding.tvProductPrice.setFormattedPrice(formattedPrice);
 
+            // Organic Pinterest masonry staggered heights based on product ID
+            int[] staggeredHeights = {150, 195, 170, 220, 185};
+            int heightDp = staggeredHeights[Math.abs(product.getId()) % staggeredHeights.length];
+            int heightPx = (int) (heightDp * itemView.getContext().getResources().getDisplayMetrics().density);
+            if (binding.containerImage.getLayoutParams() != null) {
+                binding.containerImage.getLayoutParams().height = heightPx;
+            }
+
             String stockLabel;
             if (!product.isInStock()) {
                 binding.badgeOutOfStock.setVisibility(View.VISIBLE);

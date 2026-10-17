@@ -1,5 +1,7 @@
 <resources>
-    <string name="cart_screen_title">Your Cart</string>
+    <string name="cart_screen_title">Your Bag</string>
+    <string name="cart_brand_subtitle">EShop Verse / Bag</string>
+    <string name="cart_summary_heading">Order summary</string>
     <string name="cart_items_issues_notice">One or more items in your cart need attention before checkout.</string>
     <string name="cart_item_price_changed">Price changed to %s</string>
     <string name="cart_item_unavailable">This item is currently unavailable.</string>
