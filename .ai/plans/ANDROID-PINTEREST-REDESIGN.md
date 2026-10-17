@@ -43,70 +43,47 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
 
 ---
 
-## Implementation Steps
+## Checklist & Progress Status
 
-### Step 1: Design System & Specifications Documentation [COMPLETED]
-- Updated `docs/DESIGN_SYSTEM.md` with:
-  - The MUSE / Botanical Green (`#385740`) & Warm Ivory (`#F5F2EA`) color system and WCAG 2.2 AA contrast ratings.
-  - Floating pill navigation specifications (28dp radius, 16dp bottom, 24dp horizontal margins).
-  - Staggered Pinterest masonry card specifications (16dp radius, dynamic organic aspect ratios).
-  - Pill button and editorial hero guidelines.
-- Updated `docs/SCREEN_SPECIFICATIONS.md` to reflect:
-  - M-01 (Home): Editorial hero banner, circular category mood chips, trending staggered grid.
-  - M-02 (Explore): Staggered masonry catalog grid, pill search bar, pill category chips.
-  - Navigation shell: Floating bottom pill navigation.
-
-### Step 2: Android Resource Tokens & Drawables [COMPLETED]
-- `res/values/colors.xml`: Added exact Figma color tokens (`color_botanical_green`, `color_warm_ivory`, `color_sandstone`, `color_terracotta`, `color_ink`, etc.) and mapped to Material 3 semantic color attributes.
-- `res/values-night/colors.xml`: Added dark theme equivalents (`#151A16` canvas, `#A8C5A4` luminous sage, `#202720` surfaces).
-- `res/values/dimens.xml`: Added dimensions for corner radii (16dp, 22dp, 28dp), floating nav margins and elevations.
-- `res/values/styles.xml`: Updated button, card, and text styles to match the new tokens.
-- Drawables:
-  - `bg_floating_bottom_nav.xml`: Pill shape (28dp radius) with white/ivory surface and subtle outline.
-  - `bg_pill_search.xml`: 22dp radius input background.
-  - `bg_hero_editorial.xml`: Soft cream / botanical rounded container with 20dp radius.
-  - `bg_circular_category.xml`: Circular pastel mood chips.
-  - Category vectors: `ic_category_all.xml`, `ic_category_fashion.xml`, `ic_category_objects.xml`, `ic_category_beauty.xml`.
-
-### Step 3: Floating Bottom Navigation Implementation [COMPLETED]
-- `res/layout/activity_main.xml`:
-  - Wrapped `BottomNavigationView` inside a `com.google.android.material.card.MaterialCardView` (`@+id/card_bottom_nav`) floating pill container.
-  - Margins: 16dp bottom, 24dp start/end, 28dp corner radius, 8dp elevation, 1dp subtle hairline stroke.
-- `MainActivity.java`:
-  - Handled window insets dynamically: added system nav bar insets to `card_bottom_nav` bottom margin.
-  - Updated visibility toggles on top-level vs child screens.
-  - Updated content bottom padding calculation with safe breathing room.
-
-### Step 4: Staggered Pinterest Product Grid & Catalog [COMPLETED]
-- `res/layout/item_product_card.xml`:
-  - 16dp rounded corners (`cardCornerRadius="16dp"`).
-  - Clean tactile surface (`?attr/colorSurface`), subtle sandstone stroke.
-  - Added `@+id/container_image`.
-- `ProductGridAdapter.java`:
-  - Added dynamic organic image heights (`150dp`, `195dp`, `170dp`, `220dp`, `185dp`) based on product ID for the Pinterest masonry look.
-- `ExploreFragment.java` & `SearchResultsFragment.java` & `CategoryProductsFragment.java`:
-  - Replaced `GridLayoutManager` with `StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)`.
-  - Set gap handling: `GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS`.
-
-### Step 5: Redesigned Home Screen (Discover / Home) [COMPLETED]
-- `res/layout/fragment_home.xml`:
-  - Brand header: Wordmark "EShop Verse", tagline "Curated lifestyle & design", and avatar initial with quick theme toggle.
-  - Pill search bar: 22dp rounded input with search icon navigating to Explore.
-  - Hero Editorial Card: "Make room for beautiful things", "Objects with soul. Made to last.", and pill CTA button "EXPLORE THE EDIT ↗".
-  - Circular Category Mood Chips: "All", "Home", "Fashion", "Objects", "Beauty" with circular icons.
-  - "Trending this week" header with 2-column staggered Pinterest product grid.
-- `HomeFragment.java`:
-  - Connected `CatalogListViewModel` to populate trending items.
-  - Handled clicks for all category chips, hero CTA, pill search, and product details.
-  - Added quick theme toggle button.
-
-### Step 6: Verification & Quality Checks [COMPLETED]
-- Ran `./gradlew testDebugUnitTest`: SUCCESSFUL (100% test pass).
-- Ran `./gradlew :app:lintDebug`: SUCCESSFUL (0 errors).
+### Phase 1: Design Foundations, Home & Core Shell (Completed)
+- [x] **Step 1: Design System & Specifications Documentation**
+  - Updated `docs/DESIGN_SYSTEM.md` with Figma MUSE palette, contrast table, and floating nav tokens.
+  - Updated `docs/SCREEN_SPECIFICATIONS.md` with Home M-01 and Explore M-02 specs.
+- [x] **Step 2: Android Resource Tokens & Drawables**
+  - Added hex colors to `values/colors.xml` and `values-night/colors.xml`.
+  - Added dimension tokens (28dp pill radius, 16dp margins, 22dp search input) in `values/dimens.xml`.
+  - Created drawables: `bg_floating_bottom_nav.xml`, `bg_pill_search.xml`, `bg_hero_editorial.xml`, `bg_circular_category.xml`, and category icons.
+- [x] **Step 3: Floating Bottom Navigation Implementation**
+  - Implemented `card_bottom_nav` floating pill in `activity_main.xml` and window insets in `MainActivity.java`.
+- [x] **Step 4: Staggered Pinterest Product Grid & Catalog Layout**
+  - Updated `item_product_card.xml` with 16dp rounded corners and subtle stroke.
+  - Updated `ProductGridAdapter.java` with organic staggered masonry heights.
+  - Configured `StaggeredGridLayoutManager` in `ExploreFragment`, `SearchResultsFragment`, and `CategoryProductsFragment`.
+- [x] **Step 5: Redesigned Home Screen (M-01 Discover / Home)**
+  - Implemented editorial header, 22dp pill search, hero editorial card, circular category mood chips, and trending staggered grid in `fragment_home.xml` and `HomeFragment.java`.
+- [x] **Step 6: Adaptive & Legacy App Launcher Icons**
+  - Extracted foreground artwork with transparent background and safe zone padding (64.5%).
+  - Generated all mipmap densities (mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi) for adaptive and legacy round/square icons.
+  - Updated `ic_launcher_background.xml` to `#FAF2E6`.
+- [x] **Step 7: Verification & Quality Checks**
+  - `./gradlew testDebugUnitTest` passed (100%).
+  - `./gradlew :app:lintDebug` passed (0 errors).
 
 ---
 
-## Testing Plan
-- Unit tests: Verify `ThemeManagerTest`, catalog tests, and existing tests remain 100% green.
-- Lint tests: Verify no deprecations, no hardcoded colors/dimensions, no minSdk violations.
-- Visual verification: Verify floating navigation padding, touch targets (>= 48dp), and contrast ratios (>= 4.5:1).
+### Phase 2: Feature Screens Redesign (Figma Screens)
+- [x] **Step 8: Redesign Explore / Search Screen (`02 — Explore / Search` - Node `1:58`)**
+  - Canvas background: Warm Ivory (`#F5F2EA` in light, `#151A16` in dark).
+  - Search input: 22dp pill styling matching MUSE (`bg_pill_search.xml` / `corner_search_pill`).
+  - Category chips: Horizontal scroll with Soft Sage selected state and Sandstone hairline.
+  - Sort icon button: 48dp pill button with white background and hairline border.
+  - Results and category product screens updated with 100dp bottom padding for floating pill navigation.
+- [ ] **Step 9: Redesign Product Detail Screen (`03 — Product detail` - Node `1:122`)**
+  - Editorial header, rounded image gallery with 20dp corners, warm ivory canvas.
+  - Botanical green pill "Add to Bag" button and quantity stepper.
+- [ ] **Step 10: Redesign Shopping Bag / Cart Screen (`05 — Shopping bag / Checkout` - Node `1:201`)**
+  - Cart item cards with tactile surface and rounded styling.
+  - Order summary container and pill checkout CTA.
+- [ ] **Step 11: Redesign Account & Authentication Screens (`06`, `07`, `08`, `09`)**
+  - Signed-in profile card and guest banner.
+  - Form fields with 22dp pill inputs and filled primary buttons.
