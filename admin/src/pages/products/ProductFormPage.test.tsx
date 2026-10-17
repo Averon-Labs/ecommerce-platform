@@ -69,6 +69,7 @@ describe('ProductFormPage (A-03)', () => {
     render(<App />);
 
     await screen.findByRole('heading', { level: 1, name: 'Create product' });
+    await screen.findByRole('option', { name: 'Lighting' });
     fireEvent.change(screen.getByLabelText('Name'), { target: { value: 'New Lamp' } });
     fireEvent.change(screen.getByLabelText('Price (USD)'), { target: { value: '19.99' } });
     fireEvent.change(screen.getByLabelText(/^SKU/), { target: { value: 'NEW-1' } });
