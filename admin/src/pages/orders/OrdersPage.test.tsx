@@ -195,4 +195,54 @@ describe('OrdersPage (A-06)', () => {
 
     expect(await screen.findByRole('heading', { name: 'Admin sign in' })).toBeInTheDocument();
   });
+
+  it('orders_loading_state_shows_a_skeleton_until_the_server_responds', async () => {
+    const control: { resolve: (() => void) | null } = { resolve: null };
+
+    mockApi([
+      sessionRoute(),
+      ordersRoute(
+        () =>
+          new Promise<Response>((resolve) => {
+            control.resolve = () =>
+              resolve(
+                jsonResponse(200, { data: [orderSummary()], pagination: pagination(1, 20, 1, 1) }),
+              );
+          }),
+      ),
+    ]);
+
+    render(<App />);
+
+    expect(await screen.findByRole('status', { name: 'Loading orders' })).toBeInTheDocument();
+    expect(screen.queryByRole('table', { name: 'Orders' })).not.toBeInTheDocument();
+
+    await waitFor(() => expect(control.resolve).not.toBeNull());
+    control.resolve?.();
+
+    const table = await findOrdersTable();
+    expect(within(table).getByText('ESV-000017')).toBeInTheDocument();
+    expect(screen.queryByRole('status', { name: 'Loading orders' })).not.toBeInTheDocument();
+  });
+
+  it('orders_narrow_layout_list_exposes_each_row_and_its_view_link', async () => {
+    mockApi([
+      sessionRoute(),
+      ordersRoute(() =>
+        jsonResponse(200, { data: [orderSummary()], pagination: pagination(1, 20, 1, 1) }),
+      ),
+    ]);
+
+    render(<App />);
+
+    const list = await screen.findByRole('list', { name: 'Orders list' });
+    expect(within(list).getByText('ESV-000017')).toBeInTheDocument();
+    expect(within(list).getByText('Sara Nouri')).toBeInTheDocument();
+    expect(within(list).getByText('sara@example.com')).toBeInTheDocument();
+    expect(within(list).getByText('$84.98')).toBeInTheDocument();
+    expect(within(list).getByRole('link', { name: 'View order ESV-000017' })).toHaveAttribute(
+      'href',
+      '/orders/17',
+    );
+  });
 });

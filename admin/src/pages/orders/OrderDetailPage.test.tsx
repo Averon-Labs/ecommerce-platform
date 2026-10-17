@@ -253,4 +253,185 @@ describe('OrderDetailPage (A-07)', () => {
 
     expect(await screen.findByRole('heading', { name: 'Admin sign in' })).toBeInTheDocument();
   });
+
+  it('order_detail_loading_state_shows_a_skeleton_until_the_server_responds', async () => {
+    const control: { resolve: (() => void) | null } = { resolve: null };
+
+    mockApi([
+      sessionRoute(),
+      detailRoute(
+        () =>
+          new Promise<Response>((resolve) => {
+            control.resolve = () => resolve(jsonResponse(200, { data: orderDetail() }));
+          }),
+      ),
+    ]);
+
+    render(<App />);
+
+    expect(await screen.findByRole('status', { name: 'Loading order' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'ESV-000017' })).not.toBeInTheDocument();
+
+    await waitFor(() => expect(control.resolve).not.toBeNull());
+    control.resolve?.();
+
+    expect(await screen.findByRole('heading', { name: 'ESV-000017' })).toBeInTheDocument();
+    expect(screen.queryByRole('status', { name: 'Loading order' })).not.toBeInTheDocument();
+  });
+
+  it.each(['abc', '0'])(
+    'order_detail_invalid_id_%s_shows_not_found_without_an_api_call',
+    async (orderId) => {
+      window.history.pushState({}, '', `/orders/${orderId}`);
+      const fetchMock = mockApi([sessionRoute()]);
+
+      render(<App />);
+
+      expect(await screen.findByText('Order not found')).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Back to orders' })).toHaveAttribute(
+        'href',
+        '/orders',
+      );
+      expect(fetchMock).not.toHaveBeenCalledWith(
+        expect.stringContaining('/admin/orders/'),
+        expect.anything(),
+      );
+    },
+  );
+
+  it('order_detail_without_payment_says_none_is_recorded_yet', async () => {
+    mockApi([
+      sessionRoute(),
+      detailRoute(() =>
+        jsonResponse(200, {
+          data: orderDetail({ status: 'pending_payment', paymentStatus: 'pending', payment: null }),
+        }),
+      ),
+    ]);
+
+    render(<App />);
+
+    expect(await screen.findByRole('heading', { name: 'ESV-000017' })).toBeInTheDocument();
+    expect(screen.getByText(/No payment attempt recorded yet/)).toBeInTheDocument();
+    expect(screen.queryByText('Transaction')).not.toBeInTheDocument();
+  });
+
+  it('order_detail_timeline_reflects_the_server_order_after_a_transition', async () => {
+    mockApi([
+      sessionRoute(),
+      detailRoute(() =>
+        jsonResponse(200, {
+          data: orderDetail({ status: 'processing', allowedTransitions: ['shipped', 'cancelled'] }),
+        }),
+      ),
+      {
+        method: 'PATCH',
+        path: '/admin/orders/17/status',
+        handler: () =>
+          jsonResponse(200, {
+            data: orderDetail({
+              status: 'shipped',
+              allowedTransitions: ['delivered'],
+              timeline: [
+                { status: 'pending_payment', at: '2026-10-11T09:41:00Z' },
+                { status: 'confirmed', at: '2026-10-11T09:41:05Z' },
+                { status: 'shipped', at: '2026-10-11T10:05:00Z' },
+              ],
+            }),
+          }),
+      },
+    ]);
+
+    render(<App />);
+
+    const timelineHeading = await screen.findByRole('heading', { name: 'Timeline' });
+    const timeline = timelineHeading.parentElement as HTMLElement;
+    expect(within(timeline).getAllByRole('listitem')).toHaveLength(2);
+
+    const select = await findStatusSelect();
+    fireEvent.change(select, { target: { value: 'shipped' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Update status' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Move ESV-000017 to Shipped?' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Move to Shipped' }));
+
+    await screen.findByRole('status');
+    await waitFor(() => {
+      const events = within(timeline).getAllByRole('listitem');
+      expect(events).toHaveLength(3);
+      expect(events[2]).toHaveTextContent('Shipped');
+    });
+  });
+
+  it('order_detail_patch_401_ends_the_session_and_returns_to_sign_in', async () => {
+    mockApi([
+      sessionRoute(),
+      detailRoute(() =>
+        jsonResponse(200, {
+          data: orderDetail({ status: 'processing', allowedTransitions: ['shipped', 'cancelled'] }),
+        }),
+      ),
+      {
+        method: 'PATCH',
+        path: '/admin/orders/17/status',
+        handler: () =>
+          jsonResponse(401, {
+            error: { code: 'UNAUTHENTICATED', message: 'Authentication is required.' },
+          }),
+      },
+    ]);
+
+    render(<App />);
+
+    const select = await findStatusSelect();
+    fireEvent.change(select, { target: { value: 'shipped' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Update status' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Move ESV-000017 to Shipped?' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Move to Shipped' }));
+
+    expect(await screen.findByRole('heading', { name: 'Admin sign in' })).toBeInTheDocument();
+  });
+
+  it('order_detail_action_network_error_is_recoverable_with_refresh', async () => {
+    let detailLoads = 0;
+
+    mockApi([
+      sessionRoute(),
+      detailRoute(() => {
+        detailLoads += 1;
+        return jsonResponse(200, {
+          data: orderDetail({ status: 'processing', allowedTransitions: ['shipped', 'cancelled'] }),
+        });
+      }),
+      {
+        method: 'PATCH',
+        path: '/admin/orders/17/status',
+        handler: () => {
+          throw new Error('network down');
+        },
+      },
+    ]);
+
+    render(<App />);
+
+    const select = await findStatusSelect();
+    fireEvent.change(select, { target: { value: 'shipped' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Update status' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Move ESV-000017 to Shipped?' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Move to Shipped' }));
+
+    expect(
+      await screen.findByText('The status could not be updated. Refresh the order and try again.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh order' }));
+
+    await waitFor(() => expect(detailLoads).toBeGreaterThan(1));
+    await waitFor(() => {
+      expect(
+        screen.queryByText('The status could not be updated. Refresh the order and try again.'),
+      ).not.toBeInTheDocument();
+    });
+    expect(await findStatusSelect()).toBeInTheDocument();
+  });
 });
