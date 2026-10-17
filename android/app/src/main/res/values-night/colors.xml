@@ -14,6 +14,10 @@
     <color name="color_luminous_sage">#A8C5A4</color>
     <color name="color_pure_white">#202720</color>
 
+    <!-- Editorial Hero Banner tokens in dark mode -->
+    <color name="color_hero_banner">#1F2720</color>
+    <color name="color_hero_banner_stroke">#303D32</color>
+
     <color name="brand_coral">#A8C5A4</color>
     <color name="brand_coral_strong">#789B78</color>
     <color name="brand_lavender">#B4CBB2</color>

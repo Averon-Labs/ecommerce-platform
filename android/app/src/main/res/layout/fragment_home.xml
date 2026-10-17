@@ -117,10 +117,10 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_md"
             android:layout_marginTop="@dimen/spacing_md"
-            app:cardBackgroundColor="@color/color_soft_cream"
+            app:cardBackgroundColor="@color/color_hero_banner"
             app:cardCornerRadius="@dimen/corner_bento"
             app:cardElevation="0dp"
-            app:strokeColor="@color/border_hairline"
+            app:strokeColor="@color/color_hero_banner_stroke"
             app:strokeWidth="@dimen/stroke_hairline">
 
             <LinearLayout
@@ -131,15 +131,17 @@
                 android:padding="@dimen/spacing_lg">
 
                 <TextView
+                    android:id="@+id/tv_hero_curation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:letterSpacing="0.1"
                     android:text="@string/home_hero_curation"
                     android:textAppearance="?attr/textAppearanceLabelSmall"
-                    android:textColor="@color/color_terracotta"
+                    android:textColor="@color/color_botanical_green"
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tv_hero_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_xs"
@@ -150,6 +152,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tv_hero_subtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_xs"
@@ -166,7 +169,7 @@
                     android:backgroundTint="@color/color_botanical_green"
                     android:letterSpacing="0.05"
                     android:text="@string/home_hero_cta"
-                    android:textColor="@color/surface_white"
+                    android:textColor="?attr/colorOnPrimary"
                     app:cornerRadius="@dimen/corner_pill" />
 
             </LinearLayout>

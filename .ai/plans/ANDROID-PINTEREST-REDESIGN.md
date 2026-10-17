@@ -123,10 +123,12 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Updated `HomeFragment.java` with `updateThemeIcon()` dynamically loading `ic_light_mode` (in dark theme) or `ic_dark_mode` (in light theme).
   - Wired circular button click to `ThemeManager.toggleTheme(requireContext())`.
   - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
-- [ ] **Step 14: Adjust Home Hero Banner Light Mode Palette to Warm Cream with High-Contrast Text**
-  - Update `bg_hero_editorial.xml` to use Soft Cream (`@color/color_soft_cream` `#F0E8D9`) or Soft Sage in light mode instead of dark green.
-  - Retain dark slate `#202720` in dark mode.
-  - Verify and update text colors inside the hero banner (`tv_hero_title`, `tv_hero_subtitle`, `btn_hero_cta`) to high-contrast Ink (`@color/color_ink` `#212621`) and Botanical Green button.
+- [x] **Step 14: Adjust Home Hero Banner Light Mode Palette to Warm Cream with High-Contrast Text**
+  - Added semantic hero banner tokens `color_hero_banner` (`#EAEFE8` pale fresh sage-cream in light, `#1F2720` in dark) and `color_hero_banner_stroke` (`#D2DDD0` in light, `#303D32` in dark).
+  - Updated `bg_hero_editorial.xml` to use `@color/color_hero_banner` and `@dimen/corner_bento`.
+  - Updated `card_hero_editorial` in `fragment_home.xml` with `@color/color_hero_banner` background and `@color/color_hero_banner_stroke` border.
+  - Adjusted text colors: `tv_hero_curation` to `@color/color_botanical_green` (AAA contrast), `tv_hero_title` to `@color/color_ink`, `tv_hero_subtitle` to `@color/color_muted_olive`, and `btn_hero_cta` text to `?attr/colorOnPrimary`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
 - [ ] **Step 15: Redesign Explore Screen Product Cards to Match Figma (Node `1:58`)**
   - Match Figma Explore product card structure and styling (`item_product_card.xml` / explore grid).
 - [ ] **Step 16: Synchronize Home Mood Circles with Explore Tags & Direct Navigation**
