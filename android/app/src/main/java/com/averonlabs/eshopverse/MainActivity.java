@@ -26,7 +26,6 @@ import com.google.android.material.badge.BadgeDrawable;
 
 public class MainActivity extends AppCompatActivity {
 
-    private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
     private NavController navController;
     private Insets lastSystemBars = Insets.NONE;
@@ -47,16 +46,14 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Insets handling: left/right to root, top to AppBarLayout, bottom to BottomNavigationView and content
-        // Insets handling: left/right to root, top to AppBarLayout, bottom margin to floating card and content
+        // Insets handling: left/right/top to root, bottom margin to floating card and content
         ViewCompat.setOnApplyWindowInsetsListener(binding.main, (v, insets) -> {
             Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets ime = insets.getInsets(WindowInsetsCompat.Type.ime());
             lastSystemBars = bars;
             lastIme = ime;
 
-            v.setPadding(bars.left, 0, bars.right, 0);
-            binding.appBarLayout.setPadding(0, bars.top, 0, 0);
+            v.setPadding(bars.left, bars.top, bars.right, 0);
 
             // Dynamically position floating pill card above system navigation bars
             if (binding.cardBottomNav.getLayoutParams() instanceof CoordinatorLayout.LayoutParams) {
@@ -70,20 +67,10 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        setSupportActionBar(binding.toolbar);
-
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment_content_main);
         if (navHostFragment != null) {
             navController = navHostFragment.getNavController();
-            appBarConfiguration = new AppBarConfiguration.Builder(
-                    R.id.homeFragment,
-                    R.id.exploreFragment,
-                    R.id.cartFragment,
-                    R.id.accountFragment
-            ).build();
-
-            NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
             NavigationUI.setupWithNavController(binding.bottomNav, navController);
 
             // Hide bottom navigation on non-root destinations
@@ -164,45 +151,5 @@ public class MainActivity extends AppCompatActivity {
         } else {
             binding.bottomNav.removeBadge(R.id.cartFragment);
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_home, menu);
-        MenuItem themeItem = menu.findItem(R.id.action_theme_toggle);
-        if (themeItem != null) {
-            boolean isDarkMode = ThemeManager.isDarkMode(this);
-            themeItem.setIcon(isDarkMode ? R.drawable.ic_light_mode : R.drawable.ic_dark_mode);
-            themeItem.setTitle(isDarkMode ? R.string.theme_dark_desc : R.string.theme_light_desc);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_search) {
-            binding.bottomNav.setSelectedItemId(R.id.exploreFragment);
-            return true;
-        } else if (id == R.id.action_theme_toggle) {
-            ThemeManager.toggleTheme(this);
-            return true;
-        }
-        if (navController != null && NavigationUI.onNavDestinationSelected(item, navController)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        if (navController != null && navController.getCurrentDestination() != null) {
-            int currentId = navController.getCurrentDestination().getId();
-            if (currentId != R.id.homeFragment) {
-                navController.popBackStack(R.id.homeFragment, false);
-                return true;
-            }
-        }
-        return super.onSupportNavigateUp();
     }
 }

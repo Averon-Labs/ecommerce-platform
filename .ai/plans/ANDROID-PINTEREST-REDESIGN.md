@@ -112,8 +112,49 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
 
 ---
 
-### Phase 3: Final Verification & Delivery (Completed)
-- [x] **Unit Tests:** `./gradlew testDebugUnitTest` passing 100% (26 actionable tasks executed cleanly).
-- [x] **Android Lint:** `./gradlew :app:lintDebug` passing with 0 errors.
-- [x] **Git Remote Sync:** Pushed branch `feature/android-pinterest-redesign` to `origin`.
-- [x] **Pull Request Ready:** [Create Pull Request on GitHub](https://github.com/Averon-Labs/eshop-verse/compare/develop...feature/android-pinterest-redesign?expand=1)
+### Phase 4: UI Refinements & User Edits
+- [x] **Step 12: Remove Top Toolbar across App Shell**
+  - Removed `AppBarLayout` and `MaterialToolbar` from `activity_main.xml`.
+  - Removed `appbar_scrolling_view_behavior` from `content_main.xml`.
+  - Updated `MainActivity.java` window insets listener to apply status bar padding directly to root, removed ActionBar registration and options menu inflation.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 13: Replace 'E' Letter with Sun/Moon Icon in Circular Theme Toggle on Home**
+  - Replaced the "E" TextView in `fragment_home.xml` with `ImageView iv_theme_toggle_icon` (22dp, centered) inside the 40dp circular frame (`btn_profile_avatar`).
+  - Updated `HomeFragment.java` with `updateThemeIcon()` dynamically loading `ic_light_mode` (in dark theme) or `ic_dark_mode` (in light theme).
+  - Wired circular button click to `ThemeManager.toggleTheme(requireContext())`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 14: Adjust Home Hero Banner Light Mode Palette to Warm Cream with High-Contrast Text**
+  - Added semantic hero banner tokens `color_hero_banner` (`#EAEFE8` pale fresh sage-cream in light, `#1F2720` in dark) and `color_hero_banner_stroke` (`#D2DDD0` in light, `#303D32` in dark).
+  - Updated `bg_hero_editorial.xml` to use `@color/color_hero_banner` and `@dimen/corner_bento`.
+  - Updated `card_hero_editorial` in `fragment_home.xml` with `@color/color_hero_banner` background and `@color/color_hero_banner_stroke` border.
+  - Adjusted text colors: `tv_hero_curation` to `@color/color_botanical_green` (AAA contrast), `tv_hero_title` to `@color/color_ink`, `tv_hero_subtitle` to `@color/color_muted_olive`, and `btn_hero_cta` text to `?attr/colorOnPrimary`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 15: Redesign Explore Screen Product Cards to Match Figma (Node `1:58`)**
+  - Updated `item_product_card.xml`: 0dp flat elevation, hairline border (`@color/border_hairline`), 16dp rounded corners (`@dimen/corner_card_pinterest`), soft sage image backing (`@color/color_soft_sage`), bold ink product title with natural 1-2 line wrapping, and signature botanical green price (`@color/color_botanical_green`).
+  - Updated `PriceTextView.java` to support explicit XML `android:textColor` overrides.
+  - Updated `ProductGridAdapter.java` and `ProductCardView.java` to bind botanical green price text dynamically.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 16: Synchronize Home Mood Circles with Explore Tags & Direct Navigation**
+  - Created `item_category_mood_circle.xml` with 56dp circular frame (`@drawable/bg_circular_category`), icon, and label.
+  - Replaced static category layout in `fragment_home.xml` with horizontal `rv_home_categories` RecyclerView.
+  - Updated `HomeFragment.java` to observe `CategoryViewModel.getCategoriesState()`, rendering exact same categories (and 'All' at index 0) in identical order and labels as Explore.
+  - Configured navigation arguments (`categoryId`, `categoryName`) on `action_homeFragment_to_exploreFragment` in `nav_main.xml`.
+  - Updated `ExploreFragment.java` with `handleIncomingArguments()` to automatically select the passed category chip and filter the product catalog immediately upon navigation.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 17: Account Screen Direct Sign-In on Guest State**
+  - Replaced guest welcome greeting card in `fragment_account.xml` with direct Sign-In Bento Card including email input, password input with toggle, forgot password action, botanical green Sign-In pill CTA, and "Create Account" text link.
+  - Updated `AccountFragment.java` to manage direct login via `AuthViewModel`, binding input validation errors, lockout timers, progress indicator, and instant session transition upon login/sign-out.
+  - Added navigation actions in `nav_main.xml` from `accountFragment` to `registerFragment` and `requestPasswordResetFragment`.
+  - Updated instrumentation test `SignInFlowTest.java` to test direct sign-in on `accountFragment`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [ ] **Step 18: Add 'Continue with Google' Button with Google Logo to Auth Screens**
+  - Add Google logo vector drawable `ic_google_logo.xml`.
+  - Add 52dp pill "Continue with Google" button to `fragment_sign_in.xml` and `fragment_register.xml`.
+
+---
+
+### Phase 5: Verification, Git Remote Sync & Pull Request
+- [ ] **Unit Tests:** `./gradlew testDebugUnitTest` passing 100%.
+- [ ] **Android Lint:** `./gradlew :app:lintDebug` passing with 0 errors.
+- [ ] **Git Remote Sync & PR:** Commit, push to `origin/feature/android-pinterest-redesign`, and verify PR status.
+

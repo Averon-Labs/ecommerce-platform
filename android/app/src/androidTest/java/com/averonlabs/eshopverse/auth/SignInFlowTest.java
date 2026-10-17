@@ -76,21 +76,18 @@ public class SignInFlowTest {
             // Step 1: Navigate to Account tab via bottom navigation
             onView(withId(R.id.accountFragment)).perform(click());
 
-            // Initially signed out: tap Sign In button in guest layout
+            // Initially signed out: direct sign-in form is displayed on Account tab
+            // Step 2: Trigger validation error
+            onView(withId(R.id.et_guest_email)).perform(typeText("bad-email"), closeSoftKeyboard());
             onView(withId(R.id.btn_guest_sign_in)).perform(click());
-
-            // Step 2: Trigger M-06 validation error
-            onView(withId(R.id.et_email)).perform(typeText("bad-email"), closeSoftKeyboard());
-            onView(withId(R.id.btn_sign_in)).perform(click());
-            onView(withId(R.id.til_email)).check(matches(hasDescendant(withText(R.string.auth_error_email_invalid))));
+            onView(withId(R.id.til_guest_email)).check(matches(hasDescendant(withText(R.string.auth_error_email_invalid))));
 
             // Step 3: Enter valid credentials
-            onView(withId(R.id.et_email)).perform(replaceText("alice@example.com"), closeSoftKeyboard());
-            onView(withId(R.id.et_password)).perform(replaceText("Secret123"), closeSoftKeyboard());
-            onView(withId(R.id.btn_sign_in)).perform(click());
+            onView(withId(R.id.et_guest_email)).perform(replaceText("alice@example.com"), closeSoftKeyboard());
+            onView(withId(R.id.et_guest_password)).perform(replaceText("Secret123"), closeSoftKeyboard());
+            onView(withId(R.id.btn_guest_sign_in)).perform(click());
 
             // Step 4: Verify customer arrives at Account (M-17) and sees name
-            onView(withId(R.id.accountFragment)).perform(click());
             onView(withId(R.id.tv_user_name)).check(matches(withText("Alice Smith")));
 
             // Step 5: Sign out and verify return to guest state

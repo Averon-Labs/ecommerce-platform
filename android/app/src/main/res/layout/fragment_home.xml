@@ -53,25 +53,25 @@
 
             </LinearLayout>
 
-            <!-- Theme Toggle / Profile Initial Circle -->
+            <!-- Theme Toggle / Day-Night Mode Icon in Circular Frame -->
             <FrameLayout
                 android:id="@+id/btn_profile_avatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:background="@drawable/bg_circular_category"
                 android:clickable="true"
-                android:contentDescription="@string/action_account"
+                android:contentDescription="@string/theme_light_desc"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <ImageView
+                    android:id="@+id/iv_theme_toggle_icon"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
                     android:layout_gravity="center"
-                    android:text="E"
-                    android:textAppearance="?attr/textAppearanceTitleMedium"
-                    android:textColor="@color/color_botanical_green"
-                    android:textStyle="bold" />
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_dark_mode"
+                    app:tint="@color/color_botanical_green" />
 
             </FrameLayout>
 
@@ -117,10 +117,10 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacing_md"
             android:layout_marginTop="@dimen/spacing_md"
-            app:cardBackgroundColor="@color/color_soft_cream"
+            app:cardBackgroundColor="@color/color_hero_banner"
             app:cardCornerRadius="@dimen/corner_bento"
             app:cardElevation="0dp"
-            app:strokeColor="@color/border_hairline"
+            app:strokeColor="@color/color_hero_banner_stroke"
             app:strokeWidth="@dimen/stroke_hairline">
 
             <LinearLayout
@@ -131,15 +131,17 @@
                 android:padding="@dimen/spacing_lg">
 
                 <TextView
+                    android:id="@+id/tv_hero_curation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:letterSpacing="0.1"
                     android:text="@string/home_hero_curation"
                     android:textAppearance="?attr/textAppearanceLabelSmall"
-                    android:textColor="@color/color_terracotta"
+                    android:textColor="@color/color_botanical_green"
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tv_hero_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_xs"
@@ -150,6 +152,7 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tv_hero_subtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/spacing_xs"
@@ -166,216 +169,25 @@
                     android:backgroundTint="@color/color_botanical_green"
                     android:letterSpacing="0.05"
                     android:text="@string/home_hero_cta"
-                    android:textColor="@color/surface_white"
+                    android:textColor="?attr/colorOnPrimary"
                     app:cornerRadius="@dimen/corner_pill" />
 
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Circular Category Mood Chips (Horizontal Scroll) -->
-        <HorizontalScrollView
+        <!-- Circular Category Mood Chips (Horizontal Scroll, Synchronized with Explore) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_home_categories"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_lg"
             android:clipToPadding="false"
+            android:orientation="horizontal"
             android:overScrollMode="never"
             android:paddingHorizontal="@dimen/spacing_md"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <!-- Category: All -->
-                <LinearLayout
-                    android:id="@+id/chip_cat_all"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:background="@drawable/bg_circular_category">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_category_all"
-                            app:tint="@color/color_botanical_green" />
-
-                    </FrameLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_xs"
-                        android:text="@string/home_category_all"
-                        android:textAppearance="?attr/textAppearanceLabelMedium"
-                        android:textColor="@color/text_primary_ink" />
-
-                </LinearLayout>
-
-                <!-- Category: Home -->
-                <LinearLayout
-                    android:id="@+id/chip_cat_home"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/spacing_md"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:background="@drawable/bg_circular_category">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_home"
-                            app:tint="@color/color_botanical_green" />
-
-                    </FrameLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_xs"
-                        android:text="@string/home_category_home"
-                        android:textAppearance="?attr/textAppearanceLabelMedium"
-                        android:textColor="@color/text_primary_ink" />
-
-                </LinearLayout>
-
-                <!-- Category: Fashion -->
-                <LinearLayout
-                    android:id="@+id/chip_cat_fashion"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/spacing_md"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:background="@drawable/bg_circular_category">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_category_fashion"
-                            app:tint="@color/color_botanical_green" />
-
-                    </FrameLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_xs"
-                        android:text="@string/home_category_fashion"
-                        android:textAppearance="?attr/textAppearanceLabelMedium"
-                        android:textColor="@color/text_primary_ink" />
-
-                </LinearLayout>
-
-                <!-- Category: Objects -->
-                <LinearLayout
-                    android:id="@+id/chip_cat_objects"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/spacing_md"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:background="@drawable/bg_circular_category">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_category_objects"
-                            app:tint="@color/color_botanical_green" />
-
-                    </FrameLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_xs"
-                        android:text="@string/home_category_objects"
-                        android:textAppearance="?attr/textAppearanceLabelMedium"
-                        android:textColor="@color/text_primary_ink" />
-
-                </LinearLayout>
-
-                <!-- Category: Beauty -->
-                <LinearLayout
-                    android:id="@+id/chip_cat_beauty"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/spacing_md"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="56dp"
-                        android:layout_height="56dp"
-                        android:background="@drawable/bg_circular_category">
-
-                        <ImageView
-                            android:layout_width="24dp"
-                            android:layout_height="24dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_category_beauty"
-                            app:tint="@color/color_botanical_green" />
-
-                    </FrameLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_xs"
-                        android:text="@string/home_category_beauty"
-                        android:textAppearance="?attr/textAppearanceLabelMedium"
-                        android:textColor="@color/text_primary_ink" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-        </HorizontalScrollView>
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:listitem="@layout/item_category_mood_circle" />
 
         <!-- Section Header: Trending This Week -->
         <LinearLayout
