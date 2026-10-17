@@ -131,7 +131,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 ### Step 1 — ORD-003 — Admin order management
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** FND-003, FND-004, AUTH-003, ORD-001, DES-001
 
@@ -158,12 +158,14 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **Acceptance criteria:**
 
-- [ ] **a.** Admin can inspect order snapshots and apply only documented valid state transitions.
-- [ ] **b.** Server rejects unauthorized users and invalid transitions; tests cover both.
-- [ ] **c.** Dashboard shows loading, empty, conflict, error, and updated status states.
-- [ ] **d.** Admin tests verify behavior through API responses, not implementation details.
+- [x] **a.** Admin can inspect order snapshots and apply only documented valid state transitions.
+- [x] **b.** Server rejects unauthorized users and invalid transitions; tests cover both.
+- [x] **c.** Dashboard shows loading, empty, conflict, error, and updated status states.
+- [x] **d.** Admin tests verify behavior through API responses, not implementation details.
 
 **Verification:** backend transition/authorization feature tests and admin behavior tests.
+
+**Verification record (2026-10-17):** implemented in `e468ec5` (A-06 order list with reference/customer search, status and date filters, API pagination, and state panels; A-07 order detail with immutable snapshots, payment outcome, timeline, and an allowed-only status action behind confirmation; orders API module, shared order/payment badges, Orders destination, and 24 order tests), independently verified at `3b36810` (test-only commit, 9 added tests — final total 82 tests in 10 files), and stabilized at `4357fd7` (test-only: product-form category-option race fixed, 5/8 → 0/8 isolated failures; auth verification waits raised to 8 s, 2/3 → 0/3 full-suite failures; retested independently at 6/6 isolated and 3/3 full-suite clean runs). All criteria **a–d** PASS. Admin checks: `npm run typecheck`, `npm run lint`, `npm test` (82 tests in 10 files, repeated clean runs), and `npm run build` all pass. Backend: `php artisan test --filter="AdminOrder|Order"` = 41 tests, 719 assertions, 0 failures. Live probes against the local API confirmed: guest `GET /admin/orders` and guest `PATCH …/status` → `401 UNAUTHENTICATED`; a disposable customer completed register → cart → order → pay-success (order `confirmed`, payment `completed`); list pagination and filters (`q` by customer email, `status=pending_payment`) returned the matching rows; `perPage=101` → `422 VALIDATION_ERROR`; detail exposed the server `timeline` and `allowedTransitions`. The state machine enforced live: `confirmed → processing → shipped → delivered` each `200` with updated `allowedTransitions` (`delivered` → `[]`), `pending_payment → cancelled` `200`, while terminal → `shipped`, `pending_payment → shipped`, and `delivered → processing` all `409 INVALID_TRANSITION`. Criterion **a** holds: both screens use only the documented `docs/openapi.yaml` admin order endpoints, and the status action offers exactly the server's `allowedTransitions` (never `confirmed`). Criterion **b** holds: client `401`s end the session and route to sign-in; `409` conflicts show the server message with a "Refresh order" path and no optimistic status claim. Criterion **c** holds: loading skeletons, empty and filtered-empty panels, error/retry, conflict, and post-response updated status are covered by behavior tests. Criterion **d** holds: all admin tests drive the mocked HTTP layer and assert user-visible behavior; backend internals are never asserted. Known limitation: no browser E2E (the same accepted limitation as Phase 1; browser E2E remains with QUAL-005). Tracked by the Phase 2 PR targeting `develop`.
 
 ## Phase 3 — Quality and Portfolio Delivery
 
