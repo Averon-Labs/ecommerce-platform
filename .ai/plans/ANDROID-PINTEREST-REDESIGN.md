@@ -78,9 +78,13 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Category chips: Horizontal scroll with Soft Sage selected state and Sandstone hairline.
   - Sort icon button: 48dp pill button with white background and hairline border.
   - Results and category product screens updated with 100dp bottom padding for floating pill navigation.
-- [ ] **Step 9: Redesign Product Detail Screen (`03 — Product detail` - Node `1:122`)**
-  - Editorial header, rounded image gallery with 20dp corners, warm ivory canvas.
-  - Botanical green pill "Add to Bag" button and quantity stepper.
+- [x] **Step 9: Redesign Product Detail Screen (`03 — Product detail` - Node `1:122`)**
+  - Canvas background: Warm Ivory (`#F5F2EA` light, `#151A16` dark).
+  - Editorial image gallery: Bento card container with 20dp rounded corners (`@dimen/corner_bento`), subtle stroke, and pill indicator.
+  - Typography & Brand tokens: Added uppercase category tag (`tv_product_category`), bold ink product title, and botanical green price (`@color/color_botanical_green`).
+  - Tactile card container for quantity stepper (`layout_quantity`) with `@dimen/corner_card_pinterest`.
+  - Sticky elevated bottom action bar with 52dp botanical green pill "Add to Bag" button (`@dimen/corner_pill`), status notice, and delivery note matching Figma (`Free shipping on orders over $100`).
+  - Unit tests (`./gradlew testDebugUnitTest`) and lint (`./gradlew :app:lintDebug`) verified with 0 errors.
 - [ ] **Step 10: Redesign Shopping Bag / Cart Screen (`05 — Shopping bag / Checkout` - Node `1:201`)**
   - Cart item cards with tactile surface and rounded styling.
   - Order summary container and pill checkout CTA.

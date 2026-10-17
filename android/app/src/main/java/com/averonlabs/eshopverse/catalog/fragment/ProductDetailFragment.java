@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
@@ -151,8 +152,16 @@ public class ProductDetailFragment extends Fragment {
     }
 
     private void bindProduct(@NonNull ProductDetail product) {
+        if (product.getCategoryName() != null && !product.getCategoryName().trim().isEmpty()) {
+            binding.tvProductCategory.setText(product.getCategoryName().toUpperCase());
+            binding.tvProductCategory.setVisibility(View.VISIBLE);
+        } else {
+            binding.tvProductCategory.setVisibility(View.GONE);
+        }
+
         binding.tvProductName.setText(product.getName());
         binding.tvProductPrice.setFormattedPrice(MoneyFormat.format(product.getPriceMoney()));
+        binding.tvProductPrice.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_botanical_green));
 
         // Description
         String description = product.getDescription();
