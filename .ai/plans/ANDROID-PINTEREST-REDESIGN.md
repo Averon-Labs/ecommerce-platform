@@ -94,6 +94,19 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Cart line items: 16dp rounded card (`@dimen/corner_card_pinterest`) with 12dp rounded image container, bold ink product title, and botanical green line total.
   - Order summary Bento card: 20dp rounded corners (`@dimen/corner_bento`), hairline border, and 52dp botanical green pill checkout CTA button (`@dimen/corner_pill`).
   - Scroll container: 120dp bottom padding ensuring content floats cleanly above the 28dp pill bottom navigation bar.
-- [ ] **Step 11: Redesign Account & Authentication Screens (`06`, `07`, `08`, `09`)**
-  - Signed-in profile card and guest banner.
-  - Form fields with 22dp pill inputs and filled primary buttons.
+- [x] **Step 11: Redesign Account & Authentication Screens (`06`, `07`, `08`, `09`)**
+  - Updated button and input design tokens in `styles.xml`: 52dp Botanical Green filled pill buttons (`@dimen/corner_pill`), 52dp outlined pill buttons, 22dp pill inputs (`@dimen/corner_search_pill`), and 20dp Bento card panels with hairline border.
+  - Redesigned `fragment_account.xml` (Figma `06` & `07`):
+    - Signed-in profile hero Bento card with 60dp Soft Sage circular avatar container (`bg_avatar_circle`), bold Ink name, email, and Botanical Green status badge.
+    - Profile details Bento card with 22dp pill inputs for first/last name and 52dp filled pill "Save Profile" button.
+    - Guest welcome Bento card with 72dp Soft Sage circular icon, warm editorial prompt, 52dp filled "Sign In" pill button, and 52dp outlined "Create Account" pill button.
+    - 120dp bottom padding on scroll container to float cleanly above the 28dp pill floating bottom navigation.
+  - Redesigned `fragment_sign_in.xml` (Figma `08`):
+    - Editorial brand header ("ESHOP VERSE", "Welcome back.", subtitle).
+    - Bento card with 22dp pill inputs, password visibility toggle, forgot password action, and 52dp Botanical Green filled pill button.
+  - Redesigned `fragment_register.xml` (Figma `09`):
+    - Editorial header ("ESHOP VERSE", "Create an account.", subtitle).
+    - Bento card with horizontal name fields, email, password, confirm password in 22dp pill styling, and 52dp filled pill button.
+  - Redesigned `fragment_request_password_reset.xml` & `fragment_set_new_password.xml`:
+    - Warm Ivory canvas, editorial typography, Bento cards, 22dp pill inputs, and 52dp pill buttons.
+
