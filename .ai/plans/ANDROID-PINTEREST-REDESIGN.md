@@ -147,14 +147,17 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Added navigation actions in `nav_main.xml` from `accountFragment` to `registerFragment` and `requestPasswordResetFragment`.
   - Updated instrumentation test `SignInFlowTest.java` to test direct sign-in on `accountFragment`.
   - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
-- [ ] **Step 18: Add 'Continue with Google' Button with Google Logo to Auth Screens**
-  - Add Google logo vector drawable `ic_google_logo.xml`.
-  - Add 52dp pill "Continue with Google" button to `fragment_sign_in.xml` and `fragment_register.xml`.
+- [x] **Step 18: Add 'Continue with Google' Button with Google Logo to Auth Screens**
+  - Created authentic multi-color Google logo vector drawable `ic_google_logo.xml`.
+  - Added `Widget.EShopVerse.Button.Google` style (52dp pill, white/surface surface, hairline border, ink text, untinted Google logo).
+  - Added subtle "or" divider and 52dp "Continue with Google" button across `fragment_sign_in.xml`, `fragment_register.xml`, and `fragment_account.xml`.
+  - Wired interactive click handlers in `SignInFragment.java`, `RegisterFragment.java`, and `AccountFragment.java`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
 
 ---
 
 ### Phase 5: Verification, Git Remote Sync & Pull Request
-- [ ] **Unit Tests:** `./gradlew testDebugUnitTest` passing 100%.
-- [ ] **Android Lint:** `./gradlew :app:lintDebug` passing with 0 errors.
-- [ ] **Git Remote Sync & PR:** Commit, push to `origin/feature/android-pinterest-redesign`, and verify PR status.
+- [x] **Unit Tests:** `./gradlew testDebugUnitTest` passing 100%.
+- [x] **Android Lint:** `./gradlew :app:lintDebug` passing with 0 errors.
+- [x] **Git Remote Sync & PR:** Commit, push to `origin/feature/android-pinterest-redesign`, and verify PR status.
 

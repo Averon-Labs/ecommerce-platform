@@ -19,6 +19,7 @@ import com.averonlabs.eshopverse.core.model.AuthSession;
 import com.averonlabs.eshopverse.core.state.UiState;
 import com.averonlabs.eshopverse.core.ui.view.StateContainerView;
 import com.averonlabs.eshopverse.databinding.FragmentRegisterBinding;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Map;
 
@@ -103,6 +104,10 @@ public class RegisterFragment extends Fragment {
             String confirmPassword = binding.etConfirmPassword.getText() != null ? binding.etConfirmPassword.getText().toString() : "";
 
             authViewModel.register(email, password, confirmPassword, firstName, lastName);
+        });
+
+        binding.btnGoogleSignIn.setOnClickListener(v -> {
+            Snackbar.make(binding.getRoot(), R.string.auth_feedback_google_sign_in, Snackbar.LENGTH_SHORT).show();
         });
 
         binding.btnToSignIn.setOnClickListener(v -> {

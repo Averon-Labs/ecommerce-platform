@@ -19,6 +19,7 @@ import com.averonlabs.eshopverse.core.model.AuthSession;
 import com.averonlabs.eshopverse.core.state.UiState;
 import com.averonlabs.eshopverse.core.ui.view.StateContainerView;
 import com.averonlabs.eshopverse.databinding.FragmentSignInBinding;
+import com.google.android.material.snackbar.Snackbar;
 
 /**
  * Screen M-06: Customer Sign In.
@@ -97,6 +98,10 @@ public class SignInFragment extends Fragment {
         binding.btnForgotPassword.setOnClickListener(v -> {
             NavController navController = NavHostFragment.findNavController(this);
             navController.navigate(R.id.action_signInFragment_to_requestPasswordResetFragment);
+        });
+
+        binding.btnGoogleSignIn.setOnClickListener(v -> {
+            Snackbar.make(binding.getRoot(), R.string.auth_feedback_google_sign_in, Snackbar.LENGTH_SHORT).show();
         });
 
         binding.btnToRegister.setOnClickListener(v -> {
