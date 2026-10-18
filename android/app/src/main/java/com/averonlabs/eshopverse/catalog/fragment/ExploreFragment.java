@@ -266,12 +266,22 @@ public class ExploreFragment extends Fragment {
     }
 
     private void onProductClicked(@NonNull ProductSummary product) {
+        if (!isAdded()) {
+            return;
+        }
         Bundle args = new Bundle();
         args.putLong("productId", product.getId());
-        Navigation.findNavController(requireView()).navigate(
-                R.id.action_exploreFragment_to_productDetailFragment,
-                args
-        );
+        try {
+            Navigation.findNavController(requireView()).navigate(
+                    R.id.action_exploreFragment_to_productDetailFragment,
+                    args
+            );
+        } catch (Exception e) {
+            try {
+                Navigation.findNavController(requireView()).navigate(R.id.nav_catalog, args);
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     @Override

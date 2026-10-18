@@ -228,25 +228,35 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Enhanced Glide image loading across `ProductGridAdapter.java`, `CartAdapter.java`, `ImageCarouselAdapter.java`, and `ReviewItemsAdapter.java` with `DrawableTransitionOptions.withCrossFade()`.
   - Updated `OfflineMockInterceptor.java` to handle pagination parameters (`page`, `per_page=20`), delivering realistic page slices and prefetching.
   - Updated `OfflineMockInterceptorTest.java` with pagination verification; `./gradlew testDebugUnitTest` and `:app:lintDebug` passed with 0 errors.
-- [ ] **Step 28: Cart Screen Quantity Stepper & Removal Stability**
+- [x] **Step 28 (Priority): Product Detail Screen Crash Elimination, Navigation, Back Button & Add to Bag**
+  - Fix crash on product click from Home and Explore:
+    - In `nav_main.xml`, update `action_homeFragment_to_productDetailFragment` and `action_exploreFragment_to_productDetailFragment` to target `@id/nav_catalog` (the top-level nested graph id) instead of inner `@id/productDetailFragment`.
+    - In `nav_catalog.xml`, add `<argument android:name="productId" android:defaultValue="-1L" app:argType="long" />` to the root `<navigation>` element so argument bundles passed to `nav_catalog` are automatically forwarded to start destination `productDetailFragment`.
+    - In `HomeFragment.java` and `ExploreFragment.java`, add safe navigation and fallback handling `navController.navigate(R.id.nav_catalog, args)`.
+  - Add top circular back button to `fragment_product_detail.xml` (40dp frosted/surface pill button with `ic_arrow_back` / `ic_back` and 48dp touch target) allowing user to pop back to previous screen.
+  - In `ProductDetailFragment.java`:
+    - Add null safety for `product.getImages()` (preventing NPE when image list is null).
+    - Wire `btn_add_to_cart` to `CartRepository.addItem(...)` with quantity selection, visual confirmation feedback (Snackbar), and proper state handling.
+  - Verify with `./gradlew testDebugUnitTest` and `:app:lintDebug`.
+- [ ] **Step 29: Cart Screen Quantity Stepper & Removal Stability**
   - Fix `QuantityStepperView.java`: replace bare text buttons with dedicated vector drawables/icons (`ic_minus.xml`, `ic_plus.xml`), ensure high-contrast tints (`@color/color_botanical_green` / `@color/text_primary_ink`), and remove text padding clipping.
   - Fix Cart trash / remove button: update `OfflineMockInterceptor.java` to handle `DELETE /cart/items/{productId}` and update the in-memory cart state dynamically so items are removed and totals recomputed.
-- [ ] **Step 29: Account Screen Google Sign-In & Forgot Password Crash Fix**
+- [ ] **Step 30: Account Screen Google Sign-In & Forgot Password Crash Fix**
   - Anchor Snackbars to bottom navigation or proper anchor view so feedback displays clearly above the floating pill bottom navigation bar.
   - Clarify Google Sign-In backend status (planned in `BACKEND-GOOGLE-AUTH-INTEGRATION.md`) and prevent dead-end UI confusion.
   - Fix Forgot Password crash: resolve navigation action from `accountFragment` to `requestPasswordResetFragment` and `registerFragment` safely across nested graphs with comprehensive null checks and try-catch safety.
-- [ ] **Step 30: Home Category Mood Circles & "All" Icon Aesthetic Upgrade**
+- [ ] **Step 31: Home Category Mood Circles & "All" Icon Aesthetic Upgrade**
   - Redesign `ic_category_all.xml` with a sleek, minimalist Dribbble/Pinterest-grade boutique bento/sparkle vector.
   - Fix mood circle spacing: set uniform fixed item width (`72dp`) and balanced horizontal margins (`10dp`) on `item_category_mood_circle.xml` so all circles are spaced strictly equally regardless of label width.
   - Streamline category labels to punchy, elegant single-word titles ("Shirts", "Pants", "Dresses", "Jackets", "T-Shirts", "Activewear", "Shoes", "Accessories", "Leather", "Bags") with centered text.
-- [ ] **Step 31: Swipe-to-Refresh on Home, Explore, and Cart**
+- [ ] **Step 32: Swipe-to-Refresh on Home, Explore, and Cart**
   - Wrap content layouts with `SwipeRefreshLayout` in `fragment_home.xml`, `fragment_explore.xml`, and `fragment_cart.xml`.
   - Style swipe spinners with `@color/color_botanical_green` indicator tint.
   - Connect pull-to-refresh to `CatalogListViewModel.reload()`, `CartViewModel.loadCart()`, and home feeds.
-- [ ] **Step 32: Instant Explore Search Filtering & Crash Elimination**
+- [ ] **Step 33: Instant Explore Search Filtering & Crash Elimination**
   - Remove buggy cross-graph navigation on search input.
   - Implement real-time in-place grid filtering with `TextWatcher` and debounce (starts filtering immediately once 2 characters are typed).
   - Add null safety across search query and list updates.
-- [ ] **Step 33: Verification, Unit Tests & Android Lint**
+- [ ] **Step 34: Verification, Unit Tests & Android Lint**
   - Verify clean test run (`testDebugUnitTest`) and lint check (`lintDebug`).
 

@@ -15,7 +15,7 @@
             app:destination="@id/exploreFragment" />
         <action
             android:id="@+id/action_homeFragment_to_productDetailFragment"
-            app:destination="@id/productDetailFragment" />
+            app:destination="@id/nav_catalog" />
         <action
             android:id="@+id/action_homeFragment_to_categoryProductsFragment"
             app:destination="@id/categoryProductsFragment" />
@@ -43,7 +43,7 @@
             app:destination="@id/searchResultsFragment" />
         <action
             android:id="@+id/action_exploreFragment_to_productDetailFragment"
-            app:destination="@id/productDetailFragment" />
+            app:destination="@id/nav_catalog" />
         <action
             android:id="@+id/action_exploreFragment_to_categoryProductsFragment"
             app:destination="@id/categoryProductsFragment" />

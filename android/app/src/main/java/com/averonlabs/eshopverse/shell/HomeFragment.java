@@ -189,10 +189,17 @@ public class HomeFragment extends Fragment {
         }
         Bundle args = new Bundle();
         args.putLong("productId", product.getId());
-        Navigation.findNavController(requireView()).navigate(
-                R.id.action_homeFragment_to_productDetailFragment,
-                args
-        );
+        try {
+            Navigation.findNavController(requireView()).navigate(
+                    R.id.action_homeFragment_to_productDetailFragment,
+                    args
+            );
+        } catch (Exception e) {
+            try {
+                Navigation.findNavController(requireView()).navigate(R.id.nav_catalog, args);
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     private void navigateToExplore() {
