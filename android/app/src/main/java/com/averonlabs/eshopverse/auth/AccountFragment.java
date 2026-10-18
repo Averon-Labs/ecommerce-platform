@@ -117,20 +117,56 @@ public class AccountFragment extends Fragment {
         });
 
         binding.btnGuestGoogleSignIn.setOnClickListener(v -> {
-            Snackbar.make(binding.getRoot(), R.string.auth_feedback_google_sign_in, Snackbar.LENGTH_SHORT).show();
+            showAnchoredSnackbar(R.string.auth_feedback_google_sign_in);
         });
 
         binding.btnGuestForgotPassword.setOnClickListener(v -> {
-            NavController navController = NavHostFragment.findNavController(this);
-            navController.navigate(R.id.action_accountFragment_to_requestPasswordResetFragment);
+            try {
+                NavController navController = NavHostFragment.findNavController(this);
+                navController.navigate(R.id.action_accountFragment_to_requestPasswordResetFragment);
+            } catch (Exception e) {
+                try {
+                    NavHostFragment.findNavController(this).navigate(R.id.requestPasswordResetFragment);
+                } catch (Exception ignored) {}
+            }
         });
 
         binding.btnGuestRegister.setOnClickListener(v -> {
-            NavController navController = NavHostFragment.findNavController(this);
-            Bundle args = new Bundle();
-            args.putInt("returnToNavId", R.id.accountFragment);
-            navController.navigate(R.id.action_accountFragment_to_registerFragment, args);
+            try {
+                NavController navController = NavHostFragment.findNavController(this);
+                Bundle args = new Bundle();
+                args.putInt("returnToNavId", R.id.accountFragment);
+                navController.navigate(R.id.action_accountFragment_to_registerFragment, args);
+            } catch (Exception e) {
+                try {
+                    NavHostFragment.findNavController(this).navigate(R.id.registerFragment);
+                } catch (Exception ignored) {}
+            }
         });
+    }
+
+    private void showAnchoredSnackbar(@androidx.annotation.StringRes int messageRes) {
+        if (!isAdded() || getView() == null) return;
+        Snackbar snackbar = Snackbar.make(binding.getRoot(), messageRes, Snackbar.LENGTH_LONG);
+        if (getActivity() != null) {
+            View bottomNav = getActivity().findViewById(R.id.card_bottom_nav);
+            if (bottomNav != null && bottomNav.getVisibility() == View.VISIBLE) {
+                snackbar.setAnchorView(bottomNav);
+            }
+        }
+        snackbar.show();
+    }
+
+    private void showAnchoredSnackbar(@NonNull String message) {
+        if (!isAdded() || getView() == null) return;
+        Snackbar snackbar = Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG);
+        if (getActivity() != null) {
+            View bottomNav = getActivity().findViewById(R.id.card_bottom_nav);
+            if (bottomNav != null && bottomNav.getVisibility() == View.VISIBLE) {
+                snackbar.setAnchorView(bottomNav);
+            }
+        }
+        snackbar.show();
     }
 
     private void observeViewModels() {
@@ -245,6 +281,7 @@ public class AccountFragment extends Fragment {
             if (updatedUser != null) {
                 sessionViewModel.updateCurrentUser(updatedUser);
             }
+            showAnchoredSnackbar(R.string.auth_feedback_profile_updated);
         } else if (state.isError()) {
             binding.progressProfile.setVisibility(View.GONE);
             binding.btnSaveProfile.setEnabled(true);

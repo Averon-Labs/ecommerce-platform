@@ -241,10 +241,14 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
 - [x] **Step 29: Cart Screen Quantity Stepper & Removal Stability**
   - Fix `QuantityStepperView.java`: replace bare text buttons with dedicated vector drawables/icons (`ic_minus.xml`, `ic_plus.xml`), ensure high-contrast tints (`@color/color_botanical_green` / `@color/text_primary_ink`), and remove text padding clipping.
   - Fix Cart trash / remove button: update `OfflineMockInterceptor.java` to handle `DELETE /cart/items/{productId}` and update the in-memory cart state dynamically so items are removed and totals recomputed.
-- [ ] **Step 30: Account Screen Google Sign-In & Forgot Password Crash Fix**
-  - Anchor Snackbars to bottom navigation or proper anchor view so feedback displays clearly above the floating pill bottom navigation bar.
-  - Clarify Google Sign-In backend status (planned in `BACKEND-GOOGLE-AUTH-INTEGRATION.md`) and prevent dead-end UI confusion.
-  - Fix Forgot Password crash: resolve navigation action from `accountFragment` to `requestPasswordResetFragment` and `registerFragment` safely across nested graphs with comprehensive null checks and try-catch safety.
+- [x] **Step 30: Account Screen Google Sign-In & Forgot Password Crash Fix**
+  - Anchored Snackbars across `AccountFragment.java` and `CartFragment.java` using `snackbar.setAnchorView(bottomNav)` (anchored to `card_bottom_nav`), ensuring feedback toasts float clearly above the floating pill bottom navigation bar.
+  - Resolved Forgot Password and Register navigation:
+    - Added first-class fragment destinations `registerFragment`, `requestPasswordResetFragment`, and `setNewPasswordFragment` directly in `nav_main.xml`.
+    - Configured actions `action_requestPasswordResetFragment_to_setNewPasswordFragment`, `action_setNewPasswordFragment_to_requestPasswordResetFragment`, and `action_setNewPasswordFragment_to_signInFragment`.
+    - Added safe navigation try-catch fallbacks across `AccountFragment.java`, `RequestPasswordResetFragment.java`, and `SetNewPasswordFragment.java`.
+  - Added anchored success snackbar on profile update (`R.string.auth_feedback_profile_updated`).
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
 - [ ] **Step 31: Home Category Mood Circles & "All" Icon Aesthetic Upgrade**
   - Redesign `ic_category_all.xml` with a sleek, minimalist Dribbble/Pinterest-grade boutique bento/sparkle vector.
   - Fix mood circle spacing: set uniform fixed item width (`72dp`) and balanced horizontal margins (`10dp`) on `item_category_mood_circle.xml` so all circles are spaced strictly equally regardless of label width.

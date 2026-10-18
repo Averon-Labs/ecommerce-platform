@@ -96,14 +96,14 @@ public class CartFragment extends Fragment {
         viewModel.getNoticeEvent().observe(getViewLifecycleOwner(), event -> {
             String notice = event.getContentIfNotHandled();
             if (notice != null && getView() != null) {
-                Snackbar.make(getView(), notice, Snackbar.LENGTH_LONG).show();
+                showAnchoredSnackbar(notice);
             }
         });
 
         viewModel.getErrorResEvent().observe(getViewLifecycleOwner(), event -> {
             Integer errorRes = event.getContentIfNotHandled();
             if (errorRes != null && getView() != null) {
-                Snackbar.make(getView(), errorRes, Snackbar.LENGTH_SHORT).show();
+                showAnchoredSnackbar(errorRes);
             }
         });
 
@@ -177,6 +177,30 @@ public class CartFragment extends Fragment {
         }
         boolean canCheckout = !cart.getItems().isEmpty() && !hasUnavailable;
         binding.btnCartCheckout.setEnabled(canCheckout);
+    }
+
+    private void showAnchoredSnackbar(@androidx.annotation.StringRes int messageRes) {
+        if (!isAdded() || getView() == null) return;
+        Snackbar snackbar = Snackbar.make(getView(), messageRes, Snackbar.LENGTH_SHORT);
+        if (getActivity() != null) {
+            View bottomNav = getActivity().findViewById(R.id.card_bottom_nav);
+            if (bottomNav != null && bottomNav.getVisibility() == View.VISIBLE) {
+                snackbar.setAnchorView(bottomNav);
+            }
+        }
+        snackbar.show();
+    }
+
+    private void showAnchoredSnackbar(@NonNull String message) {
+        if (!isAdded() || getView() == null) return;
+        Snackbar snackbar = Snackbar.make(getView(), message, Snackbar.LENGTH_LONG);
+        if (getActivity() != null) {
+            View bottomNav = getActivity().findViewById(R.id.card_bottom_nav);
+            if (bottomNav != null && bottomNav.getVisibility() == View.VISIBLE) {
+                snackbar.setAnchorView(bottomNav);
+            }
+        }
+        snackbar.show();
     }
 
     @Override
