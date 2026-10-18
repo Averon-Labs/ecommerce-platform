@@ -16,16 +16,19 @@
     app:strokeColor="@color/border_hairline"
     app:strokeWidth="@dimen/stroke_hairline">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
         <FrameLayout
             android:id="@+id/container_image"
-            android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:background="@color/color_soft_sage">
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/color_soft_sage"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/iv_product_image"
@@ -47,12 +50,17 @@
         </FrameLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/container_text"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="10dp"
             android:paddingTop="10dp"
-            android:paddingBottom="12dp">
+            android:paddingBottom="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/container_image">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_product_name"
@@ -62,11 +70,11 @@
                 android:letterSpacing="-0.01"
                 android:lineSpacingExtra="2dp"
                 android:maxLines="2"
-                android:minLines="1"
+                android:minLines="2"
                 android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="@color/color_ink"
                 android:textStyle="bold"
-                tools:text="Classic Leather Sneaker" />
+                tools:text="Classic White Oxford Shirt" />
 
             <com.averonlabs.eshopverse.core.ui.view.PriceTextView
                 android:id="@+id/tv_product_price"
@@ -77,10 +85,10 @@
                 android:textAppearance="?attr/textAppearanceTitleSmall"
                 android:textColor="@color/color_botanical_green"
                 android:textStyle="bold"
-                tools:text="$89.99" />
+                tools:text="$45.99" />
 
         </LinearLayout>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>

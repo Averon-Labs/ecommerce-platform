@@ -48,8 +48,8 @@ public class OfflineMockInterceptorTest {
             Type type = new TypeToken<ApiResponse<List<Category>>>() {}.getType();
             ApiResponse<List<Category>> envelope = gson.fromJson(response.body().string(), type);
             assertNotNull(envelope.getData());
-            assertFalse(envelope.getData().isEmpty());
-            assertEquals("Footwear", envelope.getData().get(0).getName());
+            assertEquals("Shirts & Tops", envelope.getData().get(0).getName());
+            assertEquals(10, envelope.getData().size());
         }
     }
 
@@ -66,14 +66,14 @@ public class OfflineMockInterceptorTest {
             Type type = new TypeToken<PagedResponse<ProductSummary>>() {}.getType();
             PagedResponse<ProductSummary> envelope = gson.fromJson(response.body().string(), type);
             assertNotNull(envelope.getData());
-            assertEquals(16, envelope.getData().size());
+            assertEquals(50, envelope.getData().size());
             ProductSummary product = envelope.getData().get(0);
-            assertEquals("Classic Leather Sneaker", product.getName());
+            assertEquals("Classic White Oxford Shirt", product.getName());
             assertNotNull(product.getImageUrl());
             assertTrue(product.isInStock());
         }
 
-        // Verify category filter returns 4 items
+        // Verify category filter returns 5 items
         Request catRequest = new Request.Builder()
                 .url("http://127.0.0.1:54321/api/v1/products?category_id=1")
                 .build();
@@ -83,7 +83,7 @@ public class OfflineMockInterceptorTest {
             Type type = new TypeToken<PagedResponse<ProductSummary>>() {}.getType();
             PagedResponse<ProductSummary> envelope = gson.fromJson(catResponse.body().string(), type);
             assertNotNull(envelope.getData());
-            assertEquals(4, envelope.getData().size());
+            assertEquals(5, envelope.getData().size());
         }
     }
 
@@ -101,8 +101,8 @@ public class OfflineMockInterceptorTest {
             ApiResponse<ProductDetail> envelope = gson.fromJson(response.body().string(), type);
             assertNotNull(envelope.getData());
             ProductDetail detail = envelope.getData();
-            assertEquals("Classic Leather Sneaker", detail.getName());
-            assertEquals("FTW-SNK-001", detail.getSku());
+            assertEquals("Classic White Oxford Shirt", detail.getName());
+            assertEquals("shirt_001", detail.getSku());
             assertFalse(detail.getImages().isEmpty());
         }
     }
@@ -123,7 +123,7 @@ public class OfflineMockInterceptorTest {
             Cart cart = envelope.getData();
             assertEquals(1, cart.getItemCount());
             assertEquals(1, cart.getItems().size());
-            assertEquals("Classic Leather Sneaker", cart.getItems().get(0).getName());
+            assertEquals("Classic White Oxford Shirt", cart.getItems().get(0).getName());
         }
     }
 

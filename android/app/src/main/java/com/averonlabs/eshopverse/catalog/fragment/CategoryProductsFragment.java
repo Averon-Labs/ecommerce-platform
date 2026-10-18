@@ -11,8 +11,8 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.averonlabs.eshopverse.R;
 import com.averonlabs.eshopverse.catalog.CatalogListViewModel;
@@ -62,6 +62,7 @@ public class CategoryProductsFragment extends Fragment {
             }
         }
 
+        binding.stateContainer.setContentView(binding.rvProducts);
         setupProductGrid();
         setupSort();
         observeViewModel();
@@ -79,8 +80,7 @@ public class CategoryProductsFragment extends Fragment {
     }
 
     private void setupProductGrid() {
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+        GridLayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
         binding.rvProducts.setLayoutManager(layoutManager);
 
         gridAdapter = new ProductGridAdapter(this::onProductClicked);
@@ -92,8 +92,7 @@ public class CategoryProductsFragment extends Fragment {
                 if (dy > 0) {
                     int visibleCount = layoutManager.getChildCount();
                     int totalCount = layoutManager.getItemCount();
-                    int[] firstVisibleItems = layoutManager.findFirstVisibleItemPositions(null);
-                    int firstVisible = (firstVisibleItems != null && firstVisibleItems.length > 0) ? firstVisibleItems[0] : 0;
+                    int firstVisible = layoutManager.findFirstVisibleItemPosition();
 
                     if ((visibleCount + firstVisible) >= totalCount - 4) {
                         viewModel.loadNextPage();
@@ -191,7 +190,10 @@ public class CategoryProductsFragment extends Fragment {
     private void onProductClicked(@NonNull ProductSummary product) {
         Bundle args = new Bundle();
         args.putLong("productId", product.getId());
-        Navigation.findNavController(requireView()).navigate(R.id.productDetailFragment, args);
+        Navigation.findNavController(requireView()).navigate(
+                R.id.action_categoryProductsFragment_to_productDetailFragment,
+                args
+        );
     }
 
     @Override

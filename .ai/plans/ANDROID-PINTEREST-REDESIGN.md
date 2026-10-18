@@ -161,3 +161,57 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
 - [x] **Android Lint:** `./gradlew :app:lintDebug` passing with 0 errors.
 - [x] **Git Remote Sync & PR:** Commit, push to `origin/feature/android-pinterest-redesign`, and verify PR status.
 
+---
+
+### Phase 6: Real Catalog Seed, Sectioned Home, Square Grids & Explore Polish
+- [x] **Step 19: Save & Parse `fake_products.md` and Setup Product Images Asset Pipeline**
+  - Saved and parsed 10 categories and 50 products from `temp_data/fake_products.md`.
+  - Copied all 50 product images from `temp_data/*.jpg` to `android/app/src/main/assets/products/*.jpg` for instant, reliable offline loading via `file:///android_asset/products/<id>.jpg`.
+- [x] **Step 20: Replace Categories & Vector Icons in Explore and Home**
+  - Updated `/categories` endpoint in `OfflineMockInterceptor.java` to return the 10 catalog categories (`Shirts & Tops`, `Pants & Jeans`, `Dresses`, `Jackets & Coats`, `T-Shirts`, `Activewear`, `Shoes`, `Accessories`, `Leather & Suede`, `Bags & Backpacks`).
+  - Created bespoke vector drawables in `res/drawable/`: `ic_category_shirts.xml`, `ic_category_pants.xml`, `ic_category_dresses.xml`, `ic_category_jackets.xml`, `ic_category_tshirts.xml`, `ic_category_activewear.xml`, `ic_category_shoes.xml`, `ic_category_accessories.xml`, `ic_category_leather.xml`, `ic_category_bags.xml`.
+  - Implemented `CategoryIconResolver.java` to resolve matching vector icons for all categories with robust fallbacks.
+  - Updated Explore horizontal chips in `ExploreFragment.java` to display matching icons alongside labels with proper selection tinting.
+  - Updated Home mood circles in `HomeFragment.java` to use `CategoryIconResolver` with existing styling and navigation to Explore.
+  - Added unit test `CategoryIconResolverTest.java` and updated `OfflineMockInterceptorTest.java`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 21: Redesign Product Placeholder Vector (Dribbble-Grade Minimalist Aesthetic)**
+  - Replaced the generic "landscape photo" icon in `ic_image_placeholder.xml` with an atelier boutique apparel silhouette featuring an elegant curved coat hanger with soft rounded joints, a subtle ambient editorial aura backdrop (`@color/color_botanical_green` with 10% alpha), and minimalist Dribbble-grade sparkle accents.
+  - Automatically inherited across product cards, cart items, order review items, product detail carousels, and `ProductCardView`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 22: Clean Old Mock Catalog & Populate New Data in `OfflineMockInterceptor.java`**
+  - Completely purged all 16 old mock products and obsolete categories.
+  - Populated all 50 products from `temp_data/fake_products.md` with IDs (101–150), SKUs matching asset filenames (`shirt_001`–`bag_005`), exact catalog prices, rich boutique descriptions, and category associations.
+  - Linked images directly to offline Android assets via `file:///android_asset/products/<id>.jpg` for instant, reliable loading.
+  - Updated pagination (`perPage: 60`), product detail query handling (supporting both numeric IDs and string SKUs), and cart mock.
+  - Updated `OfflineMockInterceptorTest.java` assertions for 50-item catalog, 5-item category filter, and updated product details.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 23: Uniform 1:1 Square Image Aspect Ratio & Equal Height Product Grid**
+  - Updated `item_product_card.xml` with `ConstraintLayout` root and `container_image` set to `0dp` x `0dp` with strict `app:layout_constraintDimensionRatio="1:1"`.
+  - Configured `tv_product_name` with `minLines="2"` and `maxLines="2"` guaranteeing perfectly equal heights for every card across the grid.
+  - Removed dynamic staggered masonry height overrides in `ProductGridAdapter.java`.
+  - Migrated `ExploreFragment.java`, `CategoryProductsFragment.java`, and `SearchResultsFragment.java` from `StaggeredGridLayoutManager` to clean, synchronized `GridLayoutManager(requireContext(), 2)`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 24: Fix Explore Loading Spinner Layering Bug**
+  - Updated `StateContainerView.java`:
+    - Overrode `onFinishInflate()` to automatically adopt direct XML child views into `contentHost` (preventing child views from being inflated at a higher z-index above `messagePanel`).
+    - Added `messagePanel.bringToFront()` on non-CONTENT state transitions to ensure progress spinners and error messages are never obscured by card views.
+  - Added explicit `binding.stateContainer.setContentView(binding.rvProducts)` across `ExploreFragment.java`, `CategoryProductsFragment.java`, and `SearchResultsFragment.java`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 25: Sectioned Home Screen Layout & Full Click Navigation**
+  - Sectioned `fragment_home.xml` into 4 curated rows with distinct visual rhythms:
+    - Section 1: "Trending this week" (`rv_trending_carousel`) — horizontal linear carousel.
+    - Section 2: "Popular & Best Sellers" (`rv_bestsellers_grid`) — 2-column grid.
+    - Section 3: "Special Offers" (`rv_special_offers_carousel`) — horizontal linear carousel.
+    - Section 4: "Curated Essentials" (`rv_essentials_grid`) — 2-column grid.
+  - Enhanced `ProductGridAdapter.java`:
+    - Added `isCarousel` mode support to dynamically size carousel items to `164dp` (`@dimen/product_carousel_item_width`) for horizontal rows while retaining standard grid sizing for 2-column sections.
+    - Attached click listeners to both `cardProduct` and `ivProductImage` ensuring all touch interactions reliably trigger product navigation.
+  - Updated `HomeFragment.java` to set up and bind all 4 section adapters, slice catalog products cleanly across sections, and wire all section "See all" buttons to `ExploreFragment`.
+  - Configured explicit Jetpack Navigation actions to `productDetailFragment` across `HomeFragment.java`, `ExploreFragment.java`, `CategoryProductsFragment.java`, and `SearchResultsFragment.java`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 26: Verification, Unit Tests & Android Lint**
+  - `./gradlew testDebugUnitTest` passing 100% (26 tasks executed, 0 failures).
+  - `./gradlew :app:lintDebug` passing with 0 errors.
+  - Phase 6 (Real Catalog Seed, Sectioned Home, Square Grids & Explore Polish) completed and verified.
+

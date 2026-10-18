@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import com.averonlabs.eshopverse.R;
 import com.averonlabs.eshopverse.catalog.CatalogListViewModel;
 import com.averonlabs.eshopverse.catalog.CatalogViewModelFactory;
+import com.averonlabs.eshopverse.catalog.CategoryIconResolver;
 import com.averonlabs.eshopverse.catalog.CategoryViewModel;
 import com.averonlabs.eshopverse.catalog.ProductGridAdapter;
 import com.averonlabs.eshopverse.core.model.Category;
@@ -34,7 +35,10 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private CatalogListViewModel catalogViewModel;
     private CategoryViewModel categoryViewModel;
-    private ProductGridAdapter trendingAdapter;
+    private ProductGridAdapter trendingCarouselAdapter;
+    private ProductGridAdapter bestSellersAdapter;
+    private ProductGridAdapter specialOffersAdapter;
+    private ProductGridAdapter essentialsAdapter;
 
     @Override
     public View onCreateView(
@@ -54,7 +58,7 @@ public class HomeFragment extends Fragment {
         catalogViewModel = new ViewModelProvider(this, factory).get(CatalogListViewModel.class);
         categoryViewModel = new ViewModelProvider(this, factory).get(CategoryViewModel.class);
 
-        setupTrendingGrid();
+        setupSections();
         setupCategories();
         setupClickListeners();
         updateThemeIcon();
@@ -71,13 +75,22 @@ public class HomeFragment extends Fragment {
         binding.btnProfileAvatar.setContentDescription(getString(isDark ? R.string.theme_dark_desc : R.string.theme_light_desc));
     }
 
-    private void setupTrendingGrid() {
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
-        binding.rvTrendingProducts.setLayoutManager(layoutManager);
+    private void setupSections() {
+        // Section 1: Trending This Week (Horizontal Carousel)
+        trendingCarouselAdapter = new ProductGridAdapter(this::onProductClicked, true);
+        binding.rvTrendingCarousel.setAdapter(trendingCarouselAdapter);
 
-        trendingAdapter = new ProductGridAdapter(this::onProductClicked);
-        binding.rvTrendingProducts.setAdapter(trendingAdapter);
+        // Section 2: Popular & Best Sellers (2-Column Grid)
+        bestSellersAdapter = new ProductGridAdapter(this::onProductClicked, false);
+        binding.rvBestsellersGrid.setAdapter(bestSellersAdapter);
+
+        // Section 3: Special Offers (Horizontal Carousel)
+        specialOffersAdapter = new ProductGridAdapter(this::onProductClicked, true);
+        binding.rvSpecialOffersCarousel.setAdapter(specialOffersAdapter);
+
+        // Section 4: Curated Essentials (2-Column Grid)
+        essentialsAdapter = new ProductGridAdapter(this::onProductClicked, false);
+        binding.rvEssentialsGrid.setAdapter(essentialsAdapter);
     }
 
     private void setupCategories() {
@@ -113,7 +126,7 @@ public class HomeFragment extends Fragment {
                 } else {
                     Category category = categories.get(position - 1);
                     nameView.setText(category.getName());
-                    iconView.setImageResource(getCategoryIcon(category.getName()));
+                    iconView.setImageResource(CategoryIconResolver.getCategoryIcon(category.getName()));
                     holder.itemView.setOnClickListener(v -> navigateToExploreCategory(category.getId(), category.getName()));
                 }
             }
@@ -126,19 +139,7 @@ public class HomeFragment extends Fragment {
     }
 
     private int getCategoryIcon(String categoryName) {
-        if (categoryName == null) return R.drawable.ic_category_all;
-        String lower = categoryName.toLowerCase();
-        if (lower.contains("home") || lower.contains("decor") || lower.contains("furn")) {
-            return R.drawable.ic_home;
-        } else if (lower.contains("fash") || lower.contains("cloth") || lower.contains("apparel") || lower.contains("shoe")) {
-            return R.drawable.ic_category_fashion;
-        } else if (lower.contains("beaut") || lower.contains("care") || lower.contains("cosmet")) {
-            return R.drawable.ic_category_beauty;
-        } else if (lower.contains("object") || lower.contains("access") || lower.contains("art")) {
-            return R.drawable.ic_category_objects;
-        } else {
-            return R.drawable.ic_explore;
-        }
+        return CategoryIconResolver.getCategoryIcon(categoryName);
     }
 
     private void setupClickListeners() {
@@ -148,8 +149,11 @@ public class HomeFragment extends Fragment {
         // Hero CTA button: navigate to Explore
         binding.btnHeroCta.setOnClickListener(v -> navigateToExplore());
 
-        // Trending See All button: navigate to Explore
+        // Section See All buttons: navigate to Explore
         binding.btnTrendingViewAll.setOnClickListener(v -> navigateToExplore());
+        binding.btnBestsellersViewAll.setOnClickListener(v -> navigateToExplore());
+        binding.btnSpecialOffersViewAll.setOnClickListener(v -> navigateToExplore());
+        binding.btnEssentialsViewAll.setOnClickListener(v -> navigateToExplore());
 
         // Theme toggle button in circular frame
         binding.btnProfileAvatar.setOnClickListener(v -> {
@@ -161,8 +165,20 @@ public class HomeFragment extends Fragment {
     private void observeViewModel() {
         catalogViewModel.getProductsState().observe(getViewLifecycleOwner(), state -> {
             if (state != null && state.getStatus() == UiState.Status.CONTENT && state.getData() != null) {
-                List<ProductSummary> products = state.getData();
-                trendingAdapter.submitList(products);
+                List<ProductSummary> all = state.getData();
+                if (!all.isEmpty()) {
+                    int total = all.size();
+                    trendingCarouselAdapter.submitList(all.subList(0, Math.min(8, total)));
+                    if (total > 8) {
+                        bestSellersAdapter.submitList(all.subList(8, Math.min(12, total)));
+                    }
+                    if (total > 12) {
+                        specialOffersAdapter.submitList(all.subList(12, Math.min(20, total)));
+                    }
+                    if (total > 20) {
+                        essentialsAdapter.submitList(all.subList(20, Math.min(24, total)));
+                    }
+                }
             }
         });
     }

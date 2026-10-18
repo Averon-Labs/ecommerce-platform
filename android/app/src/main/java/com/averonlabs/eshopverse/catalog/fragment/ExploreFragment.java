@@ -12,12 +12,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.averonlabs.eshopverse.R;
 import com.averonlabs.eshopverse.catalog.CatalogListViewModel;
 import com.averonlabs.eshopverse.catalog.CatalogViewModelFactory;
+import com.averonlabs.eshopverse.catalog.CategoryIconResolver;
 import com.averonlabs.eshopverse.catalog.CategoryViewModel;
 import com.averonlabs.eshopverse.catalog.ProductGridAdapter;
 import com.averonlabs.eshopverse.catalog.ProductParams;
@@ -58,6 +59,7 @@ public class ExploreFragment extends Fragment {
         catalogViewModel = new ViewModelProvider(this, factory).get(CatalogListViewModel.class);
         categoryViewModel = new ViewModelProvider(this, factory).get(CategoryViewModel.class);
 
+        binding.stateContainer.setContentView(binding.rvProducts);
         setupProductGrid();
         setupSearchAndSort();
         setupCategoryChips();
@@ -85,8 +87,7 @@ public class ExploreFragment extends Fragment {
     }
 
     private void setupProductGrid() {
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+        GridLayoutManager layoutManager = new GridLayoutManager(requireContext(), 2);
         binding.rvProducts.setLayoutManager(layoutManager);
 
         gridAdapter = new ProductGridAdapter(this::onProductClicked);
@@ -98,8 +99,7 @@ public class ExploreFragment extends Fragment {
                 if (dy > 0) {
                     int visibleCount = layoutManager.getChildCount();
                     int totalCount = layoutManager.getItemCount();
-                    int[] firstVisibleItems = layoutManager.findFirstVisibleItemPositions(null);
-                    int firstVisible = (firstVisibleItems != null && firstVisibleItems.length > 0) ? firstVisibleItems[0] : 0;
+                    int firstVisible = layoutManager.findFirstVisibleItemPosition();
 
                     if ((visibleCount + firstVisible) >= totalCount - 4) {
                         catalogViewModel.loadNextPage();
@@ -184,6 +184,10 @@ public class ExploreFragment extends Fragment {
                     String label = getString(R.string.catalog_category_all);
                     chip.setText(label);
                     chip.setContentDescription(getString(R.string.catalog_cd_category_chip, label));
+                    chip.setChipIconResource(R.drawable.ic_category_all);
+                    chip.setChipIconVisible(true);
+                    chip.setCheckedIconVisible(false);
+                    chip.setChipIconTintResource(R.color.chip_filter_text);
                     chip.setChecked(categoryViewModel.getSelectedCategoryId().getValue() == null);
                     chip.setOnClickListener(v -> {
                         categoryViewModel.selectCategory(null);
@@ -193,6 +197,10 @@ public class ExploreFragment extends Fragment {
                     Category category = categories.get(position - 1);
                     chip.setText(category.getName());
                     chip.setContentDescription(getString(R.string.catalog_cd_category_chip, category.getName()));
+                    chip.setChipIconResource(CategoryIconResolver.getCategoryIcon(category.getName()));
+                    chip.setChipIconVisible(true);
+                    chip.setCheckedIconVisible(false);
+                    chip.setChipIconTintResource(R.color.chip_filter_text);
                     Long currentSelected = categoryViewModel.getSelectedCategoryId().getValue();
                     long catId = (long) category.getId();
                     boolean isSelected = currentSelected != null && currentSelected == catId;
@@ -260,7 +268,10 @@ public class ExploreFragment extends Fragment {
     private void onProductClicked(@NonNull ProductSummary product) {
         Bundle args = new Bundle();
         args.putLong("productId", product.getId());
-        Navigation.findNavController(requireView()).navigate(R.id.productDetailFragment, args);
+        Navigation.findNavController(requireView()).navigate(
+                R.id.action_exploreFragment_to_productDetailFragment,
+                args
+        );
     }
 
     @Override

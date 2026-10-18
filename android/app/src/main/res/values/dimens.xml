@@ -38,4 +38,5 @@
 
     <!-- Layout Dimensions -->
     <dimen name="screen_horizontal_margin">16dp</dimen>
+    <dimen name="product_carousel_item_width">164dp</dimen>
 </resources>
