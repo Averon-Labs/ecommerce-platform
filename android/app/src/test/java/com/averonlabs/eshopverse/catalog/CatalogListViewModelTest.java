@@ -236,4 +236,37 @@ public class CatalogListViewModelTest {
         // Repository was called only once!
         verify(repository, times(1)).listProducts(any(), any());
     }
+
+    @Test
+    public void testSetQueryTriggersSearchAndReset() {
+        PagedResponse<ProductSummary> response = new PagedResponse<>(
+                Collections.emptyList(),
+                new Pagination(1, 20, 0, 0)
+        );
+        doAnswer(invocation -> {
+            CatalogRepository.CatalogCallback<PagedResponse<ProductSummary>> cb = invocation.getArgument(1);
+            cb.onSuccess(response);
+            return null;
+        }).when(repository).listProducts(any(), any());
+
+        viewModel.setQuery("sneaker");
+        assertEquals("sneaker", viewModel.getCurrentParams().getQ());
+        verify(repository, times(1)).listProducts(any(), any());
+
+        // Same query does not trigger duplicate load
+        viewModel.setQuery("sneaker");
+        verify(repository, times(1)).listProducts(any(), any());
+
+        // Clearing query resets to null and triggers reload
+        viewModel.setQuery("");
+        assertNull(viewModel.getCurrentParams().getQ());
+        verify(repository, times(2)).listProducts(any(), any());
+    }
+
+    @Test
+    public void testReloadCallsFirstPage() {
+        viewModel.reload();
+        verify(repository, times(1)).listProducts(any(), any());
+        assertEquals(1, viewModel.getCurrentParams().getPage());
+    }
 }

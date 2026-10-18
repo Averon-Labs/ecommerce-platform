@@ -265,10 +265,13 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
     - Cart: reloads current cart lines and server totals via `viewModel.loadCart()`.
   - Polished state transitions: keeps existing content visible under the refresh spinner during pull-to-refresh without blanking into full-screen loading state, and cleanly dismisses refreshing indicator on state emission.
   - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
-- [ ] **Step 33: Instant Explore Search Filtering & Crash Elimination**
-  - Remove buggy cross-graph navigation on search input.
-  - Implement real-time in-place grid filtering with `TextWatcher` and debounce (starts filtering immediately once 2 characters are typed).
-  - Add null safety across search query and list updates.
+- [x] **Step 33: Instant Explore Search Filtering & Crash Elimination**
+  - Removed cross-graph navigation on search input in `ExploreFragment.java` (eliminating `IllegalArgumentException` on `searchResultsFragment`).
+  - Implemented real-time in-place grid filtering with `TextWatcher` and 300ms debounce (starts filtering immediately once 2 characters are typed, resets to full catalog on clear).
+  - Wired keyboard `EditorInfo.IME_ACTION_SEARCH` to query immediately and dismiss the soft keyboard without navigating away.
+  - Added null safety across `ProductGridAdapter.submitList(...)` accepting `@Nullable` with `Collections.emptyList()` fallback.
+  - Added unit test cases `testSetQueryTriggersSearchAndReset` and `testReloadCallsFirstPage` in `CatalogListViewModelTest.java`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
 - [ ] **Step 34: Verification, Unit Tests & Android Lint**
   - Verify clean test run (`testDebugUnitTest`) and lint check (`lintDebug`).
 
