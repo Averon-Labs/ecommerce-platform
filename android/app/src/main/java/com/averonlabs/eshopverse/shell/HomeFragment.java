@@ -61,6 +61,7 @@ public class HomeFragment extends Fragment {
         setupSections();
         setupCategories();
         setupClickListeners();
+        setupSwipeRefresh();
         updateThemeIcon();
         observeViewModel();
 
@@ -162,8 +163,19 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    private void setupSwipeRefresh() {
+        binding.swipeRefreshHome.setColorSchemeResources(R.color.color_botanical_green);
+        binding.swipeRefreshHome.setOnRefreshListener(() -> {
+            catalogViewModel.reload();
+            categoryViewModel.loadCategories();
+        });
+    }
+
     private void observeViewModel() {
         catalogViewModel.getProductsState().observe(getViewLifecycleOwner(), state -> {
+            if (binding != null && state != null && state.getStatus() != UiState.Status.LOADING) {
+                binding.swipeRefreshHome.setRefreshing(false);
+            }
             if (state != null && state.getStatus() == UiState.Status.CONTENT && state.getData() != null) {
                 List<ProductSummary> all = state.getData();
                 if (!all.isEmpty()) {

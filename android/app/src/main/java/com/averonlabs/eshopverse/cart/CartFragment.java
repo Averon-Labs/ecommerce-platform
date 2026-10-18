@@ -53,10 +53,11 @@ public class CartFragment extends Fragment {
         CartViewModelFactory factory = new CartViewModelFactory(requireContext());
         viewModel = new ViewModelProvider(this, factory).get(CartViewModel.class);
 
-        binding.stateContainerCart.setContentView(binding.scrollCartContent);
+        binding.stateContainerCart.setContentView(binding.swipeRefreshCart);
 
         setupRecyclerView();
         setupClickListeners();
+        setupSwipeRefresh();
         observeViewModel();
 
         viewModel.loadCart();
@@ -76,6 +77,11 @@ public class CartFragment extends Fragment {
             NavController navController = NavHostFragment.findNavController(this);
             navController.navigate(R.id.nav_checkout);
         });
+    }
+
+    private void setupSwipeRefresh() {
+        binding.swipeRefreshCart.setColorSchemeResources(R.color.color_botanical_green);
+        binding.swipeRefreshCart.setOnRefreshListener(() -> viewModel.loadCart());
     }
 
     private void observeViewModel() {
@@ -122,9 +128,15 @@ public class CartFragment extends Fragment {
             return;
         }
 
+        if (binding != null && state.getStatus() != UiState.Status.LOADING) {
+            binding.swipeRefreshCart.setRefreshing(false);
+        }
+
         switch (state.getStatus()) {
             case LOADING:
-                binding.stateContainerCart.setState(StateContainerView.State.LOADING, null, null, null);
+                if (!binding.swipeRefreshCart.isRefreshing()) {
+                    binding.stateContainerCart.setState(StateContainerView.State.LOADING, null, null, null);
+                }
                 break;
             case CONTENT:
                 binding.stateContainerCart.setState(StateContainerView.State.CONTENT, null, null, null);

@@ -255,10 +255,16 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Added `CategoryIconResolver.getStreamlinedName(...)` mapping compound names to clean, punchy, single-word titles ("Shirts", "Pants", "Dresses", "Jackets", "T-Shirts", "Activewear", "Shoes", "Accessories", "Leather", "Bags") in `HomeFragment.java`.
   - Added unit test cases for single-word category names and `getStreamlinedName()` in `CategoryIconResolverTest.java`.
   - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
-- [ ] **Step 32: Swipe-to-Refresh on Home, Explore, and Cart**
-  - Wrap content layouts with `SwipeRefreshLayout` in `fragment_home.xml`, `fragment_explore.xml`, and `fragment_cart.xml`.
-  - Style swipe spinners with `@color/color_botanical_green` indicator tint.
-  - Connect pull-to-refresh to `CatalogListViewModel.reload()`, `CartViewModel.loadCart()`, and home feeds.
+- [x] **Step 32: Swipe-to-Refresh on Home, Explore, and Cart**
+  - Integrated `SwipeRefreshLayout` across `fragment_home.xml` (`swipe_refresh_home`), `fragment_explore.xml` (`swipe_refresh_explore`), and `fragment_cart.xml` (`swipe_refresh_cart`).
+  - Styled swipe spinners with brand botanical green (`@color/color_botanical_green`) via `setColorSchemeResources`.
+  - Added semantic `reload()` to `CatalogListViewModel.java` resetting pagination to page 1.
+  - Connected pull-to-refresh:
+    - Home: reloads first page catalog products and category list;
+    - Explore: reloads catalog products via `catalogViewModel.reload()` and categories via `categoryViewModel.loadCategories()`;
+    - Cart: reloads current cart lines and server totals via `viewModel.loadCart()`.
+  - Polished state transitions: keeps existing content visible under the refresh spinner during pull-to-refresh without blanking into full-screen loading state, and cleanly dismisses refreshing indicator on state emission.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
 - [ ] **Step 33: Instant Explore Search Filtering & Crash Elimination**
   - Remove buggy cross-graph navigation on search input.
   - Implement real-time in-place grid filtering with `TextWatcher` and debounce (starts filtering immediately once 2 characters are typed).

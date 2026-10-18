@@ -59,10 +59,11 @@ public class ExploreFragment extends Fragment {
         catalogViewModel = new ViewModelProvider(this, factory).get(CatalogListViewModel.class);
         categoryViewModel = new ViewModelProvider(this, factory).get(CategoryViewModel.class);
 
-        binding.stateContainer.setContentView(binding.rvProducts);
+        binding.stateContainer.setContentView(binding.swipeRefreshExplore);
         setupProductGrid();
         setupSearchAndSort();
         setupCategoryChips();
+        setupSwipeRefresh();
 
         observeViewModel();
 
@@ -227,6 +228,14 @@ public class ExploreFragment extends Fragment {
         });
     }
 
+    private void setupSwipeRefresh() {
+        binding.swipeRefreshExplore.setColorSchemeResources(R.color.color_botanical_green);
+        binding.swipeRefreshExplore.setOnRefreshListener(() -> {
+            catalogViewModel.reload();
+            categoryViewModel.loadCategories();
+        });
+    }
+
     private void observeViewModel() {
         catalogViewModel.getProductsState().observe(getViewLifecycleOwner(), this::renderProductsState);
     }
@@ -236,9 +245,15 @@ public class ExploreFragment extends Fragment {
             return;
         }
 
+        if (binding != null && state.getStatus() != UiState.Status.LOADING) {
+            binding.swipeRefreshExplore.setRefreshing(false);
+        }
+
         switch (state.getStatus()) {
             case LOADING:
-                binding.stateContainer.setState(StateContainerView.State.LOADING, null, null, null);
+                if (!binding.swipeRefreshExplore.isRefreshing()) {
+                    binding.stateContainer.setState(StateContainerView.State.LOADING, null, null, null);
+                }
                 break;
             case CONTENT:
                 binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
