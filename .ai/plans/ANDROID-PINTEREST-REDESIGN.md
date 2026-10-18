@@ -238,7 +238,7 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
     - Add null safety for `product.getImages()` (preventing NPE when image list is null).
     - Wire `btn_add_to_cart` to `CartRepository.addItem(...)` with quantity selection, visual confirmation feedback (Snackbar), and proper state handling.
   - Verify with `./gradlew testDebugUnitTest` and `:app:lintDebug`.
-- [ ] **Step 29: Cart Screen Quantity Stepper & Removal Stability**
+- [x] **Step 29: Cart Screen Quantity Stepper & Removal Stability**
   - Fix `QuantityStepperView.java`: replace bare text buttons with dedicated vector drawables/icons (`ic_minus.xml`, `ic_plus.xml`), ensure high-contrast tints (`@color/color_botanical_green` / `@color/text_primary_ink`), and remove text padding clipping.
   - Fix Cart trash / remove button: update `OfflineMockInterceptor.java` to handle `DELETE /cart/items/{productId}` and update the in-memory cart state dynamically so items are removed and totals recomputed.
 - [ ] **Step 30: Account Screen Google Sign-In & Forgot Password Crash Fix**

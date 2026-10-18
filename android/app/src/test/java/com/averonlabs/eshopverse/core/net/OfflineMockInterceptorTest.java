@@ -15,19 +15,27 @@ import com.averonlabs.eshopverse.core.model.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class OfflineMockInterceptorTest {
 
     private final Gson gson = new Gson();
+
+    @Before
+    public void setUp() {
+        OfflineMockInterceptor.resetMockCart();
+    }
 
     private OkHttpClient createMockClient() {
         return new OkHttpClient.Builder()
@@ -141,6 +149,53 @@ public class OfflineMockInterceptorTest {
             assertEquals(1, cart.getItemCount());
             assertEquals(1, cart.getItems().size());
             assertEquals("Classic White Oxford Shirt", cart.getItems().get(0).getName());
+        }
+    }
+
+    @Test
+    public void testOfflineCartItemDeletion() throws IOException {
+        OkHttpClient client = createMockClient();
+        Request deleteRequest = new Request.Builder()
+                .url("http://127.0.0.1:54321/api/v1/cart/items/101")
+                .delete()
+                .build();
+
+        try (Response response = client.newCall(deleteRequest).execute()) {
+            assertEquals(200, response.code());
+            assertNotNull(response.body());
+            Type type = new TypeToken<ApiResponse<Cart>>() {}.getType();
+            ApiResponse<Cart> envelope = gson.fromJson(response.body().string(), type);
+            assertNotNull(envelope.getData());
+            Cart cart = envelope.getData();
+            assertEquals(0, cart.getItemCount());
+            assertTrue(cart.getItems().isEmpty());
+            assertEquals("0.00", cart.getSubtotal());
+            assertEquals("0.00", cart.getTotal());
+        }
+    }
+
+    @Test
+    public void testOfflineCartItemQuantityUpdate() throws IOException {
+        OkHttpClient client = createMockClient();
+        RequestBody body = RequestBody.create(
+                MediaType.parse("application/json"),
+                "{\"quantity\":3}"
+        );
+        Request patchRequest = new Request.Builder()
+                .url("http://127.0.0.1:54321/api/v1/cart/items/101")
+                .patch(body)
+                .build();
+
+        try (Response response = client.newCall(patchRequest).execute()) {
+            assertEquals(200, response.code());
+            assertNotNull(response.body());
+            Type type = new TypeToken<ApiResponse<Cart>>() {}.getType();
+            ApiResponse<Cart> envelope = gson.fromJson(response.body().string(), type);
+            assertNotNull(envelope.getData());
+            Cart cart = envelope.getData();
+            assertEquals(3, cart.getItemCount());
+            assertEquals(1, cart.getItems().size());
+            assertEquals(3, cart.getItems().get(0).getQuantity());
         }
     }
 
