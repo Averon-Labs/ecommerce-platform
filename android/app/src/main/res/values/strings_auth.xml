@@ -31,6 +31,8 @@
     <string name="auth_action_to_register">Don\'t have an account? Sign up</string>
     <string name="auth_action_to_sign_in">Already have an account? Sign in</string>
     <string name="auth_action_forgot_password">Forgot password?</string>
+    <string name="auth_action_continue_with_google">Continue with Google</string>
+    <string name="auth_divider_or">or</string>
     <string name="auth_action_back_to_reset">Request a new reset link</string>
     <string name="auth_action_retry">Retry</string>
 
@@ -44,6 +46,7 @@
     <string name="auth_error_reset_token_required">Reset token must be 16–128 characters.</string>
 
     <!-- Server & Feedback Messages -->
+    <string name="auth_feedback_google_sign_in">Google Sign-In integration in progress.</string>
     <string name="auth_feedback_reset_requested">If an account exists with this email, password reset instructions have been sent.</string>
     <string name="auth_feedback_password_changed">Your password has been changed. Please sign in with your new password.</string>
     <string name="auth_feedback_profile_updated">Profile updated successfully.</string>

@@ -45,6 +45,17 @@
         <item name="android:minHeight">52dp</item>
         <item name="cornerRadius">@dimen/corner_pill</item>
     </style>
+    <style name="Widget.EShopVerse.Button.Google" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/border_hairline</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="backgroundTint">@color/surface_white</item>
+        <item name="android:textColor">@color/text_primary_ink</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="cornerRadius">@dimen/corner_pill</item>
+        <item name="iconTint">@null</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">12dp</item>
+    </style>
     <style name="Widget.EShopVerse.Button.Text" parent="Widget.Material3.Button.TextButton">
         <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:minHeight">@dimen/touch_target_min</item>

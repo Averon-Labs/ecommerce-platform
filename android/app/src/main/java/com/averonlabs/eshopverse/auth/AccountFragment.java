@@ -20,6 +20,7 @@ import com.averonlabs.eshopverse.core.model.User;
 import com.averonlabs.eshopverse.core.state.UiState;
 import com.averonlabs.eshopverse.core.ui.view.StateContainerView;
 import com.averonlabs.eshopverse.databinding.FragmentAccountBinding;
+import com.google.android.material.snackbar.Snackbar;
 
 /**
  * Screen M-07 / M-17: Customer Account & Profile.
@@ -113,6 +114,10 @@ public class AccountFragment extends Fragment {
             String email = binding.etGuestEmail.getText() != null ? binding.etGuestEmail.getText().toString() : "";
             String password = binding.etGuestPassword.getText() != null ? binding.etGuestPassword.getText().toString() : "";
             authViewModel.login(email, password);
+        });
+
+        binding.btnGuestGoogleSignIn.setOnClickListener(v -> {
+            Snackbar.make(binding.getRoot(), R.string.auth_feedback_google_sign_in, Snackbar.LENGTH_SHORT).show();
         });
 
         binding.btnGuestForgotPassword.setOnClickListener(v -> {
