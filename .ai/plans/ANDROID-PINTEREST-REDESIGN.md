@@ -215,3 +215,38 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - `./gradlew :app:lintDebug` passing with 0 errors.
   - Phase 6 (Real Catalog Seed, Sectioned Home, Square Grids & Explore Polish) completed and verified.
 
+---
+
+### Phase 7: UX Polish, Data Loading Architecture, Stability & Real-time Search
+
+> **Architectural Non-Negotiables:**
+> 1. **Immediate Data Rendering & Non-blocking Pinterest Placeholders:** Product info, titles, prices, and cards render immediately without waiting for images. Every image uses `@drawable/ic_image_placeholder` with smooth async Glide cross-fade.
+> 2. **Incremental Lazy Loading & Smart Pre-fetch:** 20 items per page with background prefetching triggered around item 18/19 without disruption.
+
+- [x] **Step 27: Architecture Principles & Non-blocking Placeholder/Lazy Loading Pipeline**
+  - Documented the two core principles in `docs/ARCHITECTURE.md`, `android/AGENTS.md`, and plan.
+  - Enhanced Glide image loading across `ProductGridAdapter.java`, `CartAdapter.java`, `ImageCarouselAdapter.java`, and `ReviewItemsAdapter.java` with `DrawableTransitionOptions.withCrossFade()`.
+  - Updated `OfflineMockInterceptor.java` to handle pagination parameters (`page`, `per_page=20`), delivering realistic page slices and prefetching.
+  - Updated `OfflineMockInterceptorTest.java` with pagination verification; `./gradlew testDebugUnitTest` and `:app:lintDebug` passed with 0 errors.
+- [ ] **Step 28: Cart Screen Quantity Stepper & Removal Stability**
+  - Fix `QuantityStepperView.java`: replace bare text buttons with dedicated vector drawables/icons (`ic_minus.xml`, `ic_plus.xml`), ensure high-contrast tints (`@color/color_botanical_green` / `@color/text_primary_ink`), and remove text padding clipping.
+  - Fix Cart trash / remove button: update `OfflineMockInterceptor.java` to handle `DELETE /cart/items/{productId}` and update the in-memory cart state dynamically so items are removed and totals recomputed.
+- [ ] **Step 29: Account Screen Google Sign-In & Forgot Password Crash Fix**
+  - Anchor Snackbars to bottom navigation or proper anchor view so feedback displays clearly above the floating pill bottom navigation bar.
+  - Clarify Google Sign-In backend status (planned in `BACKEND-GOOGLE-AUTH-INTEGRATION.md`) and prevent dead-end UI confusion.
+  - Fix Forgot Password crash: resolve navigation action from `accountFragment` to `requestPasswordResetFragment` and `registerFragment` safely across nested graphs with comprehensive null checks and try-catch safety.
+- [ ] **Step 30: Home Category Mood Circles & "All" Icon Aesthetic Upgrade**
+  - Redesign `ic_category_all.xml` with a sleek, minimalist Dribbble/Pinterest-grade boutique bento/sparkle vector.
+  - Fix mood circle spacing: set uniform fixed item width (`72dp`) and balanced horizontal margins (`10dp`) on `item_category_mood_circle.xml` so all circles are spaced strictly equally regardless of label width.
+  - Streamline category labels to punchy, elegant single-word titles ("Shirts", "Pants", "Dresses", "Jackets", "T-Shirts", "Activewear", "Shoes", "Accessories", "Leather", "Bags") with centered text.
+- [ ] **Step 31: Swipe-to-Refresh on Home, Explore, and Cart**
+  - Wrap content layouts with `SwipeRefreshLayout` in `fragment_home.xml`, `fragment_explore.xml`, and `fragment_cart.xml`.
+  - Style swipe spinners with `@color/color_botanical_green` indicator tint.
+  - Connect pull-to-refresh to `CatalogListViewModel.reload()`, `CartViewModel.loadCart()`, and home feeds.
+- [ ] **Step 32: Instant Explore Search Filtering & Crash Elimination**
+  - Remove buggy cross-graph navigation on search input.
+  - Implement real-time in-place grid filtering with `TextWatcher` and debounce (starts filtering immediately once 2 characters are typed).
+  - Add null safety across search query and list updates.
+- [ ] **Step 33: Verification, Unit Tests & Android Lint**
+  - Verify clean test run (`testDebugUnitTest`) and lint check (`lintDebug`).
+

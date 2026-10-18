@@ -14,6 +14,7 @@ import com.averonlabs.eshopverse.core.model.CartItem;
 import com.averonlabs.eshopverse.core.money.MoneyFormat;
 import com.averonlabs.eshopverse.databinding.ItemReviewLineBinding;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 /**
  * Adapter for displaying ordered item snapshots on review screen M-12.
@@ -72,6 +73,7 @@ public class ReviewItemsAdapter extends ListAdapter<CartItem, ReviewItemsAdapter
                     .load(item.getImageUrl())
                     .placeholder(R.drawable.ic_image_placeholder)
                     .error(R.drawable.ic_image_placeholder)
+                    .transition(DrawableTransitionOptions.withCrossFade())
                     .into(binding.ivReviewItemImage);
         }
     }

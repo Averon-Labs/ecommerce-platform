@@ -15,6 +15,7 @@ import com.averonlabs.eshopverse.core.money.MoneyFormat;
 import com.averonlabs.eshopverse.core.ui.view.StatusBadgeView;
 import com.averonlabs.eshopverse.databinding.ItemProductCardBinding;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,6 +135,7 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
                     .load(product.getImageUrl())
                     .placeholder(R.drawable.ic_image_placeholder)
                     .error(R.drawable.ic_image_placeholder)
+                    .transition(DrawableTransitionOptions.withCrossFade())
                     .centerCrop()
                     .into(binding.ivProductImage);
 

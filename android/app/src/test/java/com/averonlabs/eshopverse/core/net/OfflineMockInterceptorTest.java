@@ -85,6 +85,23 @@ public class OfflineMockInterceptorTest {
             assertNotNull(envelope.getData());
             assertEquals(5, envelope.getData().size());
         }
+
+        // Verify pagination returns 20 items for page 1
+        Request pageRequest = new Request.Builder()
+                .url("http://127.0.0.1:54321/api/v1/products?page=1&per_page=20")
+                .build();
+        try (Response pageResponse = client.newCall(pageRequest).execute()) {
+            assertEquals(200, pageResponse.code());
+            assertNotNull(pageResponse.body());
+            Type type = new TypeToken<PagedResponse<ProductSummary>>() {}.getType();
+            PagedResponse<ProductSummary> envelope = gson.fromJson(pageResponse.body().string(), type);
+            assertNotNull(envelope.getData());
+            assertEquals(20, envelope.getData().size());
+            assertEquals(1, envelope.getPagination().getCurrentPage());
+            assertEquals(20, envelope.getPagination().getPerPage());
+            assertEquals(50, envelope.getPagination().getTotalItems());
+            assertEquals(3, envelope.getPagination().getTotalPages());
+        }
     }
 
     @Test

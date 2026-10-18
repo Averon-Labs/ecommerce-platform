@@ -118,6 +118,11 @@ starting any Android task.
   header redacted; body-level logging is never enabled.
 - **Transport.** HTTPS in every non-development configuration. Cleartext is permitted only in the
   debug build and only for the documented local development hosts.
+- **Immediate rendering & Pinterest placeholder.** Screen content and textual information must render
+  immediately upon data arrival. Do not hold UI rendering waiting for images. Every image view must display
+  an elegant Pinterest-style placeholder (`@drawable/ic_image_placeholder`), with Glide cross-fading the loaded image in asynchronously.
+- **Incremental lazy loading & prefetching.** Catalog and product lists must load in batches of 20 items.
+  When the user scrolls near the end of the batch (around item 18 or 19), trigger the next page load automatically in the background.
 - **Shared files.** Do not edit a file owned by another step (shell, Gradle, manifest, shared tokens,
   or another feature's package). Report the need instead.
 - **Git operations.** Agents are authorized to inspect status, branch, commit, push, and prepare PRs following the phase-based agent Git workflow (`feature/android-phase-<N>`).

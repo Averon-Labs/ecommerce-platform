@@ -3,6 +3,8 @@ package com.averonlabs.eshopverse.core.net;
 import androidx.annotation.NonNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.HttpUrl;
@@ -66,23 +68,58 @@ public class OfflineMockInterceptor implements Interceptor {
 
         if (path.endsWith("/products")) {
             String categoryIdParam = url.queryParameter("category_id");
-            StringBuilder itemsJson = new StringBuilder();
-            int count = 0;
+            String queryParam = url.queryParameter("q");
+            String pageParam = url.queryParameter("page");
+            String perPageParam = url.queryParameter("per_page");
+            int page = 1;
+            int perPage = 60; // Default when unpaginated to cover full set for tests
+            if (pageParam != null) {
+                try {
+                    page = Math.max(1, Integer.parseInt(pageParam));
+                    perPage = 20; // Default to 20 when pagination is active
+                } catch (Exception ignored) {}
+            }
+            if (perPageParam != null) {
+                try { perPage = Math.max(1, Integer.parseInt(perPageParam)); } catch (Exception ignored) {}
+            }
+
+            List<MockProduct> filtered = new ArrayList<>();
             for (MockProduct p : ALL_MOCK_PRODUCTS) {
                 if (categoryIdParam != null && !categoryIdParam.isEmpty()) {
-                    if (p.categoryId != Integer.parseInt(categoryIdParam)) {
+                    try {
+                        if (p.categoryId != Integer.parseInt(categoryIdParam)) {
+                            continue;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                if (queryParam != null && !queryParam.trim().isEmpty()) {
+                    String qLower = queryParam.trim().toLowerCase();
+                    if (!p.name.toLowerCase().contains(qLower)
+                            && !p.description.toLowerCase().contains(qLower)
+                            && !p.categoryName.toLowerCase().contains(qLower)) {
                         continue;
                     }
                 }
-                if (count > 0) {
-                    itemsJson.append(",");
+                filtered.add(p);
+            }
+
+            int totalItems = filtered.size();
+            int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / perPage));
+            int startIndex = (page - 1) * perPage;
+            int endIndex = Math.min(startIndex + perPage, totalItems);
+
+            StringBuilder itemsJson = new StringBuilder();
+            if (startIndex < totalItems) {
+                for (int i = startIndex; i < endIndex; i++) {
+                    if (itemsJson.length() > 0) {
+                        itemsJson.append(",");
+                    }
+                    itemsJson.append(filtered.get(i).toSummaryJson());
                 }
-                itemsJson.append(p.toSummaryJson());
-                count++;
             }
 
             return "{\"data\":[" + itemsJson.toString() + "],"
-                    + "\"pagination\":{\"currentPage\":1,\"perPage\":60,\"totalItems\":" + count + ",\"totalPages\":1}}";
+                    + "\"pagination\":{\"currentPage\":" + page + ",\"perPage\":" + perPage + ",\"totalItems\":" + totalItems + ",\"totalPages\":" + totalPages + "}}";
         }
 
         if (path.contains("/products/")) {
