@@ -249,10 +249,12 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
     - Added safe navigation try-catch fallbacks across `AccountFragment.java`, `RequestPasswordResetFragment.java`, and `SetNewPasswordFragment.java`.
   - Added anchored success snackbar on profile update (`R.string.auth_feedback_profile_updated`).
   - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
-- [ ] **Step 31: Home Category Mood Circles & "All" Icon Aesthetic Upgrade**
-  - Redesign `ic_category_all.xml` with a sleek, minimalist Dribbble/Pinterest-grade boutique bento/sparkle vector.
-  - Fix mood circle spacing: set uniform fixed item width (`72dp`) and balanced horizontal margins (`10dp`) on `item_category_mood_circle.xml` so all circles are spaced strictly equally regardless of label width.
-  - Streamline category labels to punchy, elegant single-word titles ("Shirts", "Pants", "Dresses", "Jackets", "T-Shirts", "Activewear", "Shoes", "Accessories", "Leather", "Bags") with centered text.
+- [x] **Step 31: Home Category Mood Circles & "All" Icon Aesthetic Upgrade**
+  - Redesigned `ic_category_all.xml` with a 3-star luxury boutique sparkle vector using smooth cubic Bezier paths.
+  - Set uniform fixed item width (`72dp`), 10dp marginEnd, and centered labels (`match_parent`, `gravity="center"`, `textAlignment="center"`) on `item_category_mood_circle.xml`, guaranteeing strictly equal circle spacing across all categories regardless of text length.
+  - Added `CategoryIconResolver.getStreamlinedName(...)` mapping compound names to clean, punchy, single-word titles ("Shirts", "Pants", "Dresses", "Jackets", "T-Shirts", "Activewear", "Shoes", "Accessories", "Leather", "Bags") in `HomeFragment.java`.
+  - Added unit test cases for single-word category names and `getStreamlinedName()` in `CategoryIconResolverTest.java`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
 - [ ] **Step 32: Swipe-to-Refresh on Home, Explore, and Cart**
   - Wrap content layouts with `SwipeRefreshLayout` in `fragment_home.xml`, `fragment_explore.xml`, and `fragment_cart.xml`.
   - Style swipe spinners with `@color/color_botanical_green` indicator tint.

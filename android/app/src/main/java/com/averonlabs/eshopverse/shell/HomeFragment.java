@@ -125,7 +125,7 @@ public class HomeFragment extends Fragment {
                     holder.itemView.setOnClickListener(v -> navigateToExploreCategory(-1, getString(R.string.catalog_category_all)));
                 } else {
                     Category category = categories.get(position - 1);
-                    nameView.setText(category.getName());
+                    nameView.setText(CategoryIconResolver.getStreamlinedName(category.getName()));
                     iconView.setImageResource(CategoryIconResolver.getCategoryIcon(category.getName()));
                     holder.itemView.setOnClickListener(v -> navigateToExploreCategory(category.getId(), category.getName()));
                 }
