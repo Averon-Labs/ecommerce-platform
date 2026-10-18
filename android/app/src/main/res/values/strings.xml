@@ -31,6 +31,9 @@
     <string name="home_hero_subtitle">Objects with soul. Made to last.</string>
     <string name="home_hero_cta">EXPLORE THE EDIT ↗</string>
     <string name="home_trending_title">Trending this week</string>
+    <string name="home_bestsellers_title">Popular &amp; Best Sellers</string>
+    <string name="home_special_offers_title">Special Offers</string>
+    <string name="home_essentials_title">Curated Essentials</string>
     <string name="home_view_all">See all</string>
     <string name="home_category_all">All</string>
     <string name="home_category_home">Home</string>

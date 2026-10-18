@@ -66,6 +66,18 @@ public final class StateContainerView extends FrameLayout {
         setState(State.CONTENT, null, null, null);
     }
 
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        for (int i = getChildCount() - 1; i >= 0; i--) {
+            View child = getChildAt(i);
+            if (child != contentHost && child != messagePanel) {
+                removeView(child);
+                setContentView(child);
+            }
+        }
+    }
+
     public void setContentView(View view) {
         if (view == null) return;
         if (view.getParent() instanceof ViewGroup) {
@@ -85,6 +97,9 @@ public final class StateContainerView extends FrameLayout {
         progress.setVisibility(state == State.LOADING ? VISIBLE : GONE);
         message.setVisibility(state == State.EMPTY || state == State.ERROR ? VISIBLE : GONE);
         retry.setVisibility(state == State.ERROR && onRetry != null ? VISIBLE : GONE);
+        if (state != State.CONTENT) {
+            messagePanel.bringToFront();
+        }
         if (messageText != null) message.setText(messageText);
         if (retryLabel != null) retry.setText(retryLabel);
         setImportantForAccessibility(state == State.LOADING

@@ -31,9 +31,15 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
 
     private final List<ProductSummary> items = new ArrayList<>();
     @Nullable private final OnProductClickListener clickListener;
+    private final boolean isCarousel;
 
     public ProductGridAdapter(@Nullable OnProductClickListener clickListener) {
+        this(clickListener, false);
+    }
+
+    public ProductGridAdapter(@Nullable OnProductClickListener clickListener, boolean isCarousel) {
         this.clickListener = clickListener;
+        this.isCarousel = isCarousel;
     }
 
     public void submitList(@NonNull List<ProductSummary> newItems) {
@@ -71,6 +77,13 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
                 parent,
                 false
         );
+        if (isCarousel) {
+            ViewGroup.LayoutParams lp = binding.getRoot().getLayoutParams();
+            if (lp != null) {
+                lp.width = parent.getContext().getResources().getDimensionPixelSize(R.dimen.product_carousel_item_width);
+                binding.getRoot().setLayoutParams(lp);
+            }
+        }
         return new ProductViewHolder(binding);
     }
 
@@ -99,14 +112,6 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
             binding.tvProductPrice.setFormattedPrice(formattedPrice);
             binding.tvProductPrice.setTextColor(androidx.core.content.ContextCompat.getColor(itemView.getContext(), R.color.color_botanical_green));
 
-            // Organic Pinterest masonry staggered heights based on product ID
-            int[] staggeredHeights = {150, 195, 170, 220, 185};
-            int heightDp = staggeredHeights[Math.abs(product.getId()) % staggeredHeights.length];
-            int heightPx = (int) (heightDp * itemView.getContext().getResources().getDisplayMetrics().density);
-            if (binding.containerImage.getLayoutParams() != null) {
-                binding.containerImage.getLayoutParams().height = heightPx;
-            }
-
             String stockLabel;
             if (!product.isInStock()) {
                 binding.badgeOutOfStock.setVisibility(View.VISIBLE);
@@ -132,11 +137,13 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
                     .centerCrop()
                     .into(binding.ivProductImage);
 
-            binding.cardProduct.setOnClickListener(v -> {
+            View.OnClickListener onProductClickAction = v -> {
                 if (clickListener != null) {
                     clickListener.onProductClick(product);
                 }
-            });
+            };
+            binding.cardProduct.setOnClickListener(onProductClickAction);
+            binding.ivProductImage.setOnClickListener(onProductClickAction);
         }
     }
 }
