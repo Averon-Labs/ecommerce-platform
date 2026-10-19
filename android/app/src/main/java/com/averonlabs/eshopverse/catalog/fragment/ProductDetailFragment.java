@@ -70,6 +70,10 @@ public class ProductDetailFragment extends Fragment {
         setupAddToCartAction();
         observeViewModel();
 
+        binding.skeletonProductDetail.getRoot().setVisibility(View.VISIBLE);
+        binding.scrollProductContent.setVisibility(View.GONE);
+        binding.cardBottomActions.setVisibility(View.GONE);
+
         if (productId > 0) {
             viewModel.loadProduct(productId);
         } else {
@@ -185,9 +189,15 @@ public class ProductDetailFragment extends Fragment {
 
         switch (state.getStatus()) {
             case LOADING:
-                binding.stateContainer.setState(StateContainerView.State.LOADING, null, null, null);
+                binding.skeletonProductDetail.getRoot().setVisibility(View.VISIBLE);
+                binding.scrollProductContent.setVisibility(View.GONE);
+                binding.cardBottomActions.setVisibility(View.GONE);
+                binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
                 break;
             case CONTENT:
+                binding.skeletonProductDetail.getRoot().setVisibility(View.GONE);
+                binding.scrollProductContent.setVisibility(View.VISIBLE);
+                binding.cardBottomActions.setVisibility(View.VISIBLE);
                 binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
                 if (state.getData() != null) {
                     bindProduct(state.getData());
@@ -195,6 +205,7 @@ public class ProductDetailFragment extends Fragment {
                 break;
             case EMPTY:
             case ERROR:
+                binding.skeletonProductDetail.getRoot().setVisibility(View.GONE);
                 binding.stateContainer.setState(
                         StateContainerView.State.ERROR,
                         getString(state.getMessageRes() != 0 ? state.getMessageRes() : R.string.catalog_error_load_details),
