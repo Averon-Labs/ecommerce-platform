@@ -581,14 +581,16 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 7 — IMG-001 — Instant Image Engine & Cache Strategy
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Component contribution:** Implement multi-tier aggressive disk caching and local asset fallback to deliver near 0ms image display.
 
 **Acceptance criteria:**
-- [ ] **a.** Configure Glide with `DiskCacheStrategy.ALL` to eliminate repeated network fetches.
-- [ ] **b.** Support local product image assets from `temp_data` for instantaneous offline catalog rendering.
-- [ ] **c.** Verify zero-jank image loading with smooth crossfades and lookahead prefetching.
+- [x] **a.** Configure Glide with `DiskCacheStrategy.ALL` to eliminate repeated network fetches.
+- [x] **b.** Support local product image assets from `temp_data` for instantaneous offline catalog rendering.
+- [x] **c.** Verify zero-jank image loading with smooth crossfades and lookahead prefetching.
+
+**Verification:** updated `ImageLoaderHelper.java` to enforce `DiskCacheStrategy.ALL` across both load and preload methods, converted all 50 product catalog images to lightweight WebP assets under `android/app/src/main/assets/products/`, wired offline mock asset resolution in `OfflineMockInterceptor.java`, and verified lookahead prefetching on Home and Explore screens (`ImageLoaderHelperTest` 100% pass).
 
 ## External dependencies owned by other components
 
