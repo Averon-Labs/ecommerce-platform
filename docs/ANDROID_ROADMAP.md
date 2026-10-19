@@ -553,14 +553,16 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 5 — AUTH-005 — Google Sign-In Hardening & Keystore Expiry Fix
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Component contribution:** Fix NullPointerException during Google/mock sign-in by providing valid `expiresAt` timestamps and safe fallbacks in AuthRepository.
 
 **Acceptance criteria:**
-- [ ] **a.** OfflineMockInterceptor returns valid `expiresAt` ISO-8601 timestamps on auth endpoints.
-- [ ] **b.** AuthRepository handles missing or null expiry gracefully without throwing NullPointerException in KeystoreTokenStore.
-- [ ] **c.** Google Sign-In button logs in smoothly without crashing the application.
+- [x] **a.** OfflineMockInterceptor returns valid `expiresAt` ISO-8601 timestamps on auth endpoints.
+- [x] **b.** AuthRepository handles missing or null expiry gracefully without throwing NullPointerException in KeystoreTokenStore.
+- [x] **c.** Google Sign-In button logs in smoothly without crashing the application.
+
+**Verification:** added safe expiry timestamp fallback in `AuthRepository.persistSessionSafely`, updated `/auth/google` in `OfflineMockInterceptor`, and added test in `AuthRepositoryTest.testGoogleLoginSuccessWithMissingExpiresAtDoesNotCrash` (100% test suite pass).
 
 ### Step 6 — FLT-001 — Advanced Filter Bottom Sheet
 
