@@ -1,0 +1,30 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Pass the Authorization and XSRF headers through to PHP
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    RewriteCond %{HTTP:x-xsrf-token} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+
+    # Root -> admin SPA (not Laravel's welcome page)
+    RewriteRule ^$ index.html [L]
+
+    # Laravel API + health check
+    RewriteRule ^api(/.*)?$ index.php [L]
+    RewriteRule ^up$ index.php [L]
+
+    # Real files (admin assets, fonts, index.html)
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # React Router fallback (admin pages such as /products)
+    RewriteRule ^ index.html [L]
+</IfModule>
+
+# Never serve Laravel environment files
+<FilesMatch "^\.env">
+    Require all denied
+</FilesMatch>

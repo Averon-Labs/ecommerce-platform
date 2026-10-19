@@ -361,6 +361,7 @@ Each Task ID has exactly one canonical task entry. Status, dependencies, accepta
 | FND-001 | [Android Roadmap — Phase 0 — Step 1](ANDROID_ROADMAP.md) | Verify Android scaffold and toolchain |
 | FND-006 | [Android Roadmap — Phase 0 — Step 2](ANDROID_ROADMAP.md) | Toolchain, dependency, and test-harness modernization |
 | UI-002 | [Android Roadmap — Phase 0 — Step 3](ANDROID_ROADMAP.md) | Android design token and component style layer |
+| UI-003 | [Admin Roadmap — Phase 3 — Step 6](ADMIN_ROADMAP.md) | Admin light/dark theme |
 | APP-002 | [Android Roadmap — Phase 0 — Step 4](ANDROID_ROADMAP.md) | App shell and navigation |
 | DOM-002 | [Android Roadmap — Phase 0 — Step 5](ANDROID_ROADMAP.md) | Money, API models, and shared UI state |
 | DATA-002 | [Android Roadmap — Phase 0 — Step 6](ANDROID_ROADMAP.md) | Secure token storage and local persistence decision |
@@ -399,6 +400,12 @@ Each Task ID has exactly one canonical task entry. Status, dependencies, accepta
 ## Optional follow-up — Public deployment
 
 Public hosting is outside the required portfolio release. Do not block Phases 0–3 on it. If requested, create a separately scoped deployment Task after the local release is complete. Before execution, the owner must choose/approve the hosting provider, domain/origin arrangement, budget, secrets/configuration, and public demo-account policy. Deployment must use HTTPS, fictional data, and the simulated-payment boundary; production operations remain a separate project.
+
+**Deployment record (2026-10-19):** the owner approved a free ByetHost demo deployment at
+`https://eshopverse.byethost8.com` with the admin SPA and Laravel API on the same HTTPS origin. The backend,
+database import, API health/products checks, and admin sign-in were verified live. The admin theme update is
+built and packaged for upload. Setup, environment guidance, file layout, and ByetHost limitations are recorded
+in [`DEPLOYMENT.md`](DEPLOYMENT.md). This does not change the production/non-production boundary above.
 
 ## Deferred product features
 

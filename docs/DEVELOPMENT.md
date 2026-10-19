@@ -279,7 +279,7 @@ npm run lint                   # eslint .
 npm test
 npm run test:watch
 
-# WCAG 2.2 contrast check for the admin light-theme tokens (no dependencies)
+# WCAG 2.2 contrast check for the admin light + dark tokens (no dependencies)
 npm run check:contrast
 
 # Production build (runs the type-check first, output in dist/)
@@ -304,8 +304,12 @@ npm run preview                # serve the production build locally
   secret belongs in this file or anywhere in the admin source.
 - Requests that carry session/CSRF state (login, logout, mutations) are sent with
   `credentials: 'include'` so `eshop_admin_session` and `XSRF-TOKEN` cookies travel, and echo the
-  `XSRF-TOKEN` cookie in the `X-XSRF-TOKEN` header. Tokens are never written to `localStorage`;
-  the SPA derives its auth state from `GET /admin/auth/session`.
+  `XSRF-TOKEN` cookie in the `X-XSRF-TOKEN` header. Auth tokens are never written to `localStorage`;
+  the SPA derives its auth state from `GET /admin/auth/session`. The only stored preference is the
+  non-sensitive `eshop-admin-theme` light/dark value.
+- The admin theme follows the operating-system preference by default and persists an explicit choice.
+  The boot script applies it before first paint; details and tokens: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md)
+  § Admin Web Theme.
 - If port 8000 is occupied locally, run the API on another port (for example
   `php artisan serve --port=8010`) and update `VITE_API_BASE_URL` accordingly.
 
@@ -367,6 +371,24 @@ Rehearsed from a clean checkout of commit `a15def7` (`git worktree add --detach 
 The checked-in workflow (`.github/workflows/ci.yml`) currently runs only the repository-structure,
 Android, and backend jobs; adding the admin job and recording its verified run is part of the
 pending project task **FND-005** (CI workflow changes require human approval).
+
+**Verification status (2026-10-19, UI-003 light/dark theme):**
+
+| Command (from `admin/`) | Result |
+|-------------------------|--------|
+| `npm run typecheck` | ✔ exit 0, no errors |
+| `npm run lint` | ✔ exit 0, no warnings or errors |
+| `npm run check:contrast` | ✔ 34/34 pairs pass (17 light + 17 dark) |
+| `npm test` | ✔ 11 test files, 85 tests passed (adds stored/system/toggle theme tests) |
+| `npm run build` | ✔ exit 0 — `dist/` with one CSS (`index-tL7PdeFP.css`, ~37 kB) and one JS (`index-X4fCBd4x.js`, ~348 kB) bundle |
+| `npm run preview` + browser smoke | ✔ OS-dark default rendered dark; toggle switched to light; `localStorage["eshop-admin-theme"]` became `light`; reload kept light |
+
+The theme implementation adds `src/theme/ThemeContext.tsx`, `src/components/ThemeToggle.tsx`, an inline
+boot script in `admin/index.html`, and `color-scheme` declarations in `src/globals.css`. The toggle is in the
+authenticated shell header and on sign-in, not-found, and API-unreachable states; it is a 44px minimum target
+with an accessible name and `aria-pressed`. Light remains the default baseline when the OS has no preference.
+The production build keeps the same-origin API path (`VITE_API_BASE_URL=/api/v1`); the deployment/upload guide
+is [`DEPLOYMENT.md`](DEPLOYMENT.md).
 
 ---
 

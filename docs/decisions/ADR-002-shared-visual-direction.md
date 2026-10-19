@@ -43,3 +43,12 @@ The owner supplied an e-commerce mobile and admin-dashboard reference and reques
 - Android font assets must be bundled locally with the applicable license notice when implemented; web font loading must not require a third-party runtime request.
 - The light palette is the first-release baseline. Dark mode and user-selected dynamic palettes require a later design task.
 - Verify real component contrast and keyboard/screen-reader behavior during implementation and QUAL-002; palette values alone are not accessibility evidence.
+
+## Update (2026-10-19)
+
+The owner approved a follow-up admin theme task (UI-003). The admin dashboard now exposes a persisted
+light/dark toggle using the existing coral/neutral dark tokens; light remains the baseline, and the choice
+follows the OS preference until the user sets one. The implementation, contrast evidence, and accessibility
+behavior are recorded in [`DESIGN_SYSTEM.md`](../DESIGN_SYSTEM.md) § Admin Web Theme and the Admin Roadmap
+Phase 3 Step 6. Android dark mode and user-selected dynamic palettes remain deferred; this update does not
+change the Android visual direction.

@@ -8,6 +8,10 @@ A portfolio e-commerce application with an Android customer app, REST API, and a
 
 EShop Verse is a single-store portfolio project for an international audience. The Android customer app and admin dashboard use the same REST API. The first release uses English UI and sample USD prices, and checkout uses a simulated payment flow.
 
+> **Optional live demo:** <https://eshopverse.byethost8.com> — free ByetHost hosting with the admin SPA and
+> Laravel API on the same origin. It is a portfolio demo, not a production service; setup, limitations, and
+> the upload archive are recorded in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
 ## Features
 
 ### Customer Application (Android)
@@ -19,6 +23,7 @@ EShop Verse is a single-store portfolio project for an international audience. T
 ### Admin Dashboard
 - Product, category, and inventory management
 - Order status management
+- Persisted light/dark theme with an accessible shell and sign-in toggle
 
 ### Backend API
 - RESTful API serving both client applications
@@ -72,6 +77,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed architecture docum
 ├── android/           # Android customer application
 ├── backend/           # PHP REST API
 ├── admin/             # Admin dashboard
+├── deploy/            # Optional ByetHost upload assets (generated .zip is git-ignored)
 ├── docs/              # Project documentation
 │   ├── decisions/     # Architecture Decision Records
 │   └── *.md           # Topic-specific documentation
@@ -126,6 +132,7 @@ Supported agents include Claude Code, OpenAI Codex, Google Gemini/Antigravity, G
 | [SECURITY.md](docs/SECURITY.md) | Security guidelines |
 | [TESTING.md](docs/TESTING.md) | Testing strategy |
 | [DEVELOPMENT.md](docs/DEVELOPMENT.md) | Development workflow |
+| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Optional ByetHost public demo deployment and upload guide |
 | [DECISIONS.md](docs/DECISIONS.md) | Architecture decisions index |
 | [ROADMAP.md](docs/ROADMAP.md) | Cross-component tasks and final project/release validation |
 | [ANDROID_ROADMAP.md](docs/ANDROID_ROADMAP.md) | Sole Android execution roadmap: phases, numbered steps, status, and canonical task criteria |
@@ -136,13 +143,15 @@ Supported agents include Claude Code, OpenAI Codex, Google Gemini/Antigravity, G
 
 ## Project Status
 
-**Phase 0 — Foundation**
+**Phase 3 — Quality and Portfolio Delivery (component roadmaps delivered; final cross-component validation pending)**
 
-The first-release product scope and engineering workflow are documented. Feature completion has not yet been verified for the full product: the backend is complete and verified, the admin dashboard has committed its Phase 3 quality contributions for review, and the Android customer app is completing its Phase 2 steps.
+The first-release product scope and engineering workflow are documented. The backend, admin, and Android component roadmaps are delivered; final cross-component QUAL consolidation, CI completion, and release validation remain.
 
 **Backend API: ✅ complete and verified (2026-10-15).** All Backend Roadmap Phases 0–3 are delivered — customer auth, catalog, cart, checkout/orders with idempotency, simulated payment, and the admin session/catalog/inventory/order APIs — with 153 passing tests (2062 assertions), clean style and dependency audits. See [docs/BACKEND_ROADMAP.md](docs/BACKEND_ROADMAP.md), [docs/SECURITY_REVIEW.md](docs/SECURITY_REVIEW.md), and [docs/HANDOFF.md](docs/HANDOFF.md).
 
-**Admin dashboard: Phases 0–2 merged; Phase 3 quality contributions committed (pending independent verification).** React 19 + TypeScript 6 + Vite 8 SPA with Sanctum session auth and the product/category/inventory/order screens; the admin portions of QUAL-001–QUAL-005 (regression evidence, accessibility and contrast fixes, security review, handoff walkthrough, clean-checkout rehearsal) are recorded in [docs/ADMIN_ROADMAP.md](docs/ADMIN_ROADMAP.md) Phase 3, with the reviewer walkthrough in [docs/HANDOFF.md](docs/HANDOFF.md).
+**Android customer app: ✅ Phases 0–3 complete.** The Java/XML Material 3 customer app covers the full purchase journey, accessibility and contrast checks, security/privacy hardening, handoff documentation, and a clean-checkout rehearsal recorded in [docs/ANDROID_ROADMAP.md](docs/ANDROID_ROADMAP.md).
+
+**Admin dashboard: ✅ Phases 0–3 delivered; Phase 3 quality contributions merged via [PR #47](https://github.com/Averon-Labs/eshop-verse/pull/47), plus the UI-003 light/dark theme ([PR #55](https://github.com/Averon-Labs/eshop-verse/pull/55)).** React 19 + TypeScript 6 + Vite 8 SPA with Sanctum session auth, the product/category/inventory/order screens, and a persisted light/dark theme (OS default, saved choice, 44px accessible toggle, 34/34 contrast pairs). The admin portions of QUAL-001–QUAL-005 are recorded in [docs/ADMIN_ROADMAP.md](docs/ADMIN_ROADMAP.md) Phase 3, the theme in Phase 3 Step 6, and the reviewer walkthrough in [docs/HANDOFF.md](docs/HANDOFF.md). The optional ByetHost demo deployment is documented in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 Use the relevant component roadmap to execute and report component work. Use [docs/ROADMAP.md](docs/ROADMAP.md) for cross-component tasks and final project/release validation only.
 
