@@ -12,9 +12,9 @@ import androidx.annotation.Nullable;
 import com.averonlabs.eshopverse.R;
 import com.averonlabs.eshopverse.core.model.ProductSummary;
 import com.averonlabs.eshopverse.core.money.MoneyFormat;
+import com.averonlabs.eshopverse.core.ui.ImageLoaderHelper;
 import com.averonlabs.eshopverse.core.ui.view.PriceTextView;
 import com.averonlabs.eshopverse.core.ui.view.StatusBadgeView;
-import com.bumptech.glide.Glide;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.textview.MaterialTextView;
 
@@ -76,11 +76,6 @@ public class ProductCardView extends MaterialCardView {
         ));
 
         String imageUrl = product.getImageUrl();
-        Glide.with(getContext())
-                .load(imageUrl)
-                .placeholder(R.drawable.ic_image_placeholder)
-                .error(R.drawable.ic_image_placeholder)
-                .centerCrop()
-                .into(imageView);
+        ImageLoaderHelper.loadImage(imageView, imageUrl);
     }
 }

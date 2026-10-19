@@ -109,4 +109,10 @@
     <color name="glass_dark_stroke">#33394339</color>
     <color name="glow_indigo_start">#4D385740</color>
     <color name="glow_violet_start">#4DD4A894</color>
+
+    <!-- Progressive Image Loading & Shimmer Skeleton tokens -->
+    <color name="placeholder_shimmer_base">#F0ECE1</color>
+    <color name="placeholder_shimmer_highlight">#FAF8F2</color>
+    <color name="placeholder_shimmer_edge">#E6E0D2</color>
+    <color name="placeholder_fallback_tint">#A0A59B</color>
 </resources>

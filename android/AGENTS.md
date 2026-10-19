@@ -118,11 +118,19 @@ starting any Android task.
   header redacted; body-level logging is never enabled.
 - **Transport.** HTTPS in every non-development configuration. Cleartext is permitted only in the
   debug build and only for the documented local development hosts.
-- **Immediate rendering & Pinterest placeholder.** Screen content and textual information must render
-  immediately upon data arrival. Do not hold UI rendering waiting for images. Every image view must display
-  an elegant Pinterest-style placeholder (`@drawable/ic_image_placeholder`), with Glide cross-fading the loaded image in asynchronously.
-- **Incremental lazy loading & prefetching.** Catalog and product lists must load in batches of 20 items.
+- **Immediate rendering, zero CLS & progressive image loading.** Screen content, pricing, and textual
+  information must render immediately upon data arrival (<100ms). Never hold UI rendering waiting for images.
+  Image viewports must enforce fixed aspect ratios (1:1 for catalog cards, 16:9 for banners, 4:5 for detail galleries)
+  to guarantee zero Cumulative Layout Shift (CLS = 0).
+- **Curated shimmer skeleton & luxury error fallbacks.** Image viewports must display a refined brand shimmer/skeleton
+  drawable (`@drawable/bg_placeholder_shimmer`) or editorial watermark (`@drawable/ic_image_placeholder`) during load.
+  Failed images must display a muted luxury fallback vector (`@drawable/ic_image_placeholder_error`); never show raw
+  empty holes or default broken image markers.
+- **Glide multi-tier caching & smooth cross-fade.** Always load images with `DrawableTransitionOptions.withCrossFade(250)`,
+  `DiskCacheStrategy.AUTOMATIC`, memory caching enabled, and target-sized hardware decoding.
+- **Incremental lazy loading & proactive prefetching.** Catalog and product lists must load in batches of 20 items.
   When the user scrolls near the end of the batch (around item 18 or 19), trigger the next page load automatically in the background.
+  Proactively prefetch off-screen image URLs (the next 4–6 items in scroll direction) into Glide cache.
 - **Shared files.** Do not edit a file owned by another step (shell, Gradle, manifest, shared tokens,
   or another feature's package). Report the need instead.
 - **Git operations.** Agents are authorized to inspect status, branch, commit, push, and prepare PRs following the phase-based agent Git workflow (`feature/android-phase-<N>`).

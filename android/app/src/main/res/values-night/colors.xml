@@ -103,4 +103,10 @@
     <color name="glass_white_30">#33FFFFFF</color>
     <color name="glass_dark_40">#80151A16</color>
     <color name="glass_dark_stroke">#33394339</color>
+
+    <!-- Progressive Image Loading & Shimmer Skeleton tokens in dark mode -->
+    <color name="placeholder_shimmer_base">#1C231D</color>
+    <color name="placeholder_shimmer_highlight">#2A362C</color>
+    <color name="placeholder_shimmer_edge">#151B16</color>
+    <color name="placeholder_fallback_tint">#6E776A</color>
 </resources>

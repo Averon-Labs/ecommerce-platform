@@ -30,6 +30,8 @@ import com.averonlabs.eshopverse.catalog.ProductGridAdapter;
 import com.averonlabs.eshopverse.catalog.ProductParams;
 import com.averonlabs.eshopverse.core.model.Category;
 import com.averonlabs.eshopverse.core.model.ProductSummary;
+import com.averonlabs.eshopverse.core.ui.ImageLoaderHelper;
+import com.averonlabs.eshopverse.core.ui.SkeletonAdapter;
 import com.averonlabs.eshopverse.core.state.UiState;
 import com.averonlabs.eshopverse.core.ui.view.StateContainerView;
 import com.averonlabs.eshopverse.databinding.FragmentExploreBinding;
@@ -100,11 +102,16 @@ public class ExploreFragment extends Fragment {
         binding.rvProducts.setLayoutManager(layoutManager);
 
         gridAdapter = new ProductGridAdapter(this::onProductClicked);
-        binding.rvProducts.setAdapter(gridAdapter);
+        // Initially attach skeleton placeholder cards so the product grid is never blank or spinning
+        binding.rvProducts.setAdapter(new SkeletonAdapter(R.layout.item_skeleton_product_card, 6));
 
         binding.rvProducts.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (binding.rvProducts.getAdapter() != gridAdapter) {
+                    return; // Ignore scroll prefetching while skeleton placeholders are active
+                }
+
                 if (dy > 0) {
                     int visibleCount = layoutManager.getChildCount();
                     int totalCount = layoutManager.getItemCount();
@@ -112,6 +119,32 @@ public class ExploreFragment extends Fragment {
 
                     if ((visibleCount + firstVisible) >= totalCount - 4) {
                         catalogViewModel.loadNextPage();
+                    }
+
+                    // Proactive scroll lookahead prefetching (next 4-6 items)
+                    int lastVisible = layoutManager.findLastVisibleItemPosition();
+                    if (lastVisible >= 0 && lastVisible + 1 < totalCount) {
+                        List<ProductSummary> currentList = gridAdapter.getItems();
+                        int preloadEnd = Math.min(lastVisible + 5, currentList.size());
+                        for (int i = lastVisible + 1; i < preloadEnd; i++) {
+                            ProductSummary item = currentList.get(i);
+                            if (item != null && item.getImageUrl() != null) {
+                                ImageLoaderHelper.preload(recyclerView.getContext(), item.getImageUrl());
+                            }
+                        }
+                    }
+                } else if (dy < 0) {
+                    // Proactive reverse prefetching when scrolling back up
+                    int firstVisible = layoutManager.findFirstVisibleItemPosition();
+                    if (firstVisible > 0) {
+                        List<ProductSummary> currentList = gridAdapter.getItems();
+                        int preloadStart = Math.max(0, firstVisible - 4);
+                        for (int i = preloadStart; i < firstVisible; i++) {
+                            ProductSummary item = currentList.get(i);
+                            if (item != null && item.getImageUrl() != null) {
+                                ImageLoaderHelper.preload(recyclerView.getContext(), item.getImageUrl());
+                            }
+                        }
                     }
                 }
             }
@@ -197,13 +230,16 @@ public class ExploreFragment extends Fragment {
     }
 
     private void setupCategoryChips() {
+        // Immediately attach skeleton chips so the category bar is never blank on initial entry
+        binding.rvCategories.setAdapter(new SkeletonAdapter(R.layout.item_skeleton_category_chip, 5));
+
         categoryViewModel.getCategoriesState().observe(getViewLifecycleOwner(), state -> {
             if (state != null && state.isContent() && state.getData() != null) {
                 renderCategoryChips(state.getData());
             }
         });
         categoryViewModel.getSelectedCategoryId().observe(getViewLifecycleOwner(), selectedId -> {
-            if (binding.rvCategories.getAdapter() != null) {
+            if (binding.rvCategories.getAdapter() != null && !(binding.rvCategories.getAdapter() instanceof SkeletonAdapter)) {
                 binding.rvCategories.getAdapter().notifyDataSetChanged();
             }
         });
@@ -293,11 +329,17 @@ public class ExploreFragment extends Fragment {
         switch (state.getStatus()) {
             case LOADING:
                 if (!binding.swipeRefreshExplore.isRefreshing()) {
-                    binding.stateContainer.setState(StateContainerView.State.LOADING, null, null, null);
+                    if (binding.rvProducts.getAdapter() != gridAdapter || gridAdapter.getItemCount() == 0) {
+                        binding.rvProducts.setAdapter(new SkeletonAdapter(R.layout.item_skeleton_product_card, 6));
+                    }
+                    binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
                 }
                 break;
             case CONTENT:
                 binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
+                if (binding.rvProducts.getAdapter() != gridAdapter) {
+                    binding.rvProducts.setAdapter(gridAdapter);
+                }
                 if (state.getData() != null) {
                     gridAdapter.submitList(state.getData());
                 }

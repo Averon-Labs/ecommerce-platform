@@ -8,9 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.averonlabs.eshopverse.R;
 import com.averonlabs.eshopverse.core.model.ProductImage;
+import com.averonlabs.eshopverse.core.ui.ImageLoaderHelper;
 import com.averonlabs.eshopverse.databinding.ItemProductImageBinding;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,13 +62,7 @@ public class ImageCarouselAdapter extends RecyclerView.Adapter<ImageCarouselAdap
                     itemView.getContext().getString(R.string.catalog_cd_product_image, position + 1, total)
             );
 
-            Glide.with(itemView.getContext())
-                    .load(image.getUrl())
-                    .placeholder(R.drawable.ic_image_placeholder)
-                    .error(R.drawable.ic_image_placeholder)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .centerCrop()
-                    .into(binding.ivCarouselImage);
+            ImageLoaderHelper.loadImage(binding.ivCarouselImage, image.getUrl());
         }
     }
 }

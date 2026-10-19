@@ -13,10 +13,13 @@
         android:layout_height="match_parent">
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/scroll_product_content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingBottom="130dp">
+            android:paddingBottom="130dp"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -203,15 +206,26 @@
 
         </androidx.core.widget.NestedScrollView>
 
+        <!-- Full-Screen Shimmer Skeleton for Product Detail -->
+        <include
+            android:id="@+id/skeleton_product_detail"
+            layout="@layout/layout_skeleton_product_detail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
         <!-- Sticky Bottom Action Bar (Floating Pill / Elevated Surface) -->
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_bottom_actions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             app:cardElevation="8dp"
             app:cardCornerRadius="0dp"
             app:strokeWidth="0dp"
-            app:cardBackgroundColor="@color/canvas_background">
+            app:cardBackgroundColor="@color/canvas_background"
+            android:visibility="gone"
+            tools:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"

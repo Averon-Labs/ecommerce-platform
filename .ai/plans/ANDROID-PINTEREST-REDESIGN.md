@@ -277,3 +277,88 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Executed Android Lint `./gradlew :app:lintDebug`: passed with 0 errors.
   - Phase 7 (UX Polish, Data Loading Architecture, Stability & Real-time Search) completed, verified, and ready.
 
+---
+
+### Phase 8: Progressive Image Loading, Shimmer Skeleton, Curated Placeholders & Multi-Tier Caching
+
+> **Architectural Non-Negotiables (Modeled after Netflix, Pinterest, Digikala, Instagram):**
+> 1. **Immediate Data-First Rendering & Zero Layout Shift (CLS = 0):** Product info, pricing, badges, and titles render immediately (<100ms) without waiting for images. Every image container enforces fixed aspect ratios (1:1 square for catalog cards, 16:9 for banners, 4:5 for detail galleries) via `ConstraintLayout` dimension ratios to prevent layout jumps.
+> 2. **Curated Shimmer / Skeleton Placeholders:** While images download, viewports display an animated warm gradient shimmer (`bg_placeholder_shimmer.xml`) or editorial brand watermark silhouette (`ic_image_placeholder.xml`) instead of raw empty boxes.
+> 3. **Smooth Asynchronous Cross-Fade (250ms):** When the bitmap decodes, it smoothly cross-fades into place (`withCrossFade(250)`) preventing jarring pops or screen flicker.
+> 4. **Multi-Tier Intelligent Caching:** Tier 1 RAM memory cache for 0ms instantaneous display when scrolling back and forth; Tier 2 on-disk cache (`DiskCacheStrategy.AUTOMATIC`) for instant offline display across app sessions; hardware downsampling to exact ImageView dimensions.
+> 5. **Proactive Scroll Prefetching:** Preload off-screen image URLs (the next 4–6 items in scroll direction) ahead of the user's viewport so images are already cached before scrolling into view.
+> 6. **Editorial Graceful Error Fallbacks:** Network or decode failures render a discreet botanical watermark vector (`ic_image_placeholder_error.xml`) rather than generic broken image alert icons.
+
+- [x] **Step 35: Luxury Shimmer/Skeleton Placeholder & Curated Error Fallback Vectors**
+  - Created `bg_placeholder_shimmer.xml` in `res/drawable/` with a warm linear gradient pulse (`#F0ECE1` -> `#FAF8F2` -> `#E6E0D2`) layered over the centered `@drawable/ic_image_placeholder` brand watermark.
+  - Created dark mode variants in `res/values-night/colors.xml` (`#1C231D` -> `#2A362C` -> `#151B16`).
+  - Created `ic_image_placeholder_error.xml` and `bg_placeholder_error.xml` featuring a minimalist editorial camera/artwork frame with a peaceful diagonal slash and 4-point atelier sparkle in muted taupe/olive (`#A0A59B` light, `#6E776A` dark) avoiding jarring broken image icons.
+  - Defined color tokens `placeholder_shimmer_base`, `placeholder_shimmer_highlight`, `placeholder_shimmer_edge`, `placeholder_fallback_tint`.
+  - Verified with `./gradlew :app:processDebugResources` (100% pass).
+
+- [x] **Step 36: Centralized Glide Configuration & Unified Image Loading Pipeline (`ImageLoaderHelper`)**
+  - Implemented `ImageLoaderHelper.java` in `com.averonlabs.eshopverse.core.ui`:
+    - Unified helper method `loadImage(ImageView target, String url)` and overloaded variants.
+    - Configured multi-tier caching with `DiskCacheStrategy.AUTOMATIC`, memory cache enabled (`skipMemoryCache(false)`), `fitCenter()` / `centerCrop()`, and smooth 250ms cross-fade transition (`DrawableTransitionOptions.withCrossFade(250)`).
+    - Automatically attaches `R.drawable.bg_placeholder_shimmer` and `R.drawable.bg_placeholder_error`.
+  - Migrated image loading across `ProductGridAdapter.java`, `CartAdapter.java`, `ProductCardView.java`, `ImageCarouselAdapter.java`, and `ReviewItemsAdapter.java`.
+  - Created unit tests in `ImageLoaderHelperTest.java` verifying constants and complete null safety on preload and clear operations.
+
+- [x] **Step 37: Proactive Scroll Prefetcher for RecyclerView Grids & Carousels**
+  - Attached proactive lookahead scroll prefetching in `ExploreFragment.java`:
+    - When scrolling down, looks ahead 4–6 items in scroll direction and submits URLs to `ImageLoaderHelper.preload(...)`.
+    - When scrolling up, preloads reverse items ahead of the viewport.
+  - Added background batch prefetching in `HomeFragment.java` for top carousel and grid sections via `ImageLoaderHelper.preloadBatch(...)`.
+  - Added `getItems()` and `getItem(position)` helpers in `ProductGridAdapter.java`.
+
+- [x] **Step 38: Verification, Test Suite & Android Lint**
+  - Executed full unit test suite `./gradlew testDebugUnitTest`: 100% pass across all unit tests.
+  - Executed Android Lint `./gradlew :app:lintDebug`: passed with 0 errors.
+  - Phase 8 (Progressive Image Loading, Shimmer Skeleton, Curated Placeholders & Multi-Tier Caching) completed, verified, and ready.
+
+---
+
+### Phase 9: Full-Screen Skeleton Shimmer Screens & Zero-Wait Placeholders (Netflix / Pinterest / Digikala Benchmark)
+
+> **Architectural Non-Negotiables:**
+> 1. **Immediate Skeleton Presence (0ms Blank-Screen Elimination):** At no point during app launch, screen navigation, or pull-to-refresh does the user see a bare white screen, isolated spinning progress circle, or headers with empty content gaps.
+> 2. **Pixel-Perfect Skeleton Geometry:** Skeleton items mirror real content geometry: 1:1 square image boxes, two lines for title, one pill for price, and 72dp mood circles with 56dp centers.
+> 3. **Harmonious Shimmer Pulse:** All skeleton placeholders share a subtle, elegant ambient gradient sweep (`bg_placeholder_shimmer.xml` and `bg_shimmer_bar.xml`) transitioning across Warm Ivory (`#F0ECE1`), Soft Sandstone (`#FAF8F2`), and Natural Taupe (`#E6E0D2`) in light mode; Charcoal/Forest (`#1C231D` to `#2A362C`) in dark mode.
+
+- [x] **Step 39: Skeleton Shimmer Layouts & Drawables**
+  - Created `bg_shimmer_bar.xml` in `res/drawable/` with 8dp rounded corners and warm linear gradient shimmer.
+  - Created `bg_shimmer_circle.xml` in `res/drawable/` with oval gradient for circular mood categories.
+  - Created `item_skeleton_product_card.xml` in `res/layout/` mirroring `item_product_card.xml` (1:1 image box, two-line title bars, and price bar).
+  - Created `item_skeleton_category_circle.xml` in `res/layout/` mirroring `item_category_mood_circle.xml` (56dp circle + 48dp label bar).
+  - Created `item_skeleton_category_chip.xml` in `res/layout/` mirroring `item_category_chip.xml` (84dp x 36dp pill bar).
+  - Created `layout_skeleton_product_detail.xml` in `res/layout/` mirroring the product detail screen structure.
+  - Verified resource compilation via `./gradlew :app:processDebugResources` (100% pass).
+
+- [x] **Step 40: Explore Screen Skeleton & Spinner Elimination**
+  - Replaced isolated `CircularProgressIndicator` screen-blanking in `ExploreFragment.java`:
+    - Initially attached 6 skeleton cards (`item_skeleton_product_card`) to `rvProducts` and 5 skeleton chips (`item_skeleton_category_chip`) to `rvCategories` on view creation.
+    - Set `StateContainerView` state to `CONTENT` during initial loading so skeleton shimmer cards are visible from millisecond 0 without screen-blanking.
+    - Protected scroll prefetcher against skeleton adapter types.
+    - Extended skeleton loading to `CategoryProductsFragment.java` and `SearchResultsFragment.java`.
+    - Created unit tests in `SkeletonAdapterTest.java` (100% pass).
+
+- [x] **Step 41: Home Screen Instant Skeleton Presentation**
+  - In `HomeFragment.java`:
+    - On `onViewCreated()`, immediately attached 8 skeleton mood circles (`item_skeleton_category_circle`) to `rvHomeCategories`.
+    - Attached 4 skeleton cards to `rvTrendingCarousel`, `rvBestsellersGrid`, `rvSpecialOffersCarousel`, and `rvEssentialsGrid`.
+    - Seamlessly swapped to real data when `UiState.CONTENT` arrives with zero empty gaps or layout reflow.
+
+- [x] **Step 42: Product Detail Screen Skeleton Loading**
+  - In `ProductDetailFragment.java` & `fragment_product_detail.xml`:
+    - Replaced the `StateContainerView.State.LOADING` screen-blanking with `layout_skeleton_product_detail`.
+    - Displayed 320dp bento card with warm shimmer gradient, category pill, title bar, price bar, divider, and description lines from millisecond 0 while network data fetches.
+    - Preserved immediate clickability and visibility of the circular floating back button.
+    - Seamlessly swapped to real data when `UiState.CONTENT` arrives with zero UI flicker.
+
+- [x] **Step 43: Verification, Test Suite & Android Lint**
+  - Executed full unit test suite `./gradlew testDebugUnitTest`: 100% pass across all unit tests.
+  - Executed Android Lint `./gradlew :app:lintDebug`: passed with 0 errors.
+  - Phase 9 (Full-Screen Skeleton Shimmer Screens & Zero-Wait Placeholders) 100% completed, verified, and ready.
+
+
+

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_skeleton_product"
+    style="@style/Widget.EShopVerse.Card.Product"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="@dimen/corner_card_pinterest"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@color/surface_white"
+    app:strokeColor="@color/border_hairline"
+    app:strokeWidth="@dimen/stroke_hairline">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Skeleton Image Viewport with 1:1 Aspect Ratio and Shimmer Gradient -->
+        <FrameLayout
+            android:id="@+id/container_skeleton_image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/bg_placeholder_shimmer"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Skeleton Text Metadata (Two Title Lines + Price Bar) -->
+        <LinearLayout
+            android:id="@+id/container_skeleton_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/container_skeleton_image">
+
+            <!-- Title Line 1 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="14dp"
+                android:layout_marginBottom="6dp"
+                android:background="@drawable/bg_shimmer_bar" />
+
+            <!-- Title Line 2 -->
+            <View
+                android:layout_width="90dp"
+                android:layout_height="14dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/bg_shimmer_bar" />
+
+            <!-- Price Bar -->
+            <View
+                android:layout_width="60dp"
+                android:layout_height="16dp"
+                android:background="@drawable/bg_shimmer_bar" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
