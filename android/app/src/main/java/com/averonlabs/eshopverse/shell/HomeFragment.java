@@ -192,23 +192,31 @@ public class HomeFragment extends Fragment {
                     }
                     trendingCarouselAdapter.submitList(all.subList(0, Math.min(8, total)));
 
+                    if (binding.rvBestsellersGrid.getAdapter() != bestSellersAdapter) {
+                        binding.rvBestsellersGrid.setAdapter(bestSellersAdapter);
+                    }
                     if (total > 8) {
-                        if (binding.rvBestsellersGrid.getAdapter() != bestSellersAdapter) {
-                            binding.rvBestsellersGrid.setAdapter(bestSellersAdapter);
-                        }
                         bestSellersAdapter.submitList(all.subList(8, Math.min(12, total)));
+                    } else {
+                        bestSellersAdapter.submitList(all.subList(0, Math.min(4, total)));
+                    }
+
+                    if (binding.rvSpecialOffersCarousel.getAdapter() != specialOffersAdapter) {
+                        binding.rvSpecialOffersCarousel.setAdapter(specialOffersAdapter);
                     }
                     if (total > 12) {
-                        if (binding.rvSpecialOffersCarousel.getAdapter() != specialOffersAdapter) {
-                            binding.rvSpecialOffersCarousel.setAdapter(specialOffersAdapter);
-                        }
                         specialOffersAdapter.submitList(all.subList(12, Math.min(20, total)));
+                    } else {
+                        specialOffersAdapter.submitList(all.subList(Math.max(0, total - 4), total));
+                    }
+
+                    if (binding.rvEssentialsGrid.getAdapter() != essentialsAdapter) {
+                        binding.rvEssentialsGrid.setAdapter(essentialsAdapter);
                     }
                     if (total > 20) {
-                        if (binding.rvEssentialsGrid.getAdapter() != essentialsAdapter) {
-                            binding.rvEssentialsGrid.setAdapter(essentialsAdapter);
-                        }
                         essentialsAdapter.submitList(all.subList(20, Math.min(24, total)));
+                    } else {
+                        essentialsAdapter.submitList(all.subList(0, Math.min(4, total)));
                     }
 
                     // Proactive background prefetching for top section product cards
