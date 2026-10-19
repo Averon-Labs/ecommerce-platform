@@ -54,6 +54,7 @@ EShop Verse is a portfolio project that demonstrates a complete single-store sho
 
 ### First-Release Requirements
 - Registration, sign-in, and profile basics.
+- Google Sign-In as an additional customer sign-in method (owner-approved AUTH-004; admin accounts are never created this way).
 - Password reset through the backend's configured email flow.
 - Product browsing, categories, search, sorting, and product details.
 - Cart management and signed-in checkout.

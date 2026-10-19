@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProductController;
@@ -43,6 +44,8 @@ Route::prefix('auth')->group(function (): void {
         ->middleware('throttle:auth-register');
     Route::post('login', [AuthController::class, 'login'])
         ->middleware('throttle:auth-login');
+    Route::post('google', [GoogleAuthController::class, 'login'])
+        ->middleware('throttle:auth-google');
     Route::post('password-reset', [PasswordResetController::class, 'store'])
         ->middleware('throttle:password-reset');
     Route::post('password-reset/confirm', [PasswordResetController::class, 'confirm']);

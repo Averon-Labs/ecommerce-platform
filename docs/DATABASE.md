@@ -16,7 +16,8 @@ The platform uses **MySQL** as its primary relational database. This document de
 |-------|------|-------|
 | id | Primary Key | Auto-increment |
 | email | String | Unique, required |
-| password_hash | String | Hashed, never stored in plain text |
+| password_hash | String | Hashed, never stored in plain text; nullable for Google-only accounts |
+| google_id | String | Nullable, unique; Google account subject (`sub`), added by AUTH-004 |
 | first_name | String | Required |
 | last_name | String | Required |
 | role | Enum | customer, admin |

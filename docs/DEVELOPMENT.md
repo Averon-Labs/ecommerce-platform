@@ -172,6 +172,8 @@ $env:DB_DATABASE = 'eshopverse_test'; php artisan migrate:fresh
 php artisan serve        # http://127.0.0.1:8000  (health: GET /up)
 ```
 
+**Google Sign-In configuration (AUTH-004):** set `GOOGLE_CLIENT_ID` in `.env` to the OAuth client ID whose `aud` claim `POST /api/v1/auth/google` accepts (the Android app's Google client ID). It is not a secret — ID tokens are verified against Google's published keys. When empty, the endpoint fails closed with `500 INTERNAL_ERROR` and no account is created.
+
 **Safety rules**
 - `.env` is git-ignored and holds the only real credentials; `.env.example` contains placeholders only. Never commit a `.env`.
 - Tests are hard-wired in `phpunit.xml` to `DB_CONNECTION=mysql` and `DB_DATABASE=eshopverse_test`. Never point them at `eshopverse_dev`.

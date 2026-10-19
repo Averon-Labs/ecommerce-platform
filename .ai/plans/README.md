@@ -37,7 +37,7 @@ This directory contains implementation plans created by agents before starting c
 | Component | Plan Document | Scope & Focus |
 | :--- | :--- | :--- |
 | **Android** | [`ANDROID-PINTEREST-REDESIGN.md`](ANDROID-PINTEREST-REDESIGN.md) | Pinterest / MUSE visual redesign, Warm Ivory theme, floating nav, auth & catalog. |
-| **Backend** | [`BACKEND-GOOGLE-AUTH-INTEGRATION.md`](BACKEND-GOOGLE-AUTH-INTEGRATION.md) | Google OAuth token verification (`POST /api/v1/auth/google`), MySQL schema, and JWT sessions. |
+| **Backend** | [`BACKEND-GOOGLE-AUTH-INTEGRATION.md`](BACKEND-GOOGLE-AUTH-INTEGRATION.md) | Google Sign-In token verification (`POST /api/v1/auth/google`), MySQL schema, and Sanctum bearer sessions (see the plan's implementation notes). Implemented and verified as AUTH-004. |
 | **Admin** | [`ADMIN-DASHBOARD-INTEGRATION.md`](ADMIN-DASHBOARD-INTEGRATION.md) | Customer OAuth provider badges, order views, and Bento design system alignment. |
 
 ## Guidelines

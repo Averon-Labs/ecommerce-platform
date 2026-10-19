@@ -139,7 +139,8 @@ All error responses follow a consistent format:
 
 - Android authenticates with revocable Sanctum bearer tokens in the `Authorization` header.
 - The first-party React admin uses Sanctum's cookie/session flow and CSRF protections; it must share a compatible top-level domain with the API.
-- The demo requires an account for checkout. There is no guest checkout or social login in the first release.
+- The demo requires an account for checkout. There is no guest checkout.
+- Google Sign-In (`POST /auth/google`, owner-approved AUTH-004, 2026-10-19) verifies a Google ID token server-side (signature, issuer, audience, expiry, verified email) and issues the same revocable Sanctum bearer session as password sign-in. New Google accounts are always `customer` role; no admin account is ever created or escalated through this endpoint.
 - The backend enforces customer ownership and admin roles on every protected resource. Hiding a control in the UI is not authorization.
 
 ---
@@ -180,6 +181,7 @@ All error responses follow a consistent format:
 The first-release contract must cover:
 
 - Registration, login, logout, and the authenticated customer profile.
+- Owner-approved Google Sign-In for customer accounts (`POST /auth/google`, AUTH-004).
 - Public product/category listing, search, sorting, and product details.
 - Authenticated cart read/update operations.
 - Order creation, customer order history/details, and a simulated payment outcome.
@@ -202,8 +204,9 @@ English is the only supported API-facing locale in the first release. Error mess
 
 ## Open Decisions and Resolution Status
 
-- [x] **Reviewed and accepted by the API owner (FND-004):** [`openapi.yaml`](openapi.yaml) is the approved OpenAPI 3.1 machine-readable contract, covering customer registration/login/logout/profile/password reset, public category and product read/search/sort/pagination, the authenticated cart, checkout quote and order creation with idempotency, the simulated payment outcome, customer order history and detail, admin session authentication, admin product/category/inventory management, admin order status transitions, the shared error envelope and error-code list, and the status-code contract. Endpoint and client integration must follow it; any contract change is made in the contract first (canonical task: Backend FND-004). Full backend implementation completed across Phase 1–3 (`c42dbd0`).
+- [x] **Reviewed and accepted by the API owner (FND-004):** [`openapi.yaml`](openapi.yaml) is the approved OpenAPI 3.1 machine-readable contract, covering customer registration/login/logout/profile/password reset, public category and product read/search/sort/pagination, the authenticated cart, checkout quote and order creation with idempotency, the simulated payment outcome, customer order history and detail, admin session authentication, admin product/category/inventory management, admin order status transitions, the shared error envelope and error-code list, and the status-code contract. Endpoint and client integration must follow it; any contract change is made in the contract first (canonical task: Backend FND-004). Full backend implementation completed across Phase 1–3 (`c42dbd0`). Later owner-approved addition: Google Sign-In (`POST /auth/google`, AUTH-004, 2026-10-19).
 - [x] **Rate limits (QUAL-003):** Implemented in backend `AppServiceProvider` and `bootstrap/app.php` using `x-rate-limit-classes` in [`openapi.yaml`](openapi.yaml) (global 300/min/ip plus per-operation throttles).
+- [x] **Google Sign-In (AUTH-004, 2026-10-19):** Owner-approved addition to the first-release contract. `POST /auth/google` accepts a Google ID token, verifies it server-side without an SDK dependency, and answers the shared `AuthSession` envelope (`201` when the account is created, `200` when it already exists). The endpoint carries its own `google-login` rate limit (10/min/ip) and the new `GOOGLE_ACCOUNT_CONFLICT` (409) error code. Contract updated before implementation; canonical task: Backend Roadmap — Phase 1 — Step 4.
 - [x] **Category lifecycle (OPEN-2):** Resolved as archived-only (`status: active | archived`). Backend `AdminCategoryController` enforces refusal to archive while active products remain assigned.
 - [x] **Flat sample shipping rate (OPEN-3):** Resolved as USD 5.00 flat rate per order (`CartPricing::SAMPLE_SHIPPING_CENTS = 500`).
 - [x] **Failed payment order state (OPEN-4):** Resolved as remaining in `pending_payment` on simulated failure, leaving stock intact and allowing client payment retry.

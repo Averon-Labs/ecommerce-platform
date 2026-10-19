@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Services\AccountLockout;
+use App\Services\AuthSessionIssuer;
 use App\Support\ApiError;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
@@ -29,7 +30,10 @@ class AuthController extends Controller
      */
     public const TIMING_DUMMY_HASH = '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi';
 
-    public function __construct(private readonly AccountLockout $lockout) {}
+    public function __construct(
+        private readonly AccountLockout $lockout,
+        private readonly AuthSessionIssuer $sessions,
+    ) {}
 
     public function register(RegisterRequest $request): JsonResponse
     {
@@ -56,7 +60,7 @@ class AuthController extends Controller
             throw $e;
         }
 
-        return $this->issueSession($user, 201);
+        return $this->sessions->issue($user, 201);
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -79,7 +83,7 @@ class AuthController extends Controller
 
         $this->lockout->clear($email);
 
-        return $this->issueSession($user);
+        return $this->sessions->issue($user);
     }
 
     public function logout(Request $request): Response
@@ -108,24 +112,6 @@ class AuthController extends Controller
         $user->save();
 
         return new UserResource($user);
-    }
-
-    /**
-     * Create the Sanctum bearer token and answer with the AuthSession
-     * schema: token, absolute expiresAt, and the user resource.
-     */
-    private function issueSession(User $user, int $status = 200): JsonResponse
-    {
-        $expiresAt = now()->addMinutes((int) config('sanctum.expiration'));
-        $plainTextToken = $user->createToken('android-app', ['*'], $expiresAt)->plainTextToken;
-
-        return response()->json([
-            'data' => [
-                'token' => $plainTextToken,
-                'expiresAt' => $expiresAt->toIso8601String(),
-                'user' => new UserResource($user),
-            ],
-        ], $status);
     }
 
     private function accountLockedResponse(string $email): JsonResponse

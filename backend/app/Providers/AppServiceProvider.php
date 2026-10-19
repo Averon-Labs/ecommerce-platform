@@ -62,6 +62,11 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perHour(5)->by($request->ip());
         });
 
+        // AUTH-004: x-rate-limit-classes google-login { limit: 10, window: 1m, key: ip }.
+        RateLimiter::for('auth-google', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip());
+        });
+
         RateLimiter::for('password-reset', function (Request $request) {
             $email = $request->input('email');
 
