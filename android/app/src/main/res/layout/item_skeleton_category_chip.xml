@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="@dimen/spacing_sm"
+    android:layout_marginTop="@dimen/spacing_xs"
+    android:layout_marginBottom="@dimen/spacing_xs">
+
+    <!-- Skeleton Chip Pill Bar (84dp x 36dp) -->
+    <View
+        android:layout_width="84dp"
+        android:layout_height="36dp"
+        android:background="@drawable/bg_shimmer_bar" />
+
+</FrameLayout>

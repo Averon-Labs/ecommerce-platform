@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="72dp"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="10dp"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <!-- Skeleton Category Circle (56dp x 56dp) -->
+    <View
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/bg_shimmer_circle" />
+
+    <!-- Skeleton Category Label Bar -->
+    <View
+        android:layout_width="48dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_shimmer_bar" />
+
+</LinearLayout>
