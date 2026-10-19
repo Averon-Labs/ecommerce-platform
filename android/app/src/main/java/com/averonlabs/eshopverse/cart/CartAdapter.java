@@ -13,9 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.averonlabs.eshopverse.R;
 import com.averonlabs.eshopverse.core.model.CartItem;
 import com.averonlabs.eshopverse.core.money.MoneyFormat;
+import com.averonlabs.eshopverse.core.ui.ImageLoaderHelper;
 import com.averonlabs.eshopverse.databinding.ItemCartLineBinding;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,13 +118,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartItemViewHo
             binding.tvCartLineTotal.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.color_botanical_green));
 
             // Thumbnail Image
-            Glide.with(itemView.getContext())
-                    .load(item.getImageUrl())
-                    .placeholder(R.drawable.ic_image_placeholder)
-                    .error(R.drawable.ic_image_placeholder)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .centerCrop()
-                    .into(binding.ivCartItemImage);
+            ImageLoaderHelper.loadImage(binding.ivCartItemImage, item.getImageUrl());
 
             // Warnings handling: priceChanged, unavailable, stock limits
             if (item.isPriceChanged()) {

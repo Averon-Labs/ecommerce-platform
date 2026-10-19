@@ -12,10 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.averonlabs.eshopverse.R;
 import com.averonlabs.eshopverse.core.model.ProductSummary;
 import com.averonlabs.eshopverse.core.money.MoneyFormat;
+import com.averonlabs.eshopverse.core.ui.ImageLoaderHelper;
 import com.averonlabs.eshopverse.core.ui.view.StatusBadgeView;
 import com.averonlabs.eshopverse.databinding.ItemProductCardBinding;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,6 +99,19 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
         return items.size();
     }
 
+    @NonNull
+    public List<ProductSummary> getItems() {
+        return Collections.unmodifiableList(items);
+    }
+
+    @Nullable
+    public ProductSummary getItem(int position) {
+        if (position >= 0 && position < items.size()) {
+            return items.get(position);
+        }
+        return null;
+    }
+
     class ProductViewHolder extends RecyclerView.ViewHolder {
 
         private final ItemProductCardBinding binding;
@@ -133,13 +145,7 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
                     stockLabel
             ));
 
-            Glide.with(itemView.getContext())
-                    .load(product.getImageUrl())
-                    .placeholder(R.drawable.ic_image_placeholder)
-                    .error(R.drawable.ic_image_placeholder)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .centerCrop()
-                    .into(binding.ivProductImage);
+            ImageLoaderHelper.loadImage(binding.ivProductImage, product.getImageUrl());
 
             View.OnClickListener onProductClickAction = v -> {
                 if (clickListener != null) {
