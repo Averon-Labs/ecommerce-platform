@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Warm Ambient Shimmer Gradient Background -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="45"
+                android:startColor="@color/placeholder_shimmer_base"
+                android:centerColor="@color/placeholder_shimmer_highlight"
+                android:endColor="@color/placeholder_shimmer_edge"
+                android:type="linear" />
+        </shape>
+    </item>
+
+    <!-- Centered Editorial Brand Silhouette Watermark -->
+    <item
+        android:drawable="@drawable/ic_image_placeholder"
+        android:gravity="center" />
+</layer-list>

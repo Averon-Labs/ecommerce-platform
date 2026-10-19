@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Soft Muted Surface Background -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/placeholder_shimmer_base" />
+        </shape>
+    </item>
+
+    <!-- Centered Editorial Error Fallback Vector -->
+    <item
+        android:drawable="@drawable/ic_image_placeholder_error"
+        android:gravity="center" />
+</layer-list>
