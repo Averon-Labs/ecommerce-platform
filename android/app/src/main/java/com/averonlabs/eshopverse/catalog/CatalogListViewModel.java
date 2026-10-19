@@ -134,6 +134,13 @@ public class CatalogListViewModel extends ViewModel {
     }
 
     /**
+     * Reloads the product catalog from scratch (alias for loadFirstPage).
+     */
+    public void reload() {
+        loadFirstPage();
+    }
+
+    /**
      * Requests the next page of products if more items exist and no request is in-flight.
      */
     public void loadNextPage() {

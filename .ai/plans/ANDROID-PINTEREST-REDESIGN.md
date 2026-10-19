@@ -215,3 +215,65 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - `./gradlew :app:lintDebug` passing with 0 errors.
   - Phase 6 (Real Catalog Seed, Sectioned Home, Square Grids & Explore Polish) completed and verified.
 
+---
+
+### Phase 7: UX Polish, Data Loading Architecture, Stability & Real-time Search
+
+> **Architectural Non-Negotiables:**
+> 1. **Immediate Data Rendering & Non-blocking Pinterest Placeholders:** Product info, titles, prices, and cards render immediately without waiting for images. Every image uses `@drawable/ic_image_placeholder` with smooth async Glide cross-fade.
+> 2. **Incremental Lazy Loading & Smart Pre-fetch:** 20 items per page with background prefetching triggered around item 18/19 without disruption.
+
+- [x] **Step 27: Architecture Principles & Non-blocking Placeholder/Lazy Loading Pipeline**
+  - Documented the two core principles in `docs/ARCHITECTURE.md`, `android/AGENTS.md`, and plan.
+  - Enhanced Glide image loading across `ProductGridAdapter.java`, `CartAdapter.java`, `ImageCarouselAdapter.java`, and `ReviewItemsAdapter.java` with `DrawableTransitionOptions.withCrossFade()`.
+  - Updated `OfflineMockInterceptor.java` to handle pagination parameters (`page`, `per_page=20`), delivering realistic page slices and prefetching.
+  - Updated `OfflineMockInterceptorTest.java` with pagination verification; `./gradlew testDebugUnitTest` and `:app:lintDebug` passed with 0 errors.
+- [x] **Step 28 (Priority): Product Detail Screen Crash Elimination, Navigation, Back Button & Add to Bag**
+  - Fix crash on product click from Home and Explore:
+    - In `nav_main.xml`, update `action_homeFragment_to_productDetailFragment` and `action_exploreFragment_to_productDetailFragment` to target `@id/nav_catalog` (the top-level nested graph id) instead of inner `@id/productDetailFragment`.
+    - In `nav_catalog.xml`, add `<argument android:name="productId" android:defaultValue="-1L" app:argType="long" />` to the root `<navigation>` element so argument bundles passed to `nav_catalog` are automatically forwarded to start destination `productDetailFragment`.
+    - In `HomeFragment.java` and `ExploreFragment.java`, add safe navigation and fallback handling `navController.navigate(R.id.nav_catalog, args)`.
+  - Add top circular back button to `fragment_product_detail.xml` (40dp frosted/surface pill button with `ic_arrow_back` / `ic_back` and 48dp touch target) allowing user to pop back to previous screen.
+  - In `ProductDetailFragment.java`:
+    - Add null safety for `product.getImages()` (preventing NPE when image list is null).
+    - Wire `btn_add_to_cart` to `CartRepository.addItem(...)` with quantity selection, visual confirmation feedback (Snackbar), and proper state handling.
+  - Verify with `./gradlew testDebugUnitTest` and `:app:lintDebug`.
+- [x] **Step 29: Cart Screen Quantity Stepper & Removal Stability**
+  - Fix `QuantityStepperView.java`: replace bare text buttons with dedicated vector drawables/icons (`ic_minus.xml`, `ic_plus.xml`), ensure high-contrast tints (`@color/color_botanical_green` / `@color/text_primary_ink`), and remove text padding clipping.
+  - Fix Cart trash / remove button: update `OfflineMockInterceptor.java` to handle `DELETE /cart/items/{productId}` and update the in-memory cart state dynamically so items are removed and totals recomputed.
+- [x] **Step 30: Account Screen Google Sign-In & Forgot Password Crash Fix**
+  - Anchored Snackbars across `AccountFragment.java` and `CartFragment.java` using `snackbar.setAnchorView(bottomNav)` (anchored to `card_bottom_nav`), ensuring feedback toasts float clearly above the floating pill bottom navigation bar.
+  - Resolved Forgot Password and Register navigation:
+    - Added first-class fragment destinations `registerFragment`, `requestPasswordResetFragment`, and `setNewPasswordFragment` directly in `nav_main.xml`.
+    - Configured actions `action_requestPasswordResetFragment_to_setNewPasswordFragment`, `action_setNewPasswordFragment_to_requestPasswordResetFragment`, and `action_setNewPasswordFragment_to_signInFragment`.
+    - Added safe navigation try-catch fallbacks across `AccountFragment.java`, `RequestPasswordResetFragment.java`, and `SetNewPasswordFragment.java`.
+  - Added anchored success snackbar on profile update (`R.string.auth_feedback_profile_updated`).
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 31: Home Category Mood Circles & "All" Icon Aesthetic Upgrade**
+  - Redesigned `ic_category_all.xml` with a 3-star luxury boutique sparkle vector using smooth cubic Bezier paths.
+  - Set uniform fixed item width (`72dp`), 10dp marginEnd, and centered labels (`match_parent`, `gravity="center"`, `textAlignment="center"`) on `item_category_mood_circle.xml`, guaranteeing strictly equal circle spacing across all categories regardless of text length.
+  - Added `CategoryIconResolver.getStreamlinedName(...)` mapping compound names to clean, punchy, single-word titles ("Shirts", "Pants", "Dresses", "Jackets", "T-Shirts", "Activewear", "Shoes", "Accessories", "Leather", "Bags") in `HomeFragment.java`.
+  - Added unit test cases for single-word category names and `getStreamlinedName()` in `CategoryIconResolverTest.java`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 32: Swipe-to-Refresh on Home, Explore, and Cart**
+  - Integrated `SwipeRefreshLayout` across `fragment_home.xml` (`swipe_refresh_home`), `fragment_explore.xml` (`swipe_refresh_explore`), and `fragment_cart.xml` (`swipe_refresh_cart`).
+  - Styled swipe spinners with brand botanical green (`@color/color_botanical_green`) via `setColorSchemeResources`.
+  - Added semantic `reload()` to `CatalogListViewModel.java` resetting pagination to page 1.
+  - Connected pull-to-refresh:
+    - Home: reloads first page catalog products and category list;
+    - Explore: reloads catalog products via `catalogViewModel.reload()` and categories via `categoryViewModel.loadCategories()`;
+    - Cart: reloads current cart lines and server totals via `viewModel.loadCart()`.
+  - Polished state transitions: keeps existing content visible under the refresh spinner during pull-to-refresh without blanking into full-screen loading state, and cleanly dismisses refreshing indicator on state emission.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 33: Instant Explore Search Filtering & Crash Elimination**
+  - Removed cross-graph navigation on search input in `ExploreFragment.java` (eliminating `IllegalArgumentException` on `searchResultsFragment`).
+  - Implemented real-time in-place grid filtering with `TextWatcher` and 300ms debounce (starts filtering immediately once 2 characters are typed, resets to full catalog on clear).
+  - Wired keyboard `EditorInfo.IME_ACTION_SEARCH` to query immediately and dismiss the soft keyboard without navigating away.
+  - Added null safety across `ProductGridAdapter.submitList(...)` accepting `@Nullable` with `Collections.emptyList()` fallback.
+  - Added unit test cases `testSetQueryTriggersSearchAndReset` and `testReloadCallsFirstPage` in `CatalogListViewModelTest.java`.
+  - Verified with `./gradlew testDebugUnitTest` (100% pass) and `./gradlew :app:lintDebug` (0 errors).
+- [x] **Step 34: Verification, Unit Tests & Android Lint**
+  - Executed full unit test suite `./gradlew testDebugUnitTest`: 100% pass across all 182+ tests.
+  - Executed Android Lint `./gradlew :app:lintDebug`: passed with 0 errors.
+  - Phase 7 (UX Polish, Data Loading Architecture, Stability & Real-time Search) completed, verified, and ready.
+

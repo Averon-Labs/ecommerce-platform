@@ -27,5 +27,28 @@ public class CategoryIconResolverTest {
         assertEquals(R.drawable.ic_category_accessories, CategoryIconResolver.getCategoryIcon("Accessories"));
         assertEquals(R.drawable.ic_category_leather, CategoryIconResolver.getCategoryIcon("Leather & Suede"));
         assertEquals(R.drawable.ic_category_bags, CategoryIconResolver.getCategoryIcon("Bags & Backpacks"));
+
+        // Single-word streamlined category names
+        assertEquals(R.drawable.ic_category_shirts, CategoryIconResolver.getCategoryIcon("Shirts"));
+        assertEquals(R.drawable.ic_category_pants, CategoryIconResolver.getCategoryIcon("Pants"));
+        assertEquals(R.drawable.ic_category_jackets, CategoryIconResolver.getCategoryIcon("Jackets"));
+        assertEquals(R.drawable.ic_category_leather, CategoryIconResolver.getCategoryIcon("Leather"));
+        assertEquals(R.drawable.ic_category_bags, CategoryIconResolver.getCategoryIcon("Bags"));
+    }
+
+    @Test
+    public void testGetStreamlinedName() {
+        assertEquals("All", CategoryIconResolver.getStreamlinedName(null));
+        assertEquals("All", CategoryIconResolver.getStreamlinedName("All"));
+        assertEquals("Shirts", CategoryIconResolver.getStreamlinedName("Shirts & Tops"));
+        assertEquals("Pants", CategoryIconResolver.getStreamlinedName("Pants & Jeans"));
+        assertEquals("Dresses", CategoryIconResolver.getStreamlinedName("Dresses"));
+        assertEquals("Jackets", CategoryIconResolver.getStreamlinedName("Jackets & Coats"));
+        assertEquals("T-Shirts", CategoryIconResolver.getStreamlinedName("T-Shirts"));
+        assertEquals("Activewear", CategoryIconResolver.getStreamlinedName("Activewear"));
+        assertEquals("Shoes", CategoryIconResolver.getStreamlinedName("Shoes"));
+        assertEquals("Accessories", CategoryIconResolver.getStreamlinedName("Accessories"));
+        assertEquals("Leather", CategoryIconResolver.getStreamlinedName("Leather & Suede"));
+        assertEquals("Bags", CategoryIconResolver.getStreamlinedName("Bags & Backpacks"));
     }
 }

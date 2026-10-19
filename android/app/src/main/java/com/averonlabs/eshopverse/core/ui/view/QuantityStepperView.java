@@ -5,7 +5,9 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 import com.averonlabs.eshopverse.R;
 import com.google.android.material.button.MaterialButton;
@@ -35,19 +37,19 @@ public final class QuantityStepperView extends LinearLayout {
         setOrientation(HORIZONTAL);
         setGravity(Gravity.CENTER_VERTICAL);
 
-        decrementButton = createButton(context, "−");
+        decrementButton = createButton(context, R.drawable.ic_minus);
         decrementButton.setContentDescription(context.getString(R.string.catalog_cd_stepper_decrement));
         quantityText = new MaterialTextView(context);
         quantityText.setTextAppearance(R.style.TextAppearance_EShopVerse_ComponentTitle);
+        quantityText.setTextColor(ContextCompat.getColor(context, R.color.text_primary_ink));
         quantityText.setGravity(Gravity.CENTER);
-        incrementButton = createButton(context, "+");
+        incrementButton = createButton(context, R.drawable.ic_plus);
         incrementButton.setContentDescription(context.getString(R.string.catalog_cd_stepper_increment));
 
-        addView(decrementButton, buttonLayoutParams());
-        addView(quantityText, new LayoutParams(
-                getResources().getDimensionPixelSize(R.dimen.touch_target_min),
-                getResources().getDimensionPixelSize(R.dimen.touch_target_min)));
-        addView(incrementButton, buttonLayoutParams());
+        int touchTarget = getResources().getDimensionPixelSize(R.dimen.touch_target_min);
+        addView(decrementButton, new LayoutParams(touchTarget, touchTarget));
+        addView(quantityText, new LayoutParams(touchTarget, touchTarget));
+        addView(incrementButton, new LayoutParams(touchTarget, touchTarget));
         renderQuantity();
 
         decrementButton.setOnClickListener(view -> notifyUserAction(quantityRange.decrement()));
@@ -85,20 +87,29 @@ public final class QuantityStepperView extends LinearLayout {
         incrementButton.setContentDescription(description);
     }
 
-    private MaterialButton createButton(Context context, String label) {
+    private MaterialButton createButton(Context context, @DrawableRes int iconRes) {
         MaterialButton button = new MaterialButton(
                 context, null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
-        button.setText(label);
-        button.setMinWidth(getResources().getDimensionPixelSize(R.dimen.touch_target_min));
-        button.setMinHeight(getResources().getDimensionPixelSize(R.dimen.touch_target_min));
+        button.setText(null);
+        button.setIconResource(iconRes);
+        button.setIconGravity(MaterialButton.ICON_GRAVITY_TEXT_START);
+        button.setIconPadding(0);
+        button.setIconSize(getResources().getDimensionPixelSize(R.dimen.spacing_md));
+        button.setIconTint(ContextCompat.getColorStateList(context, R.color.text_primary_ink));
+        button.setPadding(0, 0, 0, 0);
+        button.setMinWidth(0);
+        button.setMinHeight(0);
+        button.setMinimumWidth(0);
+        button.setMinimumHeight(0);
+        button.setCornerRadius(getResources().getDimensionPixelSize(R.dimen.corner_xs));
+        button.setStrokeWidth(getResources().getDimensionPixelSize(R.dimen.stroke_hairline));
+        button.setStrokeColor(ContextCompat.getColorStateList(context, R.color.m3_outline_variant));
+        button.setBackgroundColor(ContextCompat.getColor(context, R.color.surface_color));
         button.setInsetTop(0);
         button.setInsetBottom(0);
+        button.setInsetLeft(0);
+        button.setInsetRight(0);
         return button;
-    }
-
-    private LayoutParams buttonLayoutParams() {
-        int target = getResources().getDimensionPixelSize(R.dimen.touch_target_min);
-        return new LayoutParams(target, target);
     }
 
     private void notifyUserAction(int quantity) {

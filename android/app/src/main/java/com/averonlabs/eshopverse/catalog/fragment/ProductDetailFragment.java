@@ -10,12 +10,16 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.averonlabs.eshopverse.R;
+import com.averonlabs.eshopverse.cart.CartRepository;
+import com.averonlabs.eshopverse.cart.CartViewModelFactory;
 import com.averonlabs.eshopverse.catalog.CatalogViewModelFactory;
 import com.averonlabs.eshopverse.catalog.ImageCarouselAdapter;
 import com.averonlabs.eshopverse.catalog.ProductDetailViewModel;
+import com.averonlabs.eshopverse.core.model.Cart;
 import com.averonlabs.eshopverse.core.model.ProductDetail;
 import com.averonlabs.eshopverse.core.model.ProductImage;
 import com.averonlabs.eshopverse.core.money.MoneyFormat;
@@ -23,6 +27,7 @@ import com.averonlabs.eshopverse.core.state.UiState;
 import com.averonlabs.eshopverse.core.ui.view.StateContainerView;
 import com.averonlabs.eshopverse.core.ui.view.StatusBadgeView;
 import com.averonlabs.eshopverse.databinding.FragmentProductDetailBinding;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +64,7 @@ public class ProductDetailFragment extends Fragment {
             productId = getArguments().getLong("productId", -1);
         }
 
+        setupBackButton();
         setupImageGallery();
         setupQuantityStepper();
         setupAddToCartAction();
@@ -74,6 +80,20 @@ public class ProductDetailFragment extends Fragment {
                     null
             );
         }
+    }
+
+    private void setupBackButton() {
+        binding.btnBack.setOnClickListener(v -> {
+            if (isAdded()) {
+                try {
+                    if (!Navigation.findNavController(v).popBackStack()) {
+                        requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                    }
+                } catch (Exception e) {
+                    requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                }
+            }
+        });
     }
 
     private void setupImageGallery() {
@@ -107,11 +127,45 @@ public class ProductDetailFragment extends Fragment {
     }
 
     private void setupAddToCartAction() {
-        // Sticky coral Add to cart action per §E.4:
-        // Disabled with notice until CART-002 is integrated.
-        binding.btnAddToCart.setEnabled(false);
-        binding.tvAddToCartNotice.setVisibility(View.VISIBLE);
-        binding.tvAddToCartNotice.setText(R.string.catalog_add_to_cart_unavailable);
+        binding.btnAddToCart.setOnClickListener(v -> {
+            if (!isAdded() || productId <= 0) {
+                return;
+            }
+            int quantity = binding.stepperQuantity.getQuantity();
+            if (quantity <= 0) {
+                quantity = 1;
+            }
+            binding.btnAddToCart.setEnabled(false);
+            CartRepository cartRepository = CartViewModelFactory.getDefaultRepository(requireContext());
+            final int finalQuantity = quantity;
+            cartRepository.addItem(productId, finalQuantity, new CartRepository.CartCallback<Cart>() {
+                @Override
+                public void onSuccess(@NonNull Cart cart) {
+                    if (!isAdded()) {
+                        return;
+                    }
+                    binding.btnAddToCart.setEnabled(true);
+                    Snackbar.make(
+                            binding.getRoot(),
+                            R.string.catalog_added_to_cart,
+                            Snackbar.LENGTH_SHORT
+                    ).show();
+                }
+
+                @Override
+                public void onError(@NonNull Throwable error) {
+                    if (!isAdded()) {
+                        return;
+                    }
+                    binding.btnAddToCart.setEnabled(true);
+                    Snackbar.make(
+                            binding.getRoot(),
+                            error.getMessage() != null ? error.getMessage() : getString(R.string.catalog_error_rate_limited),
+                            Snackbar.LENGTH_SHORT
+                    ).show();
+                }
+            });
+        });
     }
 
     private void observeViewModel() {
@@ -186,14 +240,22 @@ public class ProductDetailFragment extends Fragment {
                 binding.stepperQuantity.setMax(99);
             }
             binding.layoutQuantity.setVisibility(View.VISIBLE);
+            binding.btnAddToCart.setEnabled(true);
+            binding.tvAddToCartNotice.setVisibility(View.GONE);
         } else {
             binding.badgeStock.setStatus(StatusBadgeView.Status.NEUTRAL);
             binding.badgeStock.setText(R.string.catalog_out_of_stock);
             binding.layoutQuantity.setVisibility(View.GONE);
+            binding.btnAddToCart.setEnabled(false);
+            binding.tvAddToCartNotice.setVisibility(View.VISIBLE);
+            binding.tvAddToCartNotice.setText(R.string.catalog_out_of_stock);
         }
 
         // Image Gallery
-        List<ProductImage> imageList = new ArrayList<>(product.getImages());
+        List<ProductImage> imageList = new ArrayList<>();
+        if (product.getImages() != null) {
+            imageList.addAll(product.getImages());
+        }
         if (imageList.isEmpty() && product.getImageUrl() != null) {
             imageList.add(new ProductImage(product.getImageUrl(), 1));
         }

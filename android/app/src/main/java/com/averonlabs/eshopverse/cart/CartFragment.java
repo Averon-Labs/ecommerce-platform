@@ -53,10 +53,11 @@ public class CartFragment extends Fragment {
         CartViewModelFactory factory = new CartViewModelFactory(requireContext());
         viewModel = new ViewModelProvider(this, factory).get(CartViewModel.class);
 
-        binding.stateContainerCart.setContentView(binding.scrollCartContent);
+        binding.stateContainerCart.setContentView(binding.swipeRefreshCart);
 
         setupRecyclerView();
         setupClickListeners();
+        setupSwipeRefresh();
         observeViewModel();
 
         viewModel.loadCart();
@@ -78,6 +79,11 @@ public class CartFragment extends Fragment {
         });
     }
 
+    private void setupSwipeRefresh() {
+        binding.swipeRefreshCart.setColorSchemeResources(R.color.color_botanical_green);
+        binding.swipeRefreshCart.setOnRefreshListener(() -> viewModel.loadCart());
+    }
+
     private void observeViewModel() {
         viewModel.getCartState().observe(getViewLifecycleOwner(), this::renderCartState);
 
@@ -96,14 +102,14 @@ public class CartFragment extends Fragment {
         viewModel.getNoticeEvent().observe(getViewLifecycleOwner(), event -> {
             String notice = event.getContentIfNotHandled();
             if (notice != null && getView() != null) {
-                Snackbar.make(getView(), notice, Snackbar.LENGTH_LONG).show();
+                showAnchoredSnackbar(notice);
             }
         });
 
         viewModel.getErrorResEvent().observe(getViewLifecycleOwner(), event -> {
             Integer errorRes = event.getContentIfNotHandled();
             if (errorRes != null && getView() != null) {
-                Snackbar.make(getView(), errorRes, Snackbar.LENGTH_SHORT).show();
+                showAnchoredSnackbar(errorRes);
             }
         });
 
@@ -122,9 +128,15 @@ public class CartFragment extends Fragment {
             return;
         }
 
+        if (binding != null && state.getStatus() != UiState.Status.LOADING) {
+            binding.swipeRefreshCart.setRefreshing(false);
+        }
+
         switch (state.getStatus()) {
             case LOADING:
-                binding.stateContainerCart.setState(StateContainerView.State.LOADING, null, null, null);
+                if (!binding.swipeRefreshCart.isRefreshing()) {
+                    binding.stateContainerCart.setState(StateContainerView.State.LOADING, null, null, null);
+                }
                 break;
             case CONTENT:
                 binding.stateContainerCart.setState(StateContainerView.State.CONTENT, null, null, null);
@@ -177,6 +189,30 @@ public class CartFragment extends Fragment {
         }
         boolean canCheckout = !cart.getItems().isEmpty() && !hasUnavailable;
         binding.btnCartCheckout.setEnabled(canCheckout);
+    }
+
+    private void showAnchoredSnackbar(@androidx.annotation.StringRes int messageRes) {
+        if (!isAdded() || getView() == null) return;
+        Snackbar snackbar = Snackbar.make(getView(), messageRes, Snackbar.LENGTH_SHORT);
+        if (getActivity() != null) {
+            View bottomNav = getActivity().findViewById(R.id.card_bottom_nav);
+            if (bottomNav != null && bottomNav.getVisibility() == View.VISIBLE) {
+                snackbar.setAnchorView(bottomNav);
+            }
+        }
+        snackbar.show();
+    }
+
+    private void showAnchoredSnackbar(@NonNull String message) {
+        if (!isAdded() || getView() == null) return;
+        Snackbar snackbar = Snackbar.make(getView(), message, Snackbar.LENGTH_LONG);
+        if (getActivity() != null) {
+            View bottomNav = getActivity().findViewById(R.id.card_bottom_nav);
+            if (bottomNav != null && bottomNav.getVisibility() == View.VISIBLE) {
+                snackbar.setAnchorView(bottomNav);
+            }
+        }
+        snackbar.show();
     }
 
     @Override

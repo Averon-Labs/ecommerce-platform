@@ -15,8 +15,10 @@ import com.averonlabs.eshopverse.core.money.MoneyFormat;
 import com.averonlabs.eshopverse.core.ui.view.StatusBadgeView;
 import com.averonlabs.eshopverse.databinding.ItemProductCardBinding;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,7 +44,8 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
         this.isCarousel = isCarousel;
     }
 
-    public void submitList(@NonNull List<ProductSummary> newItems) {
+    public void submitList(@Nullable List<ProductSummary> newItems) {
+        final List<ProductSummary> safeList = newItems != null ? newItems : Collections.emptyList();
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
             @Override
             public int getOldListSize() {
@@ -51,21 +54,21 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
 
             @Override
             public int getNewListSize() {
-                return newItems.size();
+                return safeList.size();
             }
 
             @Override
             public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
-                return items.get(oldItemPosition).getId() == newItems.get(newItemPosition).getId();
+                return items.get(oldItemPosition).getId() == safeList.get(newItemPosition).getId();
             }
 
             @Override
             public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-                return Objects.equals(items.get(oldItemPosition), newItems.get(newItemPosition));
+                return Objects.equals(items.get(oldItemPosition), safeList.get(newItemPosition));
             }
         });
         items.clear();
-        items.addAll(newItems);
+        items.addAll(safeList);
         diffResult.dispatchUpdatesTo(this);
     }
 
@@ -134,6 +137,7 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
                     .load(product.getImageUrl())
                     .placeholder(R.drawable.ic_image_placeholder)
                     .error(R.drawable.ic_image_placeholder)
+                    .transition(DrawableTransitionOptions.withCrossFade())
                     .centerCrop()
                     .into(binding.ivProductImage);
 

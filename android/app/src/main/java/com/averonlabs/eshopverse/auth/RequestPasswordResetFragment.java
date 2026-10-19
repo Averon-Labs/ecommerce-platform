@@ -77,8 +77,14 @@ public class RequestPasswordResetFragment extends Fragment {
         });
 
         binding.btnEnterToken.setOnClickListener(v -> {
-            NavController navController = NavHostFragment.findNavController(this);
-            navController.navigate(R.id.action_requestPasswordResetFragment_to_setNewPasswordFragment);
+            try {
+                NavController navController = NavHostFragment.findNavController(this);
+                navController.navigate(R.id.action_requestPasswordResetFragment_to_setNewPasswordFragment);
+            } catch (Exception e) {
+                try {
+                    NavHostFragment.findNavController(this).navigate(R.id.setNewPasswordFragment);
+                } catch (Exception ignored) {}
+            }
         });
 
         binding.btnToSignIn.setOnClickListener(v -> {

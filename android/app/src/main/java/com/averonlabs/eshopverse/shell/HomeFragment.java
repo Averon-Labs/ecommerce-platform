@@ -61,6 +61,7 @@ public class HomeFragment extends Fragment {
         setupSections();
         setupCategories();
         setupClickListeners();
+        setupSwipeRefresh();
         updateThemeIcon();
         observeViewModel();
 
@@ -125,7 +126,7 @@ public class HomeFragment extends Fragment {
                     holder.itemView.setOnClickListener(v -> navigateToExploreCategory(-1, getString(R.string.catalog_category_all)));
                 } else {
                     Category category = categories.get(position - 1);
-                    nameView.setText(category.getName());
+                    nameView.setText(CategoryIconResolver.getStreamlinedName(category.getName()));
                     iconView.setImageResource(CategoryIconResolver.getCategoryIcon(category.getName()));
                     holder.itemView.setOnClickListener(v -> navigateToExploreCategory(category.getId(), category.getName()));
                 }
@@ -162,8 +163,19 @@ public class HomeFragment extends Fragment {
         });
     }
 
+    private void setupSwipeRefresh() {
+        binding.swipeRefreshHome.setColorSchemeResources(R.color.color_botanical_green);
+        binding.swipeRefreshHome.setOnRefreshListener(() -> {
+            catalogViewModel.reload();
+            categoryViewModel.loadCategories();
+        });
+    }
+
     private void observeViewModel() {
         catalogViewModel.getProductsState().observe(getViewLifecycleOwner(), state -> {
+            if (binding != null && state != null && state.getStatus() != UiState.Status.LOADING) {
+                binding.swipeRefreshHome.setRefreshing(false);
+            }
             if (state != null && state.getStatus() == UiState.Status.CONTENT && state.getData() != null) {
                 List<ProductSummary> all = state.getData();
                 if (!all.isEmpty()) {
@@ -189,10 +201,17 @@ public class HomeFragment extends Fragment {
         }
         Bundle args = new Bundle();
         args.putLong("productId", product.getId());
-        Navigation.findNavController(requireView()).navigate(
-                R.id.action_homeFragment_to_productDetailFragment,
-                args
-        );
+        try {
+            Navigation.findNavController(requireView()).navigate(
+                    R.id.action_homeFragment_to_productDetailFragment,
+                    args
+            );
+        } catch (Exception e) {
+            try {
+                Navigation.findNavController(requireView()).navigate(R.id.nav_catalog, args);
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     private void navigateToExplore() {

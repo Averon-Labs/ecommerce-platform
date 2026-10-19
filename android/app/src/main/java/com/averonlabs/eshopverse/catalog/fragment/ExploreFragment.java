@@ -1,10 +1,16 @@
 package com.averonlabs.eshopverse.catalog.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import androidx.appcompat.widget.PopupMenu;
 
 import androidx.annotation.NonNull;
@@ -40,6 +46,8 @@ public class ExploreFragment extends Fragment {
     private CatalogListViewModel catalogViewModel;
     private CategoryViewModel categoryViewModel;
     private ProductGridAdapter gridAdapter;
+    private final Handler searchHandler = new Handler(Looper.getMainLooper());
+    private Runnable searchRunnable;
 
     @Override
     public View onCreateView(
@@ -59,10 +67,11 @@ public class ExploreFragment extends Fragment {
         catalogViewModel = new ViewModelProvider(this, factory).get(CatalogListViewModel.class);
         categoryViewModel = new ViewModelProvider(this, factory).get(CategoryViewModel.class);
 
-        binding.stateContainer.setContentView(binding.rvProducts);
+        binding.stateContainer.setContentView(binding.swipeRefreshExplore);
         setupProductGrid();
         setupSearchAndSort();
         setupCategoryChips();
+        setupSwipeRefresh();
 
         observeViewModel();
 
@@ -110,13 +119,46 @@ public class ExploreFragment extends Fragment {
     }
 
     private void setupSearchAndSort() {
+        binding.etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
+
+                String query = s != null ? s.toString().trim() : "";
+                searchRunnable = () -> {
+                    if (isAdded() && binding != null) {
+                        if (query.length() >= 2) {
+                            catalogViewModel.setQuery(query);
+                        } else if (query.isEmpty()) {
+                            catalogViewModel.setQuery(null);
+                        }
+                    }
+                };
+                searchHandler.postDelayed(searchRunnable, 300);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
         binding.etSearch.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
                 String query = binding.etSearch.getText() != null ? binding.etSearch.getText().toString().trim() : "";
-                if (!query.isEmpty()) {
-                    Bundle args = new Bundle();
-                    args.putString("query", query);
-                    Navigation.findNavController(requireView()).navigate(R.id.searchResultsFragment, args);
+                catalogViewModel.setQuery(query.isEmpty() ? null : query);
+
+                if (getActivity() != null) {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
                 }
                 return true;
             }
@@ -227,6 +269,14 @@ public class ExploreFragment extends Fragment {
         });
     }
 
+    private void setupSwipeRefresh() {
+        binding.swipeRefreshExplore.setColorSchemeResources(R.color.color_botanical_green);
+        binding.swipeRefreshExplore.setOnRefreshListener(() -> {
+            catalogViewModel.reload();
+            categoryViewModel.loadCategories();
+        });
+    }
+
     private void observeViewModel() {
         catalogViewModel.getProductsState().observe(getViewLifecycleOwner(), this::renderProductsState);
     }
@@ -236,9 +286,15 @@ public class ExploreFragment extends Fragment {
             return;
         }
 
+        if (binding != null && state.getStatus() != UiState.Status.LOADING) {
+            binding.swipeRefreshExplore.setRefreshing(false);
+        }
+
         switch (state.getStatus()) {
             case LOADING:
-                binding.stateContainer.setState(StateContainerView.State.LOADING, null, null, null);
+                if (!binding.swipeRefreshExplore.isRefreshing()) {
+                    binding.stateContainer.setState(StateContainerView.State.LOADING, null, null, null);
+                }
                 break;
             case CONTENT:
                 binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
@@ -266,16 +322,29 @@ public class ExploreFragment extends Fragment {
     }
 
     private void onProductClicked(@NonNull ProductSummary product) {
+        if (!isAdded()) {
+            return;
+        }
         Bundle args = new Bundle();
         args.putLong("productId", product.getId());
-        Navigation.findNavController(requireView()).navigate(
-                R.id.action_exploreFragment_to_productDetailFragment,
-                args
-        );
+        try {
+            Navigation.findNavController(requireView()).navigate(
+                    R.id.action_exploreFragment_to_productDetailFragment,
+                    args
+            );
+        } catch (Exception e) {
+            try {
+                Navigation.findNavController(requireView()).navigate(R.id.nav_catalog, args);
+            } catch (Exception ignored) {
+            }
+        }
     }
 
     @Override
     public void onDestroyView() {
+        if (searchRunnable != null) {
+            searchHandler.removeCallbacks(searchRunnable);
+        }
         super.onDestroyView();
         binding = null;
     }

@@ -46,4 +46,43 @@ public final class CategoryIconResolver {
             return R.drawable.ic_category_all;
         }
     }
+
+    /**
+     * Maps compound backend category names into clean, punchy, single-word titles
+     * ("Shirts", "Pants", "Dresses", "Jackets", "T-Shirts", "Activewear", "Shoes", "Accessories", "Leather", "Bags").
+     */
+    @androidx.annotation.NonNull
+    public static String getStreamlinedName(@Nullable String categoryName) {
+        if (categoryName == null) {
+            return "All";
+        }
+
+        String lower = categoryName.toLowerCase().trim();
+
+        if (lower.contains("all")) {
+            return "All";
+        } else if (lower.contains("t-shirt") || lower.contains("tshirt") || lower.contains("tee")) {
+            return "T-Shirts";
+        } else if (lower.contains("shirt") || lower.contains("top") || lower.contains("blouse")) {
+            return "Shirts";
+        } else if (lower.contains("pant") || lower.contains("jean") || lower.contains("trouser") || lower.contains("chino")) {
+            return "Pants";
+        } else if (lower.contains("dress")) {
+            return "Dresses";
+        } else if (lower.contains("jacket") || lower.contains("coat") || lower.contains("puffer") || lower.contains("biker")) {
+            return "Jackets";
+        } else if (lower.contains("active") || lower.contains("sport") || lower.contains("gym")) {
+            return "Activewear";
+        } else if (lower.contains("shoe") || lower.contains("footwear") || lower.contains("sneaker") || lower.contains("boot")) {
+            return "Shoes";
+        } else if (lower.contains("access")) {
+            return "Accessories";
+        } else if (lower.contains("leather") || lower.contains("suede")) {
+            return "Leather";
+        } else if (lower.contains("bag") || lower.contains("backpack") || lower.contains("tote")) {
+            return "Bags";
+        } else {
+            return categoryName;
+        }
+    }
 }

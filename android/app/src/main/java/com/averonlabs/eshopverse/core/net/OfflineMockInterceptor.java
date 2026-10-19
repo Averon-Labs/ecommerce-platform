@@ -3,7 +3,14 @@ package com.averonlabs.eshopverse.core.net;
 import androidx.annotation.NonNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -12,6 +19,7 @@ import okhttp3.Protocol;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okio.Buffer;
 
 /**
  * Provides comprehensive offline fallback dummy data when the backend or local mock server is not reachable.
@@ -20,6 +28,42 @@ import okhttp3.ResponseBody;
 public class OfflineMockInterceptor implements Interceptor {
 
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json; charset=utf-8");
+
+    public static class MockCartItem {
+        public final long productId;
+        public final String name;
+        public final String imageUrl;
+        public final double unitPrice;
+        public int quantity;
+        public final int availableQuantity;
+
+        public MockCartItem(long productId, String name, String imageUrl, double unitPrice, int quantity, int availableQuantity) {
+            this.productId = productId;
+            this.name = name;
+            this.imageUrl = imageUrl;
+            this.unitPrice = unitPrice;
+            this.quantity = quantity;
+            this.availableQuantity = availableQuantity;
+        }
+
+        public String toJson() {
+            double lineTotal = unitPrice * quantity;
+            String unitPriceStr = String.format(Locale.US, "%.2f", unitPrice);
+            String lineTotalStr = String.format(Locale.US, "%.2f", lineTotal);
+            return "{\"productId\":" + productId + ",\"name\":\"" + name + "\",\"imageUrl\":\"" + imageUrl + "\","
+                    + "\"unitPrice\":\"" + unitPriceStr + "\",\"currency\":\"USD\",\"quantity\":" + quantity + ",\"lineTotal\":\"" + lineTotalStr + "\","
+                    + "\"inStock\":true,\"availableQuantity\":" + availableQuantity + ",\"priceChanged\":false,\"unavailable\":false}";
+        }
+    }
+
+    private static final List<MockCartItem> MOCK_CART_ITEMS = new ArrayList<>(Arrays.asList(
+            new MockCartItem(101, "Classic White Oxford Shirt", "file:///android_asset/products/shirt_001.jpg", 45.99, 1, 25)
+    ));
+
+    public static synchronized void resetMockCart() {
+        MOCK_CART_ITEMS.clear();
+        MOCK_CART_ITEMS.add(new MockCartItem(101, "Classic White Oxford Shirt", "file:///android_asset/products/shirt_001.jpg", 45.99, 1, 25));
+    }
 
     @NonNull
     @Override
@@ -30,7 +74,7 @@ public class OfflineMockInterceptor implements Interceptor {
             return chain.withConnectTimeout(1, TimeUnit.SECONDS).proceed(request);
         } catch (IOException e) {
             // Server is not running or unreachable -> deliver rich offline mock data
-            String jsonResponse = getMockResponseFor(request.method(), request.url());
+            String jsonResponse = getMockResponseFor(request);
 
             if (jsonResponse != null) {
                 return new Response.Builder()
@@ -44,6 +88,18 @@ public class OfflineMockInterceptor implements Interceptor {
 
             throw e;
         }
+    }
+
+    public String getMockResponseFor(Request request) {
+        String method = request.method();
+        HttpUrl url = request.url();
+        String path = url.encodedPath();
+
+        if (path.contains("/cart")) {
+            return handleCartRequest(method, path, request);
+        }
+
+        return getMockResponseFor(method, url);
     }
 
     private String getMockResponseFor(String method, HttpUrl url) {
@@ -66,23 +122,58 @@ public class OfflineMockInterceptor implements Interceptor {
 
         if (path.endsWith("/products")) {
             String categoryIdParam = url.queryParameter("category_id");
-            StringBuilder itemsJson = new StringBuilder();
-            int count = 0;
+            String queryParam = url.queryParameter("q");
+            String pageParam = url.queryParameter("page");
+            String perPageParam = url.queryParameter("per_page");
+            int page = 1;
+            int perPage = 60; // Default when unpaginated to cover full set for tests
+            if (pageParam != null) {
+                try {
+                    page = Math.max(1, Integer.parseInt(pageParam));
+                    perPage = 20; // Default to 20 when pagination is active
+                } catch (Exception ignored) {}
+            }
+            if (perPageParam != null) {
+                try { perPage = Math.max(1, Integer.parseInt(perPageParam)); } catch (Exception ignored) {}
+            }
+
+            List<MockProduct> filtered = new ArrayList<>();
             for (MockProduct p : ALL_MOCK_PRODUCTS) {
                 if (categoryIdParam != null && !categoryIdParam.isEmpty()) {
-                    if (p.categoryId != Integer.parseInt(categoryIdParam)) {
+                    try {
+                        if (p.categoryId != Integer.parseInt(categoryIdParam)) {
+                            continue;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                if (queryParam != null && !queryParam.trim().isEmpty()) {
+                    String qLower = queryParam.trim().toLowerCase();
+                    if (!p.name.toLowerCase().contains(qLower)
+                            && !p.description.toLowerCase().contains(qLower)
+                            && !p.categoryName.toLowerCase().contains(qLower)) {
                         continue;
                     }
                 }
-                if (count > 0) {
-                    itemsJson.append(",");
+                filtered.add(p);
+            }
+
+            int totalItems = filtered.size();
+            int totalPages = Math.max(1, (int) Math.ceil((double) totalItems / perPage));
+            int startIndex = (page - 1) * perPage;
+            int endIndex = Math.min(startIndex + perPage, totalItems);
+
+            StringBuilder itemsJson = new StringBuilder();
+            if (startIndex < totalItems) {
+                for (int i = startIndex; i < endIndex; i++) {
+                    if (itemsJson.length() > 0) {
+                        itemsJson.append(",");
+                    }
+                    itemsJson.append(filtered.get(i).toSummaryJson());
                 }
-                itemsJson.append(p.toSummaryJson());
-                count++;
             }
 
             return "{\"data\":[" + itemsJson.toString() + "],"
-                    + "\"pagination\":{\"currentPage\":1,\"perPage\":60,\"totalItems\":" + count + ",\"totalPages\":1}}";
+                    + "\"pagination\":{\"currentPage\":" + page + ",\"perPage\":" + perPage + ",\"totalItems\":" + totalItems + ",\"totalPages\":" + totalPages + "}}";
         }
 
         if (path.contains("/products/")) {
@@ -99,13 +190,7 @@ public class OfflineMockInterceptor implements Interceptor {
         }
 
         if (path.contains("/cart")) {
-            return "{\"data\":{"
-                    + "\"items\":[{"
-                    + "\"productId\":101,\"name\":\"Classic White Oxford Shirt\",\"imageUrl\":\"file:///android_asset/products/shirt_001.jpg\","
-                    + "\"unitPrice\":\"45.99\",\"currency\":\"USD\",\"quantity\":1,\"lineTotal\":\"45.99\","
-                    + "\"inStock\":true,\"availableQuantity\":25,\"priceChanged\":false,\"unavailable\":false"
-                    + "}],"
-                    + "\"itemCount\":1,\"subtotal\":\"45.99\",\"shipping\":\"5.00\",\"total\":\"50.99\",\"currency\":\"USD\",\"hasIssues\":false}}";
+            return handleCartRequest(method, path, null);
         }
 
         if (path.endsWith("/checkout/quote")) {
@@ -373,4 +458,147 @@ public class OfflineMockInterceptor implements Interceptor {
                     "file:///android_asset/products/bag_005.jpg",
                     "Opulent evening pouch clutch in pleated nappa leather with magnetic frame closure and removable chain.", 12)
     };
+
+    private synchronized String handleCartRequest(String method, String path, Request request) {
+        // DELETE /cart/items/{productId} -> remove line item
+        if ("DELETE".equalsIgnoreCase(method) && path.contains("/cart/items/")) {
+            try {
+                long productId = Long.parseLong(path.substring(path.lastIndexOf('/') + 1));
+                Iterator<MockCartItem> it = MOCK_CART_ITEMS.iterator();
+                while (it.hasNext()) {
+                    if (it.next().productId == productId) {
+                        it.remove();
+                        break;
+                    }
+                }
+            } catch (Exception ignored) {}
+            return buildCartResponse();
+        }
+
+        // PATCH /cart/items/{productId} -> update quantity
+        if ("PATCH".equalsIgnoreCase(method) && path.contains("/cart/items/")) {
+            try {
+                long productId = Long.parseLong(path.substring(path.lastIndexOf('/') + 1));
+                String body = readRequestBody(request);
+                int qty = extractIntFromJson(body, "quantity", 1);
+                for (MockCartItem item : MOCK_CART_ITEMS) {
+                    if (item.productId == productId) {
+                        item.quantity = Math.max(1, qty);
+                        break;
+                    }
+                }
+            } catch (Exception ignored) {}
+            return buildCartResponse();
+        }
+
+        // POST /cart/items -> add to cart
+        if ("POST".equalsIgnoreCase(method) && path.endsWith("/cart/items")) {
+            try {
+                String body = readRequestBody(request);
+                long productId = extractLongFromJson(body, "productId", 101);
+                int qty = extractIntFromJson(body, "quantity", 1);
+
+                boolean exists = false;
+                for (MockCartItem item : MOCK_CART_ITEMS) {
+                    if (item.productId == productId) {
+                        item.quantity += Math.max(1, qty);
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    MockProduct match = null;
+                    for (MockProduct p : ALL_MOCK_PRODUCTS) {
+                        if (p.id == productId) {
+                            match = p;
+                            break;
+                        }
+                    }
+                    if (match != null) {
+                        double price = 49.99;
+                        try {
+                            price = Double.parseDouble(match.price);
+                        } catch (Exception ignored) {}
+                        MOCK_CART_ITEMS.add(new MockCartItem(match.id, match.name, match.imageUrl, price, Math.max(1, qty), match.stockQuantity));
+                    }
+                }
+            } catch (Exception ignored) {}
+            return buildCartResponse();
+        }
+
+        // DELETE /cart -> clear cart
+        if ("DELETE".equalsIgnoreCase(method) && path.endsWith("/cart")) {
+            MOCK_CART_ITEMS.clear();
+            return "{\"data\":null}";
+        }
+
+        // Default: GET /cart
+        return buildCartResponse();
+    }
+
+    private static synchronized String buildCartResponse() {
+        StringBuilder itemsJson = new StringBuilder();
+        double subtotal = 0.0;
+        int totalItems = 0;
+        for (int i = 0; i < MOCK_CART_ITEMS.size(); i++) {
+            MockCartItem item = MOCK_CART_ITEMS.get(i);
+            if (i > 0) {
+                itemsJson.append(",");
+            }
+            itemsJson.append(item.toJson());
+            subtotal += (item.unitPrice * item.quantity);
+            totalItems += item.quantity;
+        }
+
+        double shipping = MOCK_CART_ITEMS.isEmpty() ? 0.0 : 5.00;
+        double total = subtotal + shipping;
+        String subtotalStr = String.format(Locale.US, "%.2f", subtotal);
+        String shippingStr = String.format(Locale.US, "%.2f", shipping);
+        String totalStr = String.format(Locale.US, "%.2f", total);
+
+        return "{\"data\":{"
+                + "\"items\":[" + itemsJson.toString() + "],"
+                + "\"itemCount\":" + totalItems + ",\"subtotal\":\"" + subtotalStr + "\",\"shipping\":\"" + shippingStr + "\",\"total\":\"" + totalStr + "\",\"currency\":\"USD\",\"hasIssues\":false}}";
+    }
+
+    private String readRequestBody(Request request) {
+        if (request == null || request.body() == null) {
+            return "";
+        }
+        try {
+            Buffer buffer = new Buffer();
+            request.body().writeTo(buffer);
+            return buffer.readUtf8();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    private static int extractIntFromJson(String json, String key, int defaultValue) {
+        if (json == null || json.isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            Pattern p = Pattern.compile("\"" + key + "\"\\s*:\\s*(\\d+)");
+            Matcher m = p.matcher(json);
+            if (m.find()) {
+                return Integer.parseInt(m.group(1));
+            }
+        } catch (Exception ignored) {}
+        return defaultValue;
+    }
+
+    private static long extractLongFromJson(String json, String key, long defaultValue) {
+        if (json == null || json.isEmpty()) {
+            return defaultValue;
+        }
+        try {
+            Pattern p = Pattern.compile("\"" + key + "\"\\s*:\\s*(\\d+)");
+            Matcher m = p.matcher(json);
+            if (m.find()) {
+                return Long.parseLong(m.group(1));
+            }
+        } catch (Exception ignored) {}
+        return defaultValue;
+    }
 }

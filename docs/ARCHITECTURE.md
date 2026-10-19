@@ -109,6 +109,19 @@ docs/       → Shared documentation
 
 ---
 
+## UI & Data Loading Principles (Core Architectural Rules)
+
+1. **Immediate Data Rendering & Non-Blocking Image Loading:**
+   - Text and structural layout data (titles, prices, badges, metadata) must render immediately upon receiving network/local data. UI rendering must never block or wait for images to download.
+   - Image containers must instantly show a curated, lightweight, Pinterest-style placeholder (`@drawable/ic_image_placeholder`) with fixed aspect ratio.
+   - Images must decode and cross-fade smoothly into place asynchronously (`DrawableTransitionOptions.withCrossFade()`) as each completes downloading.
+
+2. **Incremental Lazy Loading & Smart Pre-fetching:**
+   - Catalog lists and product grids must be paginated in manageable batches (default 20 items per page).
+   - Scroll listeners must detect proximity to the end of the loaded dataset (e.g. approaching item 18 or 19 of a 20-item page) and trigger the next page request automatically in the background, appending new items without disrupting user scroll position.
+
+---
+
 ## Key Architectural Decisions
 
 Significant decisions are tracked as Architecture Decision Records in `docs/decisions/`.

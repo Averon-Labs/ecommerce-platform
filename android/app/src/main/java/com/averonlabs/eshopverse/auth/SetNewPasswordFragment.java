@@ -87,13 +87,25 @@ public class SetNewPasswordFragment extends Fragment {
         });
 
         binding.btnBackToRequestReset.setOnClickListener(v -> {
-            NavController navController = NavHostFragment.findNavController(this);
-            navController.navigate(R.id.action_setNewPasswordFragment_to_requestPasswordResetFragment);
+            try {
+                NavController navController = NavHostFragment.findNavController(this);
+                navController.navigate(R.id.action_setNewPasswordFragment_to_requestPasswordResetFragment);
+            } catch (Exception e) {
+                try {
+                    NavHostFragment.findNavController(this).popBackStack();
+                } catch (Exception ignored) {}
+            }
         });
 
         binding.btnGoToSignIn.setOnClickListener(v -> {
-            NavController navController = NavHostFragment.findNavController(this);
-            navController.navigate(R.id.action_setNewPasswordFragment_to_signInFragment);
+            try {
+                NavController navController = NavHostFragment.findNavController(this);
+                navController.navigate(R.id.action_setNewPasswordFragment_to_signInFragment);
+            } catch (Exception e) {
+                try {
+                    NavHostFragment.findNavController(this).popBackStack();
+                } catch (Exception ignored) {}
+            }
         });
     }
 

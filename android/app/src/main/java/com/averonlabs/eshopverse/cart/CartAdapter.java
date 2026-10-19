@@ -15,6 +15,7 @@ import com.averonlabs.eshopverse.core.model.CartItem;
 import com.averonlabs.eshopverse.core.money.MoneyFormat;
 import com.averonlabs.eshopverse.databinding.ItemCartLineBinding;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -122,6 +123,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartItemViewHo
                     .load(item.getImageUrl())
                     .placeholder(R.drawable.ic_image_placeholder)
                     .error(R.drawable.ic_image_placeholder)
+                    .transition(DrawableTransitionOptions.withCrossFade())
                     .centerCrop()
                     .into(binding.ivCartItemImage);
 
