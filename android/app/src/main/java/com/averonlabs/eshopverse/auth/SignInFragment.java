@@ -187,11 +187,13 @@ public class SignInFragment extends Fragment {
 
     private void navigateAfterSuccess() {
         NavController navController = NavHostFragment.findNavController(this);
-        if (returnToNavId != 0 && returnToNavId != R.id.signInFragment) {
-            navController.popBackStack(R.id.signInFragment, true);
-            navController.navigate(returnToNavId);
-        } else {
-            navController.popBackStack(R.id.signInFragment, true);
+        int targetId = (returnToNavId != 0 && returnToNavId != R.id.signInFragment && returnToNavId != R.id.registerFragment)
+                ? returnToNavId : R.id.accountFragment;
+        boolean popped = navController.popBackStack(targetId, false);
+        if (!popped) {
+            if (!navController.popBackStack()) {
+                navController.navigate(targetId);
+            }
         }
     }
 

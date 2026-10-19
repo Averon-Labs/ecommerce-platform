@@ -537,7 +537,21 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 **Verification:** configured explicit `popBackStack(R.id.homeFragment, false)` in `MainActivity` bottom nav listener, disabled duplicate window insets on `BottomNavigationView` in `activity_main.xml`, implemented IME keyboard detection in window insets listener to auto-hide floating card when typing, and verified `testDebugUnitTest` (100% pass).
 
-### Step 4 — AUTH-005 — Google Sign-In Hardening & Keystore Expiry Fix
+### Step 4 — AUTH-006 — Customer Registration Hardening & Safe Back Navigation
+
+**Status:** `[x]`
+
+**Component contribution:** Eliminate NullPointerException in KeystoreTokenStore on registration by adding safe expiry fallback in AuthRepository and providing complete ISO-8601 mock payloads, and make post-registration back navigation robust against missing backstack entries.
+
+**Acceptance criteria:**
+- [x] **a.** AuthRepository provides safe fallback for missing/null `expiresAt` in `registerCustomer`, preventing NullPointerException in KeystoreTokenStore.
+- [x] **b.** OfflineMockInterceptor returns valid `expiresAt` ISO-8601 timestamps for `POST /auth/register`.
+- [x] **c.** RegisterFragment navigates smoothly back to the caller screen (e.g. AccountFragment) without crashing or relying on fragile backstack presence.
+- [x] **d.** Customer registration succeeds and updates authenticated session state cleanly.
+
+**Verification:** added safe fallback timestamp in `AuthRepository.persistSessionSafely`, updated `OfflineMockInterceptor` auth endpoints with valid `expiresAt` ISO-8601 strings, hardened post-auth navigation in `RegisterFragment` and `SignInFragment` with target popBackStack fallback, and added test in `AuthRepositoryTest.testRegisterSuccessWithMissingExpiresAtDoesNotCrash` (100% test suite pass).
+
+### Step 5 — AUTH-005 — Google Sign-In Hardening & Keystore Expiry Fix
 
 **Status:** `[ ]`
 
@@ -548,7 +562,7 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 - [ ] **b.** AuthRepository handles missing or null expiry gracefully without throwing NullPointerException in KeystoreTokenStore.
 - [ ] **c.** Google Sign-In button logs in smoothly without crashing the application.
 
-### Step 5 — FLT-001 — Advanced Filter Bottom Sheet
+### Step 6 — FLT-001 — Advanced Filter Bottom Sheet
 
 **Status:** `[ ]`
 
@@ -561,7 +575,7 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 - [ ] **d.** Provide toggle switch for "In Stock Only" availability filtering.
 - [ ] **e.** Display active filter count badge on the search filter button and offer "Clear All" and "Apply" actions.
 
-### Step 6 — IMG-001 — Instant Image Engine & Cache Strategy
+### Step 7 — IMG-001 — Instant Image Engine & Cache Strategy
 
 **Status:** `[ ]`
 
