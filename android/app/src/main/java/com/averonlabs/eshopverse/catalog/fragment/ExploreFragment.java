@@ -30,6 +30,7 @@ import com.averonlabs.eshopverse.catalog.ProductGridAdapter;
 import com.averonlabs.eshopverse.catalog.ProductParams;
 import com.averonlabs.eshopverse.core.model.Category;
 import com.averonlabs.eshopverse.core.model.ProductSummary;
+import com.averonlabs.eshopverse.core.ui.ImageLoaderHelper;
 import com.averonlabs.eshopverse.core.state.UiState;
 import com.averonlabs.eshopverse.core.ui.view.StateContainerView;
 import com.averonlabs.eshopverse.databinding.FragmentExploreBinding;
@@ -112,6 +113,32 @@ public class ExploreFragment extends Fragment {
 
                     if ((visibleCount + firstVisible) >= totalCount - 4) {
                         catalogViewModel.loadNextPage();
+                    }
+
+                    // Proactive scroll lookahead prefetching (next 4-6 items)
+                    int lastVisible = layoutManager.findLastVisibleItemPosition();
+                    if (lastVisible >= 0 && lastVisible + 1 < totalCount) {
+                        List<ProductSummary> currentList = gridAdapter.getItems();
+                        int preloadEnd = Math.min(lastVisible + 5, currentList.size());
+                        for (int i = lastVisible + 1; i < preloadEnd; i++) {
+                            ProductSummary item = currentList.get(i);
+                            if (item != null && item.getImageUrl() != null) {
+                                ImageLoaderHelper.preload(recyclerView.getContext(), item.getImageUrl());
+                            }
+                        }
+                    }
+                } else if (dy < 0) {
+                    // Proactive reverse prefetching when scrolling back up
+                    int firstVisible = layoutManager.findFirstVisibleItemPosition();
+                    if (firstVisible > 0) {
+                        List<ProductSummary> currentList = gridAdapter.getItems();
+                        int preloadStart = Math.max(0, firstVisible - 4);
+                        for (int i = preloadStart; i < firstVisible; i++) {
+                            ProductSummary item = currentList.get(i);
+                            if (item != null && item.getImageUrl() != null) {
+                                ImageLoaderHelper.preload(recyclerView.getContext(), item.getImageUrl());
+                            }
+                        }
                     }
                 }
             }

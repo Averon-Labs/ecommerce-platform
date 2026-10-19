@@ -25,8 +25,11 @@ import com.averonlabs.eshopverse.catalog.ProductGridAdapter;
 import com.averonlabs.eshopverse.core.model.Category;
 import com.averonlabs.eshopverse.core.model.ProductSummary;
 import com.averonlabs.eshopverse.core.state.UiState;
+import com.averonlabs.eshopverse.core.ui.ImageLoaderHelper;
 import com.averonlabs.eshopverse.core.ui.ThemeManager;
 import com.averonlabs.eshopverse.databinding.FragmentHomeBinding;
+
+import java.util.ArrayList;
 
 import java.util.List;
 
@@ -190,6 +193,17 @@ public class HomeFragment extends Fragment {
                     if (total > 20) {
                         essentialsAdapter.submitList(all.subList(20, Math.min(24, total)));
                     }
+
+                    // Proactive background prefetching for top section product cards
+                    List<String> preloadUrls = new ArrayList<>();
+                    int preloadCount = Math.min(12, total);
+                    for (int i = 0; i < preloadCount; i++) {
+                        ProductSummary p = all.get(i);
+                        if (p != null && p.getImageUrl() != null && !p.getImageUrl().trim().isEmpty()) {
+                            preloadUrls.add(p.getImageUrl());
+                        }
+                    }
+                    ImageLoaderHelper.preloadBatch(getContext(), preloadUrls);
                 }
             }
         });
