@@ -73,5 +73,18 @@
     <string name="favorites_added">Added to favorites</string>
     <string name="favorites_removed">Removed from favorites</string>
     <string name="catalog_cd_favorite_button">Toggle favorite for %1$s</string>
+
+    <!-- Filter Bottom Sheet (FLT-001) -->
+    <string name="filter_title">Filter &amp; Sort</string>
+    <string name="filter_sort_section">Sort By</string>
+    <string name="filter_price_section">Price Range</string>
+    <string name="filter_price_range_format">$%1$d — $%2$d</string>
+    <string name="filter_availability_section">Availability</string>
+    <string name="filter_in_stock_only">In stock only</string>
+    <string name="filter_in_stock_desc">Show only available items</string>
+    <string name="filter_action_apply">Apply Filters</string>
+    <string name="filter_action_clear">Clear All</string>
+    <string name="filter_cd_drag_handle">Filter sheet drag handle</string>
+    <string name="filter_badge_description">%1$d filters active</string>
 </resources>
 

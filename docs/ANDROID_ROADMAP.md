@@ -566,16 +566,18 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 6 — FLT-001 — Advanced Filter Bottom Sheet
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Component contribution:** Replace unstyled popup sort with a full-featured, luxury Material 3 Filter Bottom Sheet matching Bento / Botanical Green design tokens.
 
 **Acceptance criteria:**
-- [ ] **a.** Tapping filter icon next to search bar opens a modal BottomSheetDialogFragment.
-- [ ] **b.** Provide single-select chips for sorting (Newest, Price: Low to High, Price: High to Low, Name: A to Z).
-- [ ] **c.** Provide Material 3 RangeSlider for interactive price range filtering ($Min to $Max).
-- [ ] **d.** Provide toggle switch for "In Stock Only" availability filtering.
-- [ ] **e.** Display active filter count badge on the search filter button and offer "Clear All" and "Apply" actions.
+- [x] **a.** Tapping filter icon next to search bar opens a modal BottomSheetDialogFragment.
+- [x] **b.** Provide single-select chips for sorting (Newest, Price: Low to High, Price: High to Low, Name: A to Z).
+- [x] **c.** Provide Material 3 RangeSlider for interactive price range filtering ($Min to $Max).
+- [x] **d.** Provide toggle switch for "In Stock Only" availability filtering.
+- [x] **e.** Display active filter count badge on the search filter button and offer "Clear All" and "Apply" actions.
+
+**Verification:** created `bottom_sheet_filter.xml` with botanical green accents and rounded surface, implemented `FilterBottomSheetDialogFragment.java` with single-selection ChipGroup, Material 3 RangeSlider ($0–$200), and MaterialSwitch, added dual client+server filter filtering in `CatalogListViewModel`, and verified filter count badge rendering on `ExploreFragment` via `ProductParamsTest` (100% test pass).
 
 ### Step 7 — IMG-001 — Instant Image Engine & Cache Strategy
 

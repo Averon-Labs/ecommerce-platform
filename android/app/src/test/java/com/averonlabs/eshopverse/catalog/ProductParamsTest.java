@@ -123,4 +123,33 @@ public class ProductParamsTest {
         assertEquals(p1.hashCode(), p2.hashCode());
         assertNotEquals(p1, p3);
     }
+
+    @Test
+    public void testPriceRangeFilterResetsPageToOne() {
+        ProductParams page3 = new ProductParams().withPage(3);
+        assertEquals(3, page3.getPage());
+
+        ProductParams filtered = page3.withPriceRange(25.0, 150.0);
+        assertEquals(1, filtered.getPage());
+        assertEquals(Double.valueOf(25.0), filtered.getMinPrice());
+        assertEquals(Double.valueOf(150.0), filtered.getMaxPrice());
+    }
+
+    @Test
+    public void testActiveFilterCount() {
+        ProductParams defaultParams = new ProductParams();
+        assertEquals(0, defaultParams.getActiveFilterCount());
+
+        ProductParams sortOnly = defaultParams.withSort(ProductParams.SORT_PRICE_ASC);
+        assertEquals(1, sortOnly.getActiveFilterCount());
+
+        ProductParams inStockOnly = sortOnly.withInStock(true);
+        assertEquals(2, inStockOnly.getActiveFilterCount());
+
+        ProductParams withMinPrice = inStockOnly.withPriceRange(30.0, 200.0);
+        assertEquals(3, withMinPrice.getActiveFilterCount());
+
+        ProductParams withBothPrices = inStockOnly.withPriceRange(30.0, 120.0);
+        assertEquals(4, withBothPrices.getActiveFilterCount());
+    }
 }
