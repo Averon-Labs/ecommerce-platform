@@ -121,10 +121,19 @@ public class OfflineMockInterceptor implements Interceptor {
         }
 
         if (path.endsWith("/products")) {
-            String categoryIdParam = url.queryParameter("category_id");
+            String categoryIdParam = url.queryParameter("categoryId");
+            if (categoryIdParam == null) {
+                categoryIdParam = url.queryParameter("category_id");
+            }
             String queryParam = url.queryParameter("q");
+            if (queryParam == null) {
+                queryParam = url.queryParameter("search");
+            }
             String pageParam = url.queryParameter("page");
-            String perPageParam = url.queryParameter("per_page");
+            String perPageParam = url.queryParameter("perPage");
+            if (perPageParam == null) {
+                perPageParam = url.queryParameter("per_page");
+            }
             int page = 1;
             int perPage = 60; // Default when unpaginated to cover full set for tests
             if (pageParam != null) {

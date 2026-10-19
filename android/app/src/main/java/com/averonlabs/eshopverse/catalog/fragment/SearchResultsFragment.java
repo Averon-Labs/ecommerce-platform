@@ -1,10 +1,16 @@
 package com.averonlabs.eshopverse.catalog.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +42,8 @@ public class SearchResultsFragment extends Fragment {
     private FragmentSearchResultsBinding binding;
     private CatalogListViewModel viewModel;
     private ProductGridAdapter gridAdapter;
+    private final Handler searchHandler = new Handler(Looper.getMainLooper());
+    private Runnable searchRunnable;
 
     @Override
     public View onCreateView(
@@ -94,16 +102,52 @@ public class SearchResultsFragment extends Fragment {
     }
 
     private void setupSearchAndSort() {
+        binding.etSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
+
+                String query = s != null ? s.toString().trim() : "";
+                searchRunnable = () -> {
+                    if (isAdded() && binding != null) {
+                        viewModel.setQuery(query.isEmpty() ? null : query);
+                    }
+                };
+                searchHandler.postDelayed(searchRunnable, 150);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
         binding.etSearch.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
                 String query = binding.etSearch.getText() != null ? binding.etSearch.getText().toString().trim() : "";
-                viewModel.setQuery(query);
+                viewModel.setQuery(query.isEmpty() ? null : query);
+
+                if (getActivity() != null) {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                }
                 return true;
             }
             return false;
         });
 
         binding.btnClearSearch.setOnClickListener(v -> {
+            if (searchRunnable != null) {
+                searchHandler.removeCallbacks(searchRunnable);
+            }
             binding.etSearch.setText("");
             viewModel.setQuery(null);
         });

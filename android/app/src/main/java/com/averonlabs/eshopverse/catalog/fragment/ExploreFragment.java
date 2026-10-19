@@ -165,14 +165,18 @@ public class ExploreFragment extends Fragment {
                 String query = s != null ? s.toString().trim() : "";
                 searchRunnable = () -> {
                     if (isAdded() && binding != null) {
-                        if (query.length() >= 2) {
+                        if (!query.isEmpty()) {
+                            // If user explicitly searches across products, clear restrictive category filter
+                            if (categoryViewModel.getSelectedCategoryId().getValue() != null) {
+                                categoryViewModel.selectCategory(null);
+                            }
                             catalogViewModel.setQuery(query);
-                        } else if (query.isEmpty()) {
+                        } else {
                             catalogViewModel.setQuery(null);
                         }
                     }
                 };
-                searchHandler.postDelayed(searchRunnable, 300);
+                searchHandler.postDelayed(searchRunnable, 150);
             }
 
             @Override
@@ -185,6 +189,9 @@ public class ExploreFragment extends Fragment {
                     searchHandler.removeCallbacks(searchRunnable);
                 }
                 String query = binding.etSearch.getText() != null ? binding.etSearch.getText().toString().trim() : "";
+                if (!query.isEmpty() && categoryViewModel.getSelectedCategoryId().getValue() != null) {
+                    categoryViewModel.selectCategory(null);
+                }
                 catalogViewModel.setQuery(query.isEmpty() ? null : query);
 
                 if (getActivity() != null) {

@@ -50,9 +50,9 @@ public interface ApiRoutes {
     @GET("products")
     Call<PagedResponse<ProductSummary>> listProducts(
             @Query("page") @Nullable Integer page,
-            @Query("per_page") @Nullable Integer perPage,
-            @Query("category_id") @Nullable Long categoryId,
-            @Query("search") @Nullable String search,
+            @Query("perPage") @Nullable Integer perPage,
+            @Query("categoryId") @Nullable Long categoryId,
+            @Query("q") @Nullable String q,
             @Query("sort") @Nullable String sort
     );
 

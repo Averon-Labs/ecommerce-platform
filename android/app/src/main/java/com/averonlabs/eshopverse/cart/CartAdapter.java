@@ -160,12 +160,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartItemViewHo
             }
             binding.stepperCartQuantity.setQuantity(item.getQuantity());
 
-            // Disable stepper and remove button if item is currently mutating or unavailable
-            boolean isThisItemMutating = mutatingProductId != null && mutatingProductId == (long) item.getProductId();
-            boolean isStepperDisabled = isThisItemMutating || item.isUnavailable();
-
+            // Keep stepper and remove button responsive; only disable if item itself is marked unavailable
+            boolean isStepperDisabled = item.isUnavailable();
             binding.stepperCartQuantity.setEnabled(!isStepperDisabled);
-            binding.btnCartRemove.setEnabled(!isThisItemMutating);
+            binding.btnCartRemove.setEnabled(true);
 
             binding.stepperCartQuantity.setOnQuantityChangedListener(newQuantity -> {
                 if (quantityChangedListener != null && newQuantity != item.getQuantity()) {

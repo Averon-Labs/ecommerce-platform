@@ -249,4 +249,83 @@ public class CartViewModelTest {
         assertNull(viewModel.getMutatingProductId().getValue());
         assertEquals(UiState.Status.EMPTY, viewModel.getCartState().getValue().getStatus());
     }
+
+    @Test
+    public void testOptimisticQuantityUpdateInstantMathAndRollbackOnFailure() {
+        // Load an initial cart with quantity 1
+        Cart initialCart = createTestCart(1, false);
+        doAnswer(invocation -> {
+            CartRepository.CartCallback<Cart> cb = invocation.getArgument(0);
+            cb.onSuccess(initialCart);
+            return null;
+        }).when(repository).getCart(any());
+        viewModel.loadCart();
+
+        assertEquals(Integer.valueOf(1), viewModel.getItemCount().getValue());
+        assertEquals("50.00", viewModel.getCartState().getValue().getData().getSubtotal());
+
+        // Setup pending callback to simulate background network request
+        AtomicReference<CartRepository.CartCallback<Cart>> pendingCallback = new AtomicReference<>();
+        doAnswer(invocation -> {
+            pendingCallback.set(invocation.getArgument(2));
+            return null;
+        }).when(repository).updateQuantity(eq(1L), anyInt(), any());
+
+        // User increments quantity from 1 to 3
+        viewModel.updateQuantity(1L, 3);
+
+        // Optimistic UI check: State MUST be updated instantly (0ms) before network finishes!
+        UiState<Cart> optimisticState = viewModel.getCartState().getValue();
+        assertNotNull(optimisticState);
+        assertEquals(UiState.Status.CONTENT, optimisticState.getStatus());
+        assertEquals(3, optimisticState.getData().getItems().get(0).getQuantity());
+        assertEquals("150.00", optimisticState.getData().getItems().get(0).getLineTotal());
+        assertEquals("150.00", optimisticState.getData().getSubtotal());
+        assertEquals(Integer.valueOf(3), viewModel.getItemCount().getValue());
+
+        // Simulate network failure -> cart must rollback to initialCart!
+        assertNotNull(pendingCallback.get());
+        pendingCallback.get().onError(new RuntimeException("Network error"));
+
+        UiState<Cart> rolledBackState = viewModel.getCartState().getValue();
+        assertNotNull(rolledBackState);
+        assertEquals(1, rolledBackState.getData().getItems().get(0).getQuantity());
+        assertEquals("50.00", rolledBackState.getData().getSubtotal());
+        assertEquals(Integer.valueOf(1), viewModel.getItemCount().getValue());
+    }
+
+    @Test
+    public void testOptimisticRemoveItemInstantUpdateAndRollbackOnFailure() {
+        // Load initial cart with 1 item
+        Cart initialCart = createTestCart(1, false);
+        doAnswer(invocation -> {
+            CartRepository.CartCallback<Cart> cb = invocation.getArgument(0);
+            cb.onSuccess(initialCart);
+            return null;
+        }).when(repository).getCart(any());
+        viewModel.loadCart();
+
+        AtomicReference<CartRepository.CartCallback<Cart>> pendingCallback = new AtomicReference<>();
+        doAnswer(invocation -> {
+            pendingCallback.set(invocation.getArgument(1));
+            return null;
+        }).when(repository).removeItem(eq(1L), any());
+
+        // User removes item 1
+        viewModel.removeItem(1L);
+
+        // Optimistic UI check: Item removed and state becomes EMPTY immediately!
+        assertEquals(UiState.Status.EMPTY, viewModel.getCartState().getValue().getStatus());
+        assertEquals(Integer.valueOf(0), viewModel.getItemCount().getValue());
+
+        // Simulate network failure -> rollback to initialCart!
+        assertNotNull(pendingCallback.get());
+        pendingCallback.get().onError(new RuntimeException("Server error"));
+
+        UiState<Cart> rolledBackState = viewModel.getCartState().getValue();
+        assertNotNull(rolledBackState);
+        assertEquals(UiState.Status.CONTENT, rolledBackState.getStatus());
+        assertEquals(1, rolledBackState.getData().getItems().size());
+        assertEquals(Integer.valueOf(1), viewModel.getItemCount().getValue());
+    }
 }
