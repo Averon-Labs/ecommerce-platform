@@ -13,10 +13,13 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.averonlabs.eshopverse.MainActivity;
 import com.averonlabs.eshopverse.R;
+import com.averonlabs.eshopverse.auth.AuthViewModelFactory;
 import com.averonlabs.eshopverse.cart.CartRepository;
 import com.averonlabs.eshopverse.cart.CartViewModelFactory;
 import com.averonlabs.eshopverse.catalog.CatalogViewModelFactory;
+import com.averonlabs.eshopverse.catalog.FavoritesRepository;
 import com.averonlabs.eshopverse.catalog.ImageCarouselAdapter;
 import com.averonlabs.eshopverse.catalog.ProductDetailViewModel;
 import com.averonlabs.eshopverse.core.model.Cart;
@@ -27,7 +30,9 @@ import com.averonlabs.eshopverse.core.state.UiState;
 import com.averonlabs.eshopverse.core.ui.view.StateContainerView;
 import com.averonlabs.eshopverse.core.ui.view.StatusBadgeView;
 import com.averonlabs.eshopverse.databinding.FragmentProductDetailBinding;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
+import androidx.navigation.NavController;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -279,6 +284,54 @@ public class ProductDetailFragment extends Fragment {
             binding.tvImageIndicator.setText(getString(R.string.catalog_cd_product_image, 1, imageList.size()));
         } else {
             binding.tvImageIndicator.setVisibility(View.GONE);
+        }
+
+        setupFavoriteButton(product);
+    }
+
+    private void setupFavoriteButton(@NonNull ProductDetail product) {
+        FavoritesRepository favRepo = FavoritesRepository.getInstance(requireContext());
+        boolean isFav = favRepo.isFavorite(product.getId());
+        updateFavoriteVisual(isFav);
+
+        binding.btnFavorite.setOnClickListener(v -> {
+            boolean signedIn = AuthViewModelFactory.getDefaultRepository(requireContext()).isSignedIn();
+            if (signedIn) {
+                favRepo.toggleFavorite(product);
+                boolean newFav = favRepo.isFavorite(product.getId());
+                updateFavoriteVisual(newFav);
+                Snackbar.make(binding.getRoot(), newFav ? R.string.favorites_added : R.string.favorites_removed, Snackbar.LENGTH_SHORT).show();
+            } else {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(R.string.favorites_login_required_title)
+                        .setMessage(R.string.favorites_login_required_message)
+                        .setPositiveButton(R.string.favorites_action_sign_in, (dialog, which) -> {
+                            try {
+                                NavController navController = Navigation.findNavController(v);
+                                navController.navigate(R.id.accountFragment);
+                            } catch (Exception e) {
+                                if (getActivity() instanceof MainActivity) {
+                                    NavController nc = ((MainActivity) getActivity()).getNavController();
+                                    if (nc != null) {
+                                        nc.navigate(R.id.accountFragment);
+                                    }
+                                }
+                            }
+                        })
+                        .setNegativeButton(R.string.favorites_action_cancel, null)
+                        .show();
+            }
+        });
+    }
+
+    private void updateFavoriteVisual(boolean isFavorite) {
+        if (binding == null || !isAdded()) return;
+        if (isFavorite) {
+            binding.ivFavoriteIcon.setImageResource(R.drawable.ic_heart_filled);
+            binding.ivFavoriteIcon.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.favorite_red));
+        } else {
+            binding.ivFavoriteIcon.setImageResource(R.drawable.ic_heart_outline);
+            binding.ivFavoriteIcon.setImageTintList(ContextCompat.getColorStateList(requireContext(), R.color.icon_favorite_outline));
         }
     }
 

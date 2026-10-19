@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.averonlabs.eshopverse.core.error.ApiErrorCodes;
 import com.averonlabs.eshopverse.core.model.AuthSession;
+import com.averonlabs.eshopverse.core.model.GoogleAuthRequest;
 import com.averonlabs.eshopverse.core.model.LoginRequest;
 import com.averonlabs.eshopverse.core.model.PasswordResetConfirmRequest;
 import com.averonlabs.eshopverse.core.model.PasswordResetRequest;
@@ -56,6 +57,40 @@ public class AuthRepository {
     ) {
         LoginRequest request = new LoginRequest(email, password);
         apiRoutes.loginCustomer(request).enqueue(new Callback<ApiResponse<AuthSession>>() {
+            @Override
+            public void onResponse(
+                    @NonNull Call<ApiResponse<AuthSession>> call,
+                    @NonNull Response<ApiResponse<AuthSession>> response
+            ) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    AuthSession session = response.body().getData();
+                    tokenStore.save(session.getToken(), session.getExpiresAt());
+                    callback.onSuccess(session);
+                } else {
+                    callback.onError(parseError(response));
+                }
+            }
+
+            @Override
+            public void onFailure(
+                    @NonNull Call<ApiResponse<AuthSession>> call,
+                    @NonNull Throwable t
+            ) {
+                callback.onError(t);
+            }
+        });
+    }
+
+    /**
+     * Authenticates a customer using a Google ID token (AUTH-004).
+     * On success, persists the returned bearer token into protected storage.
+     */
+    public void loginWithGoogle(
+            @NonNull String idToken,
+            @NonNull AuthCallback<AuthSession> callback
+    ) {
+        GoogleAuthRequest request = new GoogleAuthRequest(idToken);
+        apiRoutes.loginWithGoogle(request).enqueue(new Callback<ApiResponse<AuthSession>>() {
             @Override
             public void onResponse(
                     @NonNull Call<ApiResponse<AuthSession>> call,

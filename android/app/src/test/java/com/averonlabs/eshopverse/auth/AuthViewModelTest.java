@@ -191,4 +191,47 @@ public class AuthViewModelTest {
         assertNotNull(state);
         assertTrue(state.isError());
     }
+
+    @Test
+    public void testLoginWithGoogleSuccess() {
+        User user = new User(10, "google.user@example.com", "Google", "User",
+                com.averonlabs.eshopverse.core.model.UserRole.CUSTOMER,
+                com.averonlabs.eshopverse.core.model.UserStatus.ACTIVE,
+                "2026-01-01T00:00:00Z");
+        AuthSession session = new AuthSession("google-session-jwt", "2099-01-01T00:00:00Z", user);
+
+        doAnswer(invocation -> {
+            AuthCallback<AuthSession> cb = invocation.getArgument(1);
+            assertTrue(viewModel.isSubmitting());
+            cb.onSuccess(session);
+            return null;
+        }).when(authRepository).loginWithGoogle(eq("test-google-id-token"), any());
+
+        viewModel.loginWithGoogle("test-google-id-token");
+
+        assertFalse(viewModel.isSubmitting());
+        UiState<AuthSession> state = viewModel.getLoginState().getValue();
+        assertNotNull(state);
+        assertTrue(state.isContent());
+        assertEquals(session, state.getData());
+    }
+
+    @Test
+    public void testLoginWithGoogleError() {
+        ApiException apiEx = new ApiException(401, ApiErrorCodes.INVALID_CREDENTIALS, "Invalid token", null);
+
+        doAnswer(invocation -> {
+            AuthCallback<AuthSession> cb = invocation.getArgument(1);
+            cb.onError(apiEx);
+            return null;
+        }).when(authRepository).loginWithGoogle(eq("bad-google-token"), any());
+
+        viewModel.loginWithGoogle("bad-google-token");
+
+        assertFalse(viewModel.isSubmitting());
+        UiState<AuthSession> state = viewModel.getLoginState().getValue();
+        assertNotNull(state);
+        assertTrue(state.isError());
+    }
 }
+

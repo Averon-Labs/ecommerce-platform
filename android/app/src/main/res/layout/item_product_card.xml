@@ -42,11 +42,34 @@
                 android:id="@+id/badge_out_of_stock"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="top|end"
+                android:layout_gravity="top|start"
                 android:layout_margin="@dimen/spacing_xs"
                 android:visibility="gone"
                 tools:visibility="visible" />
 
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btn_card_favorite"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/favorites_title"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="@color/surface_card_frosted">
+
+                <ImageView
+                    android:id="@+id/iv_card_favorite"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_heart_outline"
+                    android:contentDescription="@null" />
+
+            </com.google.android.material.card.MaterialCardView>
         </FrameLayout>
 
         <LinearLayout

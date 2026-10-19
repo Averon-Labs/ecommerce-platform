@@ -66,6 +66,9 @@
         <action
             android:id="@+id/action_accountFragment_to_requestPasswordResetFragment"
             app:destination="@id/requestPasswordResetFragment" />
+        <action
+            android:id="@+id/action_accountFragment_to_productDetailFragment"
+            app:destination="@id/nav_catalog" />
     </fragment>
 
     <fragment

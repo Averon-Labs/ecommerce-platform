@@ -152,4 +152,10 @@ public class MainActivity extends AppCompatActivity {
             binding.bottomNav.removeBadge(R.id.cartFragment);
         }
     }
+
+    @androidx.annotation.Nullable
+    public NavController getNavController() {
+        return navController;
+    }
 }
+

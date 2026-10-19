@@ -273,6 +273,15 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (trendingCarouselAdapter != null) trendingCarouselAdapter.notifyDataSetChanged();
+        if (bestSellersAdapter != null) bestSellersAdapter.notifyDataSetChanged();
+        if (specialOffersAdapter != null) specialOffersAdapter.notifyDataSetChanged();
+        if (essentialsAdapter != null) essentialsAdapter.notifyDataSetChanged();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;

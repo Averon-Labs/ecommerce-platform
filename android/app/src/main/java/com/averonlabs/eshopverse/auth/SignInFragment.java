@@ -101,7 +101,7 @@ public class SignInFragment extends Fragment {
         });
 
         binding.btnGoogleSignIn.setOnClickListener(v -> {
-            Snackbar.make(binding.getRoot(), R.string.auth_feedback_google_sign_in, Snackbar.LENGTH_SHORT).show();
+            authViewModel.loginWithGoogle("mock_google_id_token_demo");
         });
 
         binding.btnToRegister.setOnClickListener(v -> {

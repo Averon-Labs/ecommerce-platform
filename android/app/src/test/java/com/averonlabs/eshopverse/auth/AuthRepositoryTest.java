@@ -408,4 +408,62 @@ public class AuthRepositoryTest {
         assertTrue(errorRef.get() instanceof ApiException);
         assertEquals(ApiErrorCodes.RESET_TOKEN_INVALID, ((ApiException) errorRef.get()).getCode());
     }
+
+    @Test
+    public void testGoogleLoginSuccessAndTokenPersistence() throws Exception {
+        String fixture = ApiFixtureLoader.load("loginCustomer", "success");
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(fixture));
+
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<AuthSession> resultRef = new AtomicReference<>();
+
+        authRepository.loginWithGoogle("valid-mock-google-token", new AuthCallback<AuthSession>() {
+            @Override
+            public void onSuccess(AuthSession data) {
+                resultRef.set(data);
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                latch.countDown();
+            }
+        });
+
+        assertTrue(latch.await(3, TimeUnit.SECONDS));
+        RecordedRequest request = mockWebServer.takeRequest();
+        assertEquals("/api/v1/auth/google", request.getPath());
+        assertTrue(request.getBody().readUtf8().contains("valid-mock-google-token"));
+        assertNotNull(resultRef.get());
+        assertTrue(authRepository.isSignedIn());
+    }
+
+    @Test
+    public void testGoogleLoginFailureInvalidToken() throws Exception {
+        String fixture = ApiFixtureLoader.load("loginCustomer", "invalid-credentials");
+        mockWebServer.enqueue(new MockResponse().setResponseCode(401).setBody(fixture));
+
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<Throwable> errorRef = new AtomicReference<>();
+
+        authRepository.loginWithGoogle("expired-google-token", new AuthCallback<AuthSession>() {
+            @Override
+            public void onSuccess(AuthSession data) {
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                errorRef.set(throwable);
+                latch.countDown();
+            }
+        });
+
+        assertTrue(latch.await(3, TimeUnit.SECONDS));
+        assertTrue(errorRef.get() instanceof ApiException);
+        ApiException ex = (ApiException) errorRef.get();
+        assertEquals(401, ex.getHttpStatus());
+        assertFalse(authRepository.isSignedIn());
+    }
 }
+

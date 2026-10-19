@@ -241,7 +241,7 @@ public class OfflineMockInterceptor implements Interceptor {
             return "{\"data\":{\"id\":1,\"email\":\"alex.morgan@eshopverse.com\",\"firstName\":\"Alex\",\"lastName\":\"Morgan\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}";
         }
 
-        if (path.endsWith("/auth/login") || path.endsWith("/auth/register")) {
+        if (path.endsWith("/auth/login") || path.endsWith("/auth/register") || path.endsWith("/auth/google")) {
             return "{\"data\":{\"token\":\"demo-jwt-offline-token-sample\",\"user\":{\"id\":1,\"email\":\"alex.morgan@eshopverse.com\",\"firstName\":\"Alex\",\"lastName\":\"Morgan\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}}";
         }
 

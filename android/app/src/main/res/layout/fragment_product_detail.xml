@@ -26,48 +26,60 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Image Gallery Container (MUSE Editorial Rounded Bento Card) -->
-                <com.google.android.material.card.MaterialCardView
+                <!-- Image Gallery Container (1:1 Aspect Ratio Bento Card) -->
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="320dp"
-                    android:layout_marginStart="@dimen/spacing_md"
-                    android:layout_marginEnd="@dimen/spacing_md"
-                    android:layout_marginTop="@dimen/spacing_md"
-                    app:cardCornerRadius="@dimen/corner_bento"
-                    app:cardElevation="0dp"
-                    app:strokeColor="@color/m3_outline_variant"
-                    app:strokeWidth="1dp"
-                    app:cardBackgroundColor="@color/surface_color">
+                    android:layout_height="wrap_content">
 
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_product_gallery"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_marginStart="@dimen/spacing_md"
+                        android:layout_marginEnd="@dimen/spacing_md"
+                        android:layout_marginTop="@dimen/spacing_md"
+                        app:layout_constraintDimensionRatio="1:1"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:cardCornerRadius="@dimen/corner_bento"
+                        app:cardElevation="0dp"
+                        app:strokeColor="@color/m3_outline_variant"
+                        app:strokeWidth="1dp"
+                        app:cardBackgroundColor="@color/surface_color">
 
-                        <androidx.viewpager2.widget.ViewPager2
-                            android:id="@+id/vp_product_images"
+                        <FrameLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent" />
+                            android:layout_height="match_parent">
 
-                        <com.google.android.material.textview.MaterialTextView
-                            android:id="@+id/tv_image_indicator"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="bottom|end"
-                            android:layout_margin="@dimen/spacing_md"
-                            android:background="@drawable/bg_pill_search"
-                            android:paddingStart="@dimen/spacing_sm"
-                            android:paddingEnd="@dimen/spacing_sm"
-                            android:paddingTop="@dimen/spacing_xs"
-                            android:paddingBottom="@dimen/spacing_xs"
-                            android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
-                            android:textColor="@color/text_primary_ink"
-                            android:visibility="gone"
-                            tools:text="1 / 3"
-                            tools:visibility="visible" />
+                            <androidx.viewpager2.widget.ViewPager2
+                                android:id="@+id/vp_product_images"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent" />
 
-                    </FrameLayout>
+                            <com.google.android.material.textview.MaterialTextView
+                                android:id="@+id/tv_image_indicator"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="bottom|end"
+                                android:layout_margin="@dimen/spacing_md"
+                                android:background="@drawable/bg_pill_search"
+                                android:paddingStart="@dimen/spacing_sm"
+                                android:paddingEnd="@dimen/spacing_sm"
+                                android:paddingTop="@dimen/spacing_xs"
+                                android:paddingBottom="@dimen/spacing_xs"
+                                android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                                android:textColor="@color/text_primary_ink"
+                                android:visibility="gone"
+                                tools:text="1 / 3"
+                                tools:visibility="visible" />
 
-                </com.google.android.material.card.MaterialCardView>
+                        </FrameLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- Product Information -->
                 <LinearLayout
@@ -302,6 +314,32 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Circular Floating Favorite Button (MUSE Style) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btn_favorite"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_gravity="top|end"
+            android:layout_marginEnd="@dimen/spacing_md"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/favorites_title"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="6dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/m3_outline_variant"
+            app:cardBackgroundColor="@color/surface_color">
+
+            <ImageView
+                android:id="@+id/iv_favorite_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_heart_outline"
+                android:importantForAccessibility="no" />
+
+        </com.google.android.material.card.MaterialCardView>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </com.averonlabs.eshopverse.core.ui.view.StateContainerView>

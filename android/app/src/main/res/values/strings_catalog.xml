@@ -60,4 +60,18 @@
     <string name="catalog_cd_category_chip">Filter by %1$s category</string>
     <string name="catalog_cd_back">Navigate back</string>
     <string name="catalog_added_to_cart">Added to your bag</string>
+
+    <!-- Favorites / Wishlist -->
+    <string name="favorites_title">My Favorites</string>
+    <string name="favorites_heading">Saved Items</string>
+    <string name="favorites_empty_title">No favorites yet</string>
+    <string name="favorites_empty_description">Tap the heart on any product to save your favorites here.</string>
+    <string name="favorites_login_required_title">Sign in required</string>
+    <string name="favorites_login_required_message">Please sign in to save products to your favorites.</string>
+    <string name="favorites_action_sign_in">Sign In</string>
+    <string name="favorites_action_cancel">Cancel</string>
+    <string name="favorites_added">Added to favorites</string>
+    <string name="favorites_removed">Removed from favorites</string>
+    <string name="catalog_cd_favorite_button">Toggle favorite for %1$s</string>
 </resources>
+

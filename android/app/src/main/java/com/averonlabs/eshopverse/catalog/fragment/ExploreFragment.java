@@ -383,6 +383,14 @@ public class ExploreFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (gridAdapter != null) {
+            gridAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         if (searchRunnable != null) {
             searchHandler.removeCallbacks(searchRunnable);
