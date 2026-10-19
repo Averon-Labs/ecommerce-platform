@@ -4,6 +4,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { ApiError } from '../api/http';
 import { useAuth } from '../auth/AuthContext';
 import { FullPageLoading } from '../components/FullPageLoading';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 interface FieldErrors {
   email?: string;
@@ -125,6 +126,7 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
+      <ThemeToggle className="fixed right-4 top-4 z-10" />
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-strong">EShop Verse</p>

@@ -42,6 +42,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  color-scheme: light;
   --background: 240 10% 98%;      /* #F5F6F7 Clean Canvas */
   --foreground: 0 0% 9%;          /* #161616 Deep Ink */
   --card: 0 0% 100%;              /* #FFFFFF Crisp Card */
@@ -65,6 +66,7 @@
 
 /* Deep Space & OLED Dark Mode */
 .dark {
+  color-scheme: dark;
   --background: 0 0% 0%;          /* #000000 Pitch Black OLED */
   --foreground: 240 5% 95%;       /* #F0F0F4 */
   --card: 240 4% 5%;              /* #0D0D0E Deep Dark Surface */
@@ -144,6 +146,10 @@
 @layer base {
   * {
     border-color: hsl(var(--border));
+  }
+
+  html {
+    background-color: hsl(var(--background));
   }
 
   body {

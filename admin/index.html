@@ -3,7 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#F5F6F7" />
     <title>EShop Verse Admin</title>
+    <script>
+      /*
+       * Apply the saved theme before the first paint so dark-mode users never
+       * see a light flash. Keep the key in sync with ThemeContext.tsx.
+       */
+      (function () {
+        var stored = null;
+        try {
+          stored = window.localStorage.getItem('eshop-admin-theme');
+        } catch (error) {
+          stored = null;
+        }
+
+        var prefersDark =
+          typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var dark = stored === 'dark' || (stored !== 'light' && prefersDark);
+
+        document.documentElement.classList.toggle('dark', dark);
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

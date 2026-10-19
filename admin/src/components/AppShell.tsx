@@ -4,6 +4,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { ConfirmDialog } from './ConfirmDialog';
 import { NavigationGuardProvider, useNavigationGuard } from './NavigationGuard';
+import { ThemeToggle } from './ThemeToggle';
 
 function ProductsIcon() {
   return (
@@ -273,45 +274,48 @@ function AppShellLayout() {
             <span className="truncate text-sm font-semibold md:hidden">EShop Verse Admin</span>
           </div>
 
-          <div className="relative">
-            <button
-              ref={menuButtonRef}
-              type="button"
-              className="flex min-h-11 items-center gap-3 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-semibold hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-haspopup="menu"
-              aria-expanded={menuOpen}
-              onClick={() => setMenuOpen((open) => !open)}
-            >
-              <span
-                aria-hidden="true"
-                className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-foreground"
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <div className="relative">
+              <button
+                ref={menuButtonRef}
+                type="button"
+                className="flex min-h-11 items-center gap-3 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-semibold hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                onClick={() => setMenuOpen((open) => !open)}
               >
-                {user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}` : 'A'}
-              </span>
-              <span className="hidden max-w-[16rem] truncate sm:inline">{displayName}</span>
-              <span className="sr-only">Account menu</span>
-            </button>
-
-            {menuOpen && (
-              <div
-                role="menu"
-                aria-label="Account"
-                className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 animate-fade-in rounded-2xl border border-border bg-card p-2 shadow-glass"
-              >
-                <div className="px-3 py-2">
-                  <p className="text-sm font-semibold">{displayName}</p>
-                  {user && <p className="truncate text-xs text-muted-foreground">{user.email}</p>}
-                </div>
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={() => void handleSignOut()}
-                  className="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-sm font-semibold text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                <span
+                  aria-hidden="true"
+                  className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-foreground"
                 >
-                  Sign out
-                </button>
-              </div>
-            )}
+                  {user ? `${user.firstName.charAt(0)}${user.lastName.charAt(0)}` : 'A'}
+                </span>
+                <span className="hidden max-w-[16rem] truncate sm:inline">{displayName}</span>
+                <span className="sr-only">Account menu</span>
+              </button>
+
+              {menuOpen && (
+                <div
+                  role="menu"
+                  aria-label="Account"
+                  className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-64 animate-fade-in rounded-2xl border border-border bg-card p-2 shadow-glass"
+                >
+                  <div className="px-3 py-2">
+                    <p className="text-sm font-semibold">{displayName}</p>
+                    {user && <p className="truncate text-xs text-muted-foreground">{user.email}</p>}
+                  </div>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => void handleSignOut()}
+                    className="flex min-h-11 w-full items-center rounded-xl px-3 text-left text-sm font-semibold text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </header>
 

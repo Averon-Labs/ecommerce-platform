@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
+import { ThemeToggle } from '../components/ThemeToggle';
 
 export function NotFoundPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
+      <ThemeToggle className="fixed right-4 top-4 z-10" />
       <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 text-center shadow-glass sm:p-8">
         <h1 className="text-xl font-bold">Page not found</h1>
         <p className="mt-2 text-sm text-muted-foreground">

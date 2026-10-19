@@ -1,10 +1,11 @@
 /**
- * Repeatable WCAG 2.2 contrast check for the admin light-theme tokens.
+ * Repeatable WCAG 2.2 contrast check for the admin light and dark themes.
  *
- * Token values mirror `src/globals.css` `:root` (HSL triples, Tailwind style)
- * and the design-system status semantics rendered by `StatusBadge`. Run with
- * `npm run check:contrast`; exits non-zero when any pair falls below its
- * threshold (4.5:1 for normal text, 3:1 for focus indicators).
+ * Token values mirror `src/globals.css` `:root` / `.dark` (HSL triples,
+ * Tailwind style) and the design-system status semantics rendered by
+ * `StatusBadge`. Run with `npm run check:contrast`; exits non-zero when any
+ * pair falls below its threshold (4.5:1 for normal text, 3:1 for focus
+ * indicators).
  */
 
 const hsl = (h, s, l) => {
@@ -28,7 +29,7 @@ const hex = (value) => {
   return [0, 2, 4].map((i) => parseInt(v.slice(i, i + 2), 16));
 };
 
-const tokens = {
+const light = {
   background: hsl(240, 10, 98),
   card: hsl(0, 0, 100),
   foreground: hsl(0, 0, 9),
@@ -53,12 +54,37 @@ const tokens = {
   badgeNeutralBg: hex('#EFF0F2'),
 };
 
+const dark = {
+  background: hsl(0, 0, 0),
+  card: hsl(240, 4, 5),
+  foreground: hsl(240, 5, 95),
+  primary: hsl(356, 100, 85),
+  primaryForeground: hsl(352, 68, 22),
+  primaryStrong: hsl(356, 100, 85),
+  secondary: hsl(256, 100, 87),
+  secondaryForeground: hsl(260, 59, 28),
+  mutedForeground: hsl(228, 11, 79),
+  accent: hsl(186, 55, 67),
+  accentForeground: hsl(185, 100, 11),
+  destructive: hsl(6, 100, 84),
+  destructiveForeground: hsl(356, 100, 21),
+  ring: hsl(356, 100, 85),
+  badgeSuccessFg: hex('#7FD3A8'),
+  badgeSuccessBg: hex('#0F2A1E'),
+  badgeWarningFg: hex('#E8B768'),
+  badgeWarningBg: hex('#33240F'),
+  badgeErrorFg: hex('#FFB4AB'),
+  badgeErrorBg: hex('#3A1512'),
+  badgeNeutralFg: hex('#C4C6D0'),
+  badgeNeutralBg: hex('#1A1C20'),
+};
+
 const blend = (fg, bg, alpha) => fg.map((v, i) => Math.round(alpha * v + (1 - alpha) * bg[i]));
 
 const TEXT = 4.5;
 const GRAPHIC = 3;
 
-const pairs = [
+const themePairs = (tokens) => [
   [tokens.foreground, tokens.card, TEXT, 'foreground on card'],
   [tokens.foreground, tokens.background, TEXT, 'foreground on background'],
   [tokens.mutedForeground, tokens.card, TEXT, 'muted-foreground on card'],
@@ -83,6 +109,21 @@ const pairs = [
   [tokens.ring, tokens.background, GRAPHIC, 'focus ring on background'],
 ];
 
+const pairs = [
+  ...themePairs(light).map(([fg, bg, threshold, label]) => [
+    fg,
+    bg,
+    threshold,
+    `light: ${label}`,
+  ]),
+  ...themePairs(dark).map(([fg, bg, threshold, label]) => [
+    fg,
+    bg,
+    threshold,
+    `dark: ${label}`,
+  ]),
+];
+
 const luminance = (rgb) => {
   const [r, g, b] = rgb.map((v) => {
     const channel = v / 255;
@@ -92,8 +133,8 @@ const luminance = (rgb) => {
 };
 
 const ratio = (a, b) => {
-  const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x);
-  return (light + 0.05) / (dark + 0.05);
+  const [lightValue, darkValue] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (lightValue + 0.05) / (darkValue + 0.05);
 };
 
 let failures = 0;
