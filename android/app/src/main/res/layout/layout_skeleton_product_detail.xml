@@ -13,25 +13,36 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Skeleton Image Bento Card (320dp Hero Image with Shimmer Gradient) -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Skeleton Image Bento Card (1:1 Hero Image with Shimmer Gradient) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="320dp"
-            android:layout_marginStart="@dimen/spacing_md"
-            android:layout_marginEnd="@dimen/spacing_md"
-            android:layout_marginTop="@dimen/spacing_md"
-            app:cardCornerRadius="@dimen/corner_bento"
-            app:cardElevation="0dp"
-            app:strokeColor="@color/m3_outline_variant"
-            app:strokeWidth="1dp"
-            app:cardBackgroundColor="@color/surface_color">
+            android:layout_height="wrap_content">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@drawable/bg_placeholder_shimmer" />
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="@dimen/spacing_md"
+                android:layout_marginEnd="@dimen/spacing_md"
+                android:layout_marginTop="@dimen/spacing_md"
+                app:layout_constraintDimensionRatio="1:1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:cardCornerRadius="@dimen/corner_bento"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/m3_outline_variant"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="@color/surface_color">
 
-        </com.google.android.material.card.MaterialCardView>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_placeholder_shimmer" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <!-- Skeleton Product Metadata Details -->
         <LinearLayout

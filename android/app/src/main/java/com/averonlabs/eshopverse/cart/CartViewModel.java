@@ -13,6 +13,11 @@ import com.averonlabs.eshopverse.core.net.ApiException;
 import com.averonlabs.eshopverse.core.state.Event;
 import com.averonlabs.eshopverse.core.state.UiState;
 
+import com.averonlabs.eshopverse.core.model.CartItem;
+import com.averonlabs.eshopverse.core.money.Money;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -88,12 +93,79 @@ public class CartViewModel extends ViewModel {
     }
 
     /**
-     * Updates the quantity of one item line with in-flight lock protection.
+     * Updates the quantity of one item line with optimistic UI updates and in-flight lock protection.
      */
     public void updateQuantity(long productId, int quantity) {
         if (isMutationInFlight) {
             return; // In-flight lock prevents double mutation
         }
+
+        // Optimistic UI update: instantly recalculate quantity and totals on the main thread
+        Cart previousCart = (cartState.getValue() != null && cartState.getValue().getData() != null)
+                ? cartState.getValue().getData()
+                : null;
+
+        if (previousCart != null) {
+            CartItem targetItem = null;
+            for (CartItem item : previousCart.getItems()) {
+                if (item.getProductId() == productId) {
+                    targetItem = item;
+                    break;
+                }
+            }
+
+            // Client-side stock constraint validation
+            if (targetItem != null && targetItem.getAvailableQuantity() > 0 && quantity > targetItem.getAvailableQuantity()) {
+                noticeEvent.setValue(new Event<>("Requested quantity exceeds available stock."));
+                return;
+            }
+
+            if (targetItem != null) {
+                List<CartItem> optimisticItems = new ArrayList<>();
+                Money newSubtotal = Money.ZERO;
+                int newItemCount = 0;
+                for (CartItem item : previousCart.getItems()) {
+                    if (item.getProductId() == productId) {
+                        Money unitPrice = item.getUnitPriceMoney();
+                        Money lineTotal = unitPrice.times(quantity);
+                        CartItem updatedItem = new CartItem(
+                                item.getProductId(),
+                                item.getName(),
+                                item.getImageUrl(),
+                                item.getUnitPrice(),
+                                item.getCurrency(),
+                                quantity,
+                                lineTotal.toPlainString(),
+                                item.isInStock(),
+                                item.getAvailableQuantity(),
+                                item.isPriceChanged(),
+                                item.isUnavailable()
+                        );
+                        optimisticItems.add(updatedItem);
+                        newSubtotal = newSubtotal.plus(lineTotal);
+                        newItemCount += quantity;
+                    } else {
+                        optimisticItems.add(item);
+                        newSubtotal = newSubtotal.plus(item.getLineTotalMoney());
+                        newItemCount += item.getQuantity();
+                    }
+                }
+                Money shipping = previousCart.getShippingMoney();
+                Money newTotal = newSubtotal.plus(shipping);
+                Cart optimisticCart = new Cart(
+                        optimisticItems,
+                        newItemCount,
+                        newSubtotal.toPlainString(),
+                        shipping.toPlainString(),
+                        newTotal.toPlainString(),
+                        previousCart.getCurrency(),
+                        previousCart.hasIssues()
+                );
+                cartState.setValue(UiState.content(optimisticCart));
+                itemCount.setValue(newItemCount);
+            }
+        }
+
         isMutationInFlight = true;
         mutatingProductId.setValue(productId);
 
@@ -109,6 +181,9 @@ public class CartViewModel extends ViewModel {
             public void onError(Throwable throwable) {
                 isMutationInFlight = false;
                 mutatingProductId.setValue(null);
+                if (previousCart != null) {
+                    handleCartLoaded(previousCart);
+                }
                 if (isAuthError(throwable)) {
                     authRequiredEvent.setValue(new Event<>(true));
                     return;
@@ -133,12 +208,50 @@ public class CartViewModel extends ViewModel {
     }
 
     /**
-     * Removes an item line from the cart with in-flight lock protection.
+     * Removes an item line from the cart with optimistic UI updates and in-flight lock protection.
      */
     public void removeItem(long productId) {
         if (isMutationInFlight) {
             return; // In-flight lock prevents double mutation
         }
+
+        // Optimistic UI update: instantly remove item and recalculate totals
+        Cart previousCart = (cartState.getValue() != null && cartState.getValue().getData() != null)
+                ? cartState.getValue().getData()
+                : null;
+
+        if (previousCart != null) {
+            List<CartItem> optimisticItems = new ArrayList<>();
+            Money newSubtotal = Money.ZERO;
+            int newItemCount = 0;
+            for (CartItem item : previousCart.getItems()) {
+                if (item.getProductId() != productId) {
+                    optimisticItems.add(item);
+                    newSubtotal = newSubtotal.plus(item.getLineTotalMoney());
+                    newItemCount += item.getQuantity();
+                }
+            }
+
+            if (optimisticItems.isEmpty()) {
+                cartState.setValue(UiState.empty());
+                itemCount.setValue(0);
+            } else {
+                Money shipping = previousCart.getShippingMoney();
+                Money newTotal = newSubtotal.plus(shipping);
+                Cart optimisticCart = new Cart(
+                        optimisticItems,
+                        newItemCount,
+                        newSubtotal.toPlainString(),
+                        shipping.toPlainString(),
+                        newTotal.toPlainString(),
+                        previousCart.getCurrency(),
+                        previousCart.hasIssues()
+                );
+                cartState.setValue(UiState.content(optimisticCart));
+                itemCount.setValue(newItemCount);
+            }
+        }
+
         isMutationInFlight = true;
         mutatingProductId.setValue(productId);
 
@@ -154,6 +267,9 @@ public class CartViewModel extends ViewModel {
             public void onError(Throwable throwable) {
                 isMutationInFlight = false;
                 mutatingProductId.setValue(null);
+                if (previousCart != null) {
+                    handleCartLoaded(previousCart);
+                }
                 if (isAuthError(throwable)) {
                     authRequiredEvent.setValue(new Event<>(true));
                     return;

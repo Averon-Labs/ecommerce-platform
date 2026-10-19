@@ -115,4 +115,10 @@
     <color name="placeholder_shimmer_highlight">#FAF8F2</color>
     <color name="placeholder_shimmer_edge">#E6E0D2</color>
     <color name="placeholder_fallback_tint">#A0A59B</color>
+
+    <!-- Favorites & Wishlist tokens -->
+    <color name="favorite_red">#E53935</color>
+    <color name="surface_card_frosted">#E6FFFFFF</color>
+    <color name="icon_favorite_outline">#6E7268</color>
 </resources>
+

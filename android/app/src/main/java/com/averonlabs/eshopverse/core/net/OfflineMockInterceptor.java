@@ -121,10 +121,19 @@ public class OfflineMockInterceptor implements Interceptor {
         }
 
         if (path.endsWith("/products")) {
-            String categoryIdParam = url.queryParameter("category_id");
+            String categoryIdParam = url.queryParameter("categoryId");
+            if (categoryIdParam == null) {
+                categoryIdParam = url.queryParameter("category_id");
+            }
             String queryParam = url.queryParameter("q");
+            if (queryParam == null) {
+                queryParam = url.queryParameter("search");
+            }
             String pageParam = url.queryParameter("page");
-            String perPageParam = url.queryParameter("per_page");
+            String perPageParam = url.queryParameter("perPage");
+            if (perPageParam == null) {
+                perPageParam = url.queryParameter("per_page");
+            }
             int page = 1;
             int perPage = 60; // Default when unpaginated to cover full set for tests
             if (pageParam != null) {
@@ -241,7 +250,7 @@ public class OfflineMockInterceptor implements Interceptor {
             return "{\"data\":{\"id\":1,\"email\":\"alex.morgan@eshopverse.com\",\"firstName\":\"Alex\",\"lastName\":\"Morgan\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}";
         }
 
-        if (path.endsWith("/auth/login") || path.endsWith("/auth/register")) {
+        if (path.endsWith("/auth/login") || path.endsWith("/auth/register") || path.endsWith("/auth/google")) {
             return "{\"data\":{\"token\":\"demo-jwt-offline-token-sample\",\"user\":{\"id\":1,\"email\":\"alex.morgan@eshopverse.com\",\"firstName\":\"Alex\",\"lastName\":\"Morgan\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}}";
         }
 

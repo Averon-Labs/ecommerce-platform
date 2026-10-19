@@ -160,6 +160,33 @@ public class AuthViewModel extends ViewModel {
     }
 
     /**
+     * Attempts sign in with a Google ID token (AUTH-004).
+     */
+    public void loginWithGoogle(@NonNull String idToken) {
+        if (isSubmitting) {
+            return;
+        }
+
+        clearErrors();
+        isSubmitting = true;
+        loginState.setValue(UiState.loading());
+
+        authRepository.loginWithGoogle(idToken, new AuthCallback<AuthSession>() {
+            @Override
+            public void onSuccess(AuthSession data) {
+                isSubmitting = false;
+                loginState.postValue(UiState.content(data));
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                isSubmitting = false;
+                handleAuthError(throwable, loginState);
+            }
+        });
+    }
+
+    /**
      * Attempts registration of new customer account.
      */
     public void register(

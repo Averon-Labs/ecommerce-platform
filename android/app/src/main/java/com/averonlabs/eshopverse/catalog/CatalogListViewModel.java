@@ -85,6 +85,8 @@ public class CatalogListViewModel extends ViewModel {
         loadFirstPage();
     }
 
+    private int activeRequestId = 0;
+
     /**
      * Updates the search query and resets pagination to page 1.
      */
@@ -93,6 +95,7 @@ public class CatalogListViewModel extends ViewModel {
         if (!Objects.equals(currentParams.getQ(), updated.getQ())) {
             this.currentParams = updated;
             this.paramsLiveData.setValue(currentParams);
+            this.inFlight = false;
             loadFirstPage();
         }
     }
@@ -105,6 +108,7 @@ public class CatalogListViewModel extends ViewModel {
         if (!Objects.equals(currentParams.getCategoryId(), updated.getCategoryId())) {
             this.currentParams = updated;
             this.paramsLiveData.setValue(currentParams);
+            this.inFlight = false;
             loadFirstPage();
         }
     }
@@ -117,6 +121,7 @@ public class CatalogListViewModel extends ViewModel {
         if (!Objects.equals(currentParams.getSort(), updated.getSort())) {
             this.currentParams = updated;
             this.paramsLiveData.setValue(currentParams);
+            this.inFlight = false;
             loadFirstPage();
         }
     }
@@ -163,6 +168,7 @@ public class CatalogListViewModel extends ViewModel {
     }
 
     private void fetchProducts(boolean isFirstPage) {
+        final int requestId = ++activeRequestId;
         inFlight = true;
         errorCodeLiveData.setValue(null);
 
@@ -173,6 +179,9 @@ public class CatalogListViewModel extends ViewModel {
         repository.listProducts(currentParams, new CatalogRepository.CatalogCallback<PagedResponse<ProductSummary>>() {
             @Override
             public void onSuccess(PagedResponse<ProductSummary> result) {
+                if (requestId != activeRequestId) {
+                    return;
+                }
                 inFlight = false;
                 List<ProductSummary> newItems = result.getData();
                 Pagination pagination = result.getPagination();
@@ -199,6 +208,9 @@ public class CatalogListViewModel extends ViewModel {
 
             @Override
             public void onError(Throwable throwable) {
+                if (requestId != activeRequestId) {
+                    return;
+                }
                 inFlight = false;
                 int messageRes = R.string.catalog_error_load_products;
                 if (throwable instanceof ApiException) {

@@ -15,12 +15,17 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.averonlabs.eshopverse.R;
+import com.averonlabs.eshopverse.catalog.FavoritesRepository;
+import com.averonlabs.eshopverse.catalog.ProductGridAdapter;
 import com.averonlabs.eshopverse.core.model.AuthSession;
+import com.averonlabs.eshopverse.core.model.ProductSummary;
 import com.averonlabs.eshopverse.core.model.User;
 import com.averonlabs.eshopverse.core.state.UiState;
 import com.averonlabs.eshopverse.core.ui.view.StateContainerView;
 import com.averonlabs.eshopverse.databinding.FragmentAccountBinding;
 import com.google.android.material.snackbar.Snackbar;
+
+import java.util.Collections;
 
 /**
  * Screen M-07 / M-17: Customer Account & Profile.
@@ -32,6 +37,7 @@ public class AccountFragment extends Fragment {
     private FragmentAccountBinding binding;
     private AuthViewModel authViewModel;
     private SessionViewModel sessionViewModel;
+    private ProductGridAdapter favoritesAdapter;
 
     @Nullable
     @Override
@@ -56,6 +62,7 @@ public class AccountFragment extends Fragment {
 
         setupTextWatchers();
         setupClickListeners();
+        setupFavoritesSection();
         observeViewModels();
     }
 
@@ -117,7 +124,7 @@ public class AccountFragment extends Fragment {
         });
 
         binding.btnGuestGoogleSignIn.setOnClickListener(v -> {
-            showAnchoredSnackbar(R.string.auth_feedback_google_sign_in);
+            authViewModel.loginWithGoogle("mock_google_id_token_demo");
         });
 
         binding.btnGuestForgotPassword.setOnClickListener(v -> {
@@ -300,6 +307,43 @@ public class AccountFragment extends Fragment {
             } else {
                 binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
             }
+        }
+    }
+
+    private void setupFavoritesSection() {
+        favoritesAdapter = new ProductGridAdapter(this::onFavoriteProductClicked, true);
+        binding.rvFavorites.setAdapter(favoritesAdapter);
+
+        FavoritesRepository.getInstance(requireContext()).getFavorites().observe(getViewLifecycleOwner(), list -> {
+            if (binding == null) return;
+            int count = list != null ? list.size() : 0;
+            binding.tvFavoritesCountBadge.setText(count + " " + (count == 1 ? "item" : "items"));
+
+            if (count == 0) {
+                binding.layoutFavoritesEmpty.setVisibility(View.VISIBLE);
+                binding.rvFavorites.setVisibility(View.GONE);
+                favoritesAdapter.submitList(Collections.emptyList());
+            } else {
+                binding.layoutFavoritesEmpty.setVisibility(View.GONE);
+                binding.rvFavorites.setVisibility(View.VISIBLE);
+                favoritesAdapter.submitList(list);
+            }
+        });
+    }
+
+    private void onFavoriteProductClicked(@NonNull ProductSummary product) {
+        if (!isAdded()) return;
+        Bundle args = new Bundle();
+        args.putLong("productId", product.getId());
+        try {
+            NavHostFragment.findNavController(this).navigate(
+                    R.id.action_accountFragment_to_productDetailFragment,
+                    args
+            );
+        } catch (Exception e) {
+            try {
+                NavHostFragment.findNavController(this).navigate(R.id.nav_catalog, args);
+            } catch (Exception ignored) {}
         }
     }
 

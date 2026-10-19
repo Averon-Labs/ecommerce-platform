@@ -107,7 +107,7 @@ public class RegisterFragment extends Fragment {
         });
 
         binding.btnGoogleSignIn.setOnClickListener(v -> {
-            Snackbar.make(binding.getRoot(), R.string.auth_feedback_google_sign_in, Snackbar.LENGTH_SHORT).show();
+            authViewModel.loginWithGoogle("mock_google_id_token_demo");
         });
 
         binding.btnToSignIn.setOnClickListener(v -> {
@@ -140,6 +140,7 @@ public class RegisterFragment extends Fragment {
         authViewModel.getServerFieldErrors().observe(getViewLifecycleOwner(), this::mapServerFieldErrors);
 
         authViewModel.getRegisterState().observe(getViewLifecycleOwner(), this::handleRegisterState);
+        authViewModel.getLoginState().observe(getViewLifecycleOwner(), this::handleRegisterState);
     }
 
     private void mapServerFieldErrors(@Nullable Map<String, String> fieldErrors) {

@@ -9,6 +9,7 @@ import com.averonlabs.eshopverse.core.model.Category;
 import com.averonlabs.eshopverse.core.model.CheckoutQuote;
 import com.averonlabs.eshopverse.core.model.CheckoutQuoteRequest;
 import com.averonlabs.eshopverse.core.model.CreateOrderRequest;
+import com.averonlabs.eshopverse.core.model.GoogleAuthRequest;
 import com.averonlabs.eshopverse.core.model.LoginRequest;
 import com.averonlabs.eshopverse.core.model.Order;
 import com.averonlabs.eshopverse.core.model.OrderSummary;
@@ -49,9 +50,9 @@ public interface ApiRoutes {
     @GET("products")
     Call<PagedResponse<ProductSummary>> listProducts(
             @Query("page") @Nullable Integer page,
-            @Query("per_page") @Nullable Integer perPage,
-            @Query("category_id") @Nullable Long categoryId,
-            @Query("search") @Nullable String search,
+            @Query("perPage") @Nullable Integer perPage,
+            @Query("categoryId") @Nullable Long categoryId,
+            @Query("q") @Nullable String q,
             @Query("sort") @Nullable String sort
     );
 
@@ -65,6 +66,9 @@ public interface ApiRoutes {
 
     @POST("auth/login")
     Call<ApiResponse<AuthSession>> loginCustomer(@Body LoginRequest request);
+
+    @POST("auth/google")
+    Call<ApiResponse<AuthSession>> loginWithGoogle(@Body GoogleAuthRequest request);
 
     @POST("auth/logout")
     Call<Void> logoutCustomer();

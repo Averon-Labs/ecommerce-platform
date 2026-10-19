@@ -120,6 +120,101 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Customer Favorites Bento Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/card_favorites"
+                        style="@style/Widget.EShopVerse.Card.Panel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/spacing_lg">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="@dimen/spacing_lg">
+
+                            <!-- Header: Title + Badge Count -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="@dimen/spacing_md">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:layout_marginEnd="@dimen/spacing_sm"
+                                    android:src="@drawable/ic_heart_filled"
+                                    app:tint="@color/favorite_red"
+                                    android:contentDescription="@null" />
+
+                                <TextView
+                                    android:id="@+id/tv_favorites_heading"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="@string/favorites_title"
+                                    android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                                    android:textColor="@color/text_primary_ink" />
+
+                                <TextView
+                                    android:id="@+id/tv_favorites_count_badge"
+                                    style="@style/Widget.EShopVerse.Badge.Status"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_status_badge"
+                                    android:backgroundTint="@color/color_soft_sage"
+                                    android:textColor="@color/color_botanical_green"
+                                    tools:text="0 items" />
+
+                            </LinearLayout>
+
+                            <!-- Empty State for Favorites -->
+                            <LinearLayout
+                                android:id="@+id/layout_favorites_empty"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:paddingVertical="@dimen/spacing_lg"
+                                android:visibility="gone"
+                                tools:visibility="visible">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/favorites_empty_title"
+                                    android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                                    android:textColor="@color/text_primary_ink"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/spacing_xs"
+                                    android:gravity="center"
+                                    android:text="@string/favorites_empty_description"
+                                    android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                                    android:textColor="@color/text_secondary" />
+
+                            </LinearLayout>
+
+                            <!-- Horizontal Carousel of Favorited Products -->
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rv_favorites"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:clipToPadding="false"
+                                android:orientation="horizontal"
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                                tools:listitem="@layout/item_product_card" />
+
+                        </LinearLayout>
+
+                    </com.google.android.material.card.MaterialCardView>
+
                     <!-- Edit Profile Bento Card -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/card_edit_profile"

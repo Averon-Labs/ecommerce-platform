@@ -262,9 +262,10 @@ public class CheckoutViewModelTest {
     private static class DummyApiRoutes implements com.averonlabs.eshopverse.core.net.ApiRoutes {
         @Override public retrofit2.Call<com.averonlabs.eshopverse.core.net.ApiResponse<java.util.List<com.averonlabs.eshopverse.core.model.Category>>> listCategories() { return null; }
         @Override public retrofit2.Call<com.averonlabs.eshopverse.core.net.ApiResponse<com.averonlabs.eshopverse.core.model.ProductDetail>> getProduct(long id) { return null; }
-        @Override public retrofit2.Call<com.averonlabs.eshopverse.core.net.PagedResponse<com.averonlabs.eshopverse.core.model.ProductSummary>> listProducts(Integer page, Integer perPage, Long categoryId, String search, String sort) { return null; }
+        @Override public retrofit2.Call<com.averonlabs.eshopverse.core.net.PagedResponse<com.averonlabs.eshopverse.core.model.ProductSummary>> listProducts(Integer page, Integer perPage, Long categoryId, String q, String sort) { return null; }
         @Override public retrofit2.Call<com.averonlabs.eshopverse.core.net.ApiResponse<com.averonlabs.eshopverse.core.model.AuthSession>> registerCustomer(com.averonlabs.eshopverse.core.model.RegisterRequest r) { return null; }
         @Override public retrofit2.Call<com.averonlabs.eshopverse.core.net.ApiResponse<com.averonlabs.eshopverse.core.model.AuthSession>> loginCustomer(com.averonlabs.eshopverse.core.model.LoginRequest r) { return null; }
+        @Override public retrofit2.Call<com.averonlabs.eshopverse.core.net.ApiResponse<com.averonlabs.eshopverse.core.model.AuthSession>> loginWithGoogle(com.averonlabs.eshopverse.core.model.GoogleAuthRequest r) { return null; }
         @Override public retrofit2.Call<Void> logoutCustomer() { return null; }
         @Override public retrofit2.Call<com.averonlabs.eshopverse.core.net.ApiResponse<com.averonlabs.eshopverse.core.model.User>> getCustomerProfile() { return null; }
         @Override public retrofit2.Call<com.averonlabs.eshopverse.core.net.ApiResponse<com.averonlabs.eshopverse.core.model.User>> updateCustomerProfile(com.averonlabs.eshopverse.core.model.UpdateProfileRequest r) { return null; }

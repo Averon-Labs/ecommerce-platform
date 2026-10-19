@@ -6,20 +6,27 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.averonlabs.eshopverse.MainActivity;
 import com.averonlabs.eshopverse.R;
+import com.averonlabs.eshopverse.auth.AuthViewModelFactory;
 import com.averonlabs.eshopverse.core.model.ProductSummary;
 import com.averonlabs.eshopverse.core.money.MoneyFormat;
 import com.averonlabs.eshopverse.core.ui.ImageLoaderHelper;
 import com.averonlabs.eshopverse.core.ui.view.StatusBadgeView;
 import com.averonlabs.eshopverse.databinding.ItemProductCardBinding;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+
 
 /**
  * RecyclerView adapter presenting products in a multi-column grid per docs/android/PHASE-1-SPEC.md §E.4.
@@ -154,6 +161,50 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
             };
             binding.cardProduct.setOnClickListener(onProductClickAction);
             binding.ivProductImage.setOnClickListener(onProductClickAction);
+
+            // Favorites binding & toggle
+            FavoritesRepository favRepo = FavoritesRepository.getInstance(itemView.getContext());
+            boolean isFav = favRepo.isFavorite(product.getId());
+            updateFavoriteVisual(isFav);
+
+            binding.btnCardFavorite.setOnClickListener(v -> {
+                boolean signedIn = AuthViewModelFactory.getDefaultRepository(itemView.getContext()).isSignedIn();
+                if (signedIn) {
+                    favRepo.toggleFavorite(product);
+                    boolean newFav = favRepo.isFavorite(product.getId());
+                    updateFavoriteVisual(newFav);
+                } else {
+                    new MaterialAlertDialogBuilder(itemView.getContext())
+                            .setTitle(R.string.favorites_login_required_title)
+                            .setMessage(R.string.favorites_login_required_message)
+                            .setPositiveButton(R.string.favorites_action_sign_in, (dialog, which) -> {
+                                try {
+                                    NavController navController = Navigation.findNavController(itemView);
+                                    navController.navigate(R.id.accountFragment);
+                                } catch (Exception e) {
+                                    if (itemView.getContext() instanceof MainActivity) {
+                                        NavController nc = ((MainActivity) itemView.getContext()).getNavController();
+                                        if (nc != null) {
+                                            nc.navigate(R.id.accountFragment);
+                                        }
+                                    }
+                                }
+                            })
+                            .setNegativeButton(R.string.favorites_action_cancel, null)
+                            .show();
+                }
+            });
+        }
+
+        private void updateFavoriteVisual(boolean isFavorite) {
+            if (isFavorite) {
+                binding.ivCardFavorite.setImageResource(R.drawable.ic_heart_filled);
+                binding.ivCardFavorite.setImageTintList(ContextCompat.getColorStateList(itemView.getContext(), R.color.favorite_red));
+            } else {
+                binding.ivCardFavorite.setImageResource(R.drawable.ic_heart_outline);
+                binding.ivCardFavorite.setImageTintList(ContextCompat.getColorStateList(itemView.getContext(), R.color.icon_favorite_outline));
+            }
         }
     }
 }
+
