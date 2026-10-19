@@ -54,7 +54,7 @@ Admin contribution to QUAL-003 per [`ADMIN_ROADMAP.md`](ADMIN_ROADMAP.md) Phase 
 
 ### A-4 — Browser storage, client surface, and logging (Informational) — clean
 
-- **Evidence:** source review — no `localStorage`/`sessionStorage` and no bearer tokens anywhere in `admin/src` (the only cookie read is the `XSRF-TOKEN` echo in `src/api/http.ts`); no `console` logging; no `dangerouslySetInnerHTML`, `innerHTML`, or `eval`; the API origin comes solely from the public `VITE_API_BASE_URL` (`.env.example` documents it contains no credentials).
+- **Evidence:** source review — no bearer tokens anywhere in `admin/src` and no auth/session value in browser storage. The only `localStorage` value is the non-sensitive `eshop-admin-theme` light/dark display preference added by UI-003 (the only cookie read is the `XSRF-TOKEN` echo in `src/api/http.ts`); no `console` logging; no `dangerouslySetInnerHTML`, `innerHTML`, or `eval`; the API origin comes solely from the public `VITE_API_BASE_URL` (`.env.example` documents it contains no credentials).
 
 ### A-5 — CORS (Informational) — verified
 
@@ -72,7 +72,7 @@ Per [`SECURITY.md`](SECURITY.md) § Portfolio Demo Boundaries, and stated explic
 
 - **Payment is simulated.** No provider is contacted; no card number, security code, or live token is requested, accepted, logged, or stored. `DemoPayment` rows record an explicit outcome only.
 - **No production readiness is claimed.** A real launch requires a separate threat model, privacy/legal review, deployment controls, monitoring, backup/recovery, and incident response.
-- **Local development runs over loopback HTTP** (no TLS); a hosted deployment must terminate HTTPS and use a TLS-enabled MySQL connection (`MYSQL_ATTR_SSL_CA`), as documented in `DEVELOPMENT.md`. The admin session cookie is then expected to carry `Secure` (set `SESSION_SECURE_COOKIE=true` in the deployment environment; the checked-in `.env.example` keeps `false` for loopback).
+- **Local development runs over loopback HTTP** (no TLS); a hosted deployment must terminate HTTPS and use a TLS-enabled MySQL connection (`MYSQL_ATTR_SSL_CA`), as documented in `DEVELOPMENT.md`. The admin session cookie is then expected to carry `Secure` (set `SESSION_SECURE_COOKIE=true` in the deployment environment; the checked-in `.env.example` keeps `false` for loopback). The optional ByetHost demo is recorded in [`DEPLOYMENT.md`](DEPLOYMENT.md); it is configured for HTTPS and the Secure session cookie, and it does not change the production/non-production boundary above.
 - **Rate limits are tuned for demo traffic** (global 300/min/ip and the narrower classes) and would be re-derived for production scale.
 
 The demo/non-production notice required by QUAL-003 criterion (d) lives in `SECURITY.md` § Portfolio Demo Boundaries and is mirrored in `HANDOFF.md`; the admin order detail additionally states that the demo payment method collects no card data.

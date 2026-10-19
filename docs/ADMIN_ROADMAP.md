@@ -171,7 +171,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **Project phase gate:** see [Phase 3 in the Project Roadmap](ROADMAP.md).
 
-**Phase contribution PR:** all five steps of this phase ship together on `feature/admin-phase-3` — [PR #47](https://github.com/Averon-Labs/eshop-verse/pull/47) targets `develop`, is open for review, and is never merged automatically.
+**Phase contribution PR:** steps 1–5 of this phase shipped together on `feature/admin-phase-3` — [PR #47](https://github.com/Averon-Labs/eshop-verse/pull/47) targeted `develop` and was merged 2026-10-17. Step 6 (UI-003) is a post-phase enhancement requested by the owner on 2026-10-19; it is delivered in a follow-up PR on `feature/admin-phase-3` without changing the historical PR #47 scope.
 
 ### Step 1 — QUAL-001 — Component contribution
 
@@ -195,7 +195,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **Component contribution:** Review admin session/CSRF behavior, role boundaries, browser storage, error states, and dependency risks.
 
-**Contribution record (2026-10-17):** no admin-side security defect was found; the findings are recorded as informational verifications A-1–A-6 in [`SECURITY_REVIEW.md`](SECURITY_REVIEW.md) § Admin SPA. Evidence: `npm audit` and `npm audit --omit=dev` both report 0 vulnerabilities and runtime dependencies are exact-pinned with a committed lockfile; source review confirms no `localStorage`/`sessionStorage`/bearer tokens (the only cookie read is the `XSRF-TOKEN` echo), no console logging, no `dangerouslySetInnerHTML`/`innerHTML`/`eval`, and no credentials in the public `VITE_API_BASE_URL` config; live probes against the local API with disposable data passed 14/14 — guest CSRF handshake sets the JS-readable `XSRF-TOKEN` and a guest session, admin login sets an `HttpOnly` `SameSite=Lax` session cookie whose identifier rotates on login, mutations without `X-XSRF-TOKEN` answer `403 CSRF_TOKEN_MISMATCH`, a foreign origin (`https://evil.example`) receives no `Access-Control-Allow-Origin` on simple or preflight requests while the documented SPA origin is allowed with credentials, a non-admin stateful session receives `401 UNAUTHENTICATED` on `GET /admin/auth/session`, and logout ends the session. Criterion (d): the simulated-payment and non-production notice in [`SECURITY.md`](SECURITY.md) § Portfolio Demo Boundaries and [`HANDOFF.md`](HANDOFF.md) matches the admin UI copy ("Demo method only — no card data is ever collected."). The canonical QUAL-003 task stays `[~]` pending its Android contribution. **Independent verification (2026-10-17, `6d3d7f3`):** a different agent reran `npm audit`/`npm audit --omit=dev` (0 vulnerabilities), the source greps, and the 14-check security probe script (14/14).
+**Contribution record (2026-10-17):** no admin-side security defect was found; the findings are recorded as informational verifications A-1–A-6 in [`SECURITY_REVIEW.md`](SECURITY_REVIEW.md) § Admin SPA. Evidence: `npm audit` and `npm audit --omit=dev` both report 0 vulnerabilities and runtime dependencies are exact-pinned with a committed lockfile; source review confirms no `localStorage`/`sessionStorage`/bearer tokens (the only cookie read is the `XSRF-TOKEN` echo), no console logging, no `dangerouslySetInnerHTML`/`innerHTML`/`eval`, and no credentials in the public `VITE_API_BASE_URL` config; live probes against the local API with disposable data passed 14/14 — guest CSRF handshake sets the JS-readable `XSRF-TOKEN` and a guest session, admin login sets an `HttpOnly` `SameSite=Lax` session cookie whose identifier rotates on login, mutations without `X-XSRF-TOKEN` answer `403 CSRF_TOKEN_MISMATCH`, a foreign origin (`https://evil.example`) receives no `Access-Control-Allow-Origin` on simple or preflight requests while the documented SPA origin is allowed with credentials, a non-admin stateful session receives `401 UNAUTHENTICATED` on `GET /admin/auth/session`, and logout ends the session. Criterion (d): the simulated-payment and non-production notice in [`SECURITY.md`](SECURITY.md) § Portfolio Demo Boundaries and [`HANDOFF.md`](HANDOFF.md) matches the admin UI copy ("Demo method only — no card data is ever collected."). The canonical QUAL-003 task stays `[~]` pending its Android contribution. **Independent verification (2026-10-17, `6d3d7f3`):** a different agent reran `npm audit`/`npm audit --omit=dev` (0 vulnerabilities), the source greps, and the 14-check security probe script (14/14). **Update (2026-10-19):** UI-003 later added the non-sensitive `eshop-admin-theme` preference to `localStorage`; no auth/session value is stored there, so the original security finding still holds for credentials and session state.
 
 ### Step 4 — QUAL-004 — Component contribution
 
@@ -203,7 +203,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **Component contribution:** Verify admin setup, demo roles, workflows, and limitations in the handoff guide.
 
-**Contribution record (2026-10-17):** added the **Admin Dashboard** chapter to [`HANDOFF.md`](HANDOFF.md) — what the component is, clean setup (`npm ci`, optional `.env.local`, `npm run dev` on the pinned `http://localhost:5173`, the local origin arrangement), the admin checks including the new `npm run check:contrast`, the administrator demo account (local-only, from `DEMO_ADMIN_PASSWORD`; no self-registration), a screen-by-screen walkthrough for A-01–A-07 with routes and key behaviors, three guided workflows (catalog archive/conflict, inventory adjust/out-of-stock, order `Processing → Shipped → Delivered` plus `pending_payment → cancelled` and `409 INVALID_TRANSITION`), and the admin known limitations (demo image URLs only, stock in A-05, card fallback at narrow widths, no theme toggle, deferred analytics/customer-admin/CMS/wishlist scope, loopback HTTP). The intro and component-status notes now state that the guide covers all three components. Commands mirror the verified [`DEVELOPMENT.md`](DEVELOPMENT.md) § Admin Dashboard; no credential or secret is written into the guide (criterion **b**). The canonical QUAL-004 task stays `[~]` pending its Android contribution. **Independent verification (2026-10-17, `6d3d7f3`):** a different agent cross-checked the walkthrough routes against `admin/src/App.tsx`, the screen IDs and titles against `docs/SCREEN_SPECIFICATIONS.md`, and the setup/check commands against `DEVELOPMENT.md` and `package.json` — all match; no credential appears in the guide.
+**Contribution record (2026-10-17):** added the **Admin Dashboard** chapter to [`HANDOFF.md`](HANDOFF.md) — what the component is, clean setup (`npm ci`, optional `.env.local`, `npm run dev` on the pinned `http://localhost:5173`, the local origin arrangement), the admin checks including the new `npm run check:contrast`, the administrator demo account (local-only, from `DEMO_ADMIN_PASSWORD`; no self-registration), a screen-by-screen walkthrough for A-01–A-07 with routes and key behaviors, three guided workflows (catalog archive/conflict, inventory adjust/out-of-stock, order `Processing → Shipped → Delivered` plus `pending_payment → cancelled` and `409 INVALID_TRANSITION`), and the admin known limitations (demo image URLs only, stock in A-05, card fallback at narrow widths, no theme toggle, deferred analytics/customer-admin/CMS/wishlist scope, loopback HTTP). The intro and component-status notes now state that the guide covers all three components. Commands mirror the verified [`DEVELOPMENT.md`](DEVELOPMENT.md) § Admin Dashboard; no credential or secret is written into the guide (criterion **b**). The canonical QUAL-004 task stays `[~]` pending its Android contribution. **Independent verification (2026-10-17, `6d3d7f3`):** a different agent cross-checked the walkthrough routes against `admin/src/App.tsx`, the screen IDs and titles against `docs/SCREEN_SPECIFICATIONS.md`, and the setup/check commands against `DEVELOPMENT.md` and `package.json` — all match; no credential appears in the guide. **Update (2026-10-19):** the “no theme toggle” limitation is superseded by UI-003; [`HANDOFF.md`](HANDOFF.md) now documents the toggle, persistence, and the non-sensitive-storage boundary.
 
 ### Step 5 — QUAL-005 — Component contribution
 
@@ -212,3 +212,38 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 **Component contribution:** Run documented admin checks from a clean checkout and report exact commands and outcomes.
 
 **Contribution record (2026-10-17):** rehearsed from a clean checkout of commit `a15def7` (`git worktree add --detach`, no `node_modules`, no `dist`, no `.env.local`) repeating the exact [`DEVELOPMENT.md`](DEVELOPMENT.md) commands: `npm ci` (committed lockfile, 0 vulnerabilities) → `npm run typecheck`, `npm run lint`, `npm run check:contrast` (17/17), `npm test` (10 files, 82 tests), `npm run build` all pass; `npm run preview` served `/` (200), `/fonts/lato-regular.ttf` (200), and `/fonts/Lato-OFL.txt` (200) with no third-party font reference in the served HTML. Commands, results, and the tested commit are recorded in [`DEVELOPMENT.md`](DEVELOPMENT.md) § Admin Dashboard (criterion **c**). Also corrected the stale admin routing row in that section (missing `/orders`, `/orders/:orderId`). Limitation reported honestly: the checked-in CI workflow does not yet run an admin job — that, its verified run, and any branch-protection claim belong to the pending project task **FND-005** (CI changes require human approval); no false CI claim is made. The canonical QUAL-005 task stays `[~]` pending its Android contribution. **Independent verification (2026-10-17, `6d3d7f3`):** a different agent repeated the full clean-checkout rehearsal in a fresh detached worktree (`npm ci`, typecheck, lint, 17/17 contrast, 82 tests, identical build bundles) plus the preview smoke (`/`, `/fonts/lato-regular.ttf`, `/fonts/Lato-OFL.txt` all 200, no third-party font reference) and confirmed `git diff a15def7..HEAD` is docs-only; the CI limitation (no admin job; FND-005) is stated without any false claim.
+
+### Step 6 — UI-003 — Admin light/dark theme
+
+**Status:** `[x]` implemented and locally verified 2026-10-19 (owner-requested post-phase enhancement).
+
+**Scope:** add a persisted light/dark theme to the admin SPA without changing API, database, authentication, or
+product scope. Light remains the baseline; the operating-system preference is the default until the user makes
+an explicit choice.
+
+**Acceptance criteria:**
+
+- [x] **a.** The admin shell, sign-in screen, not-found screen, and API-unreachable state expose an accessible
+  light/dark toggle with a minimum 44px target, a visible focus ring, a fixed accessible name, and
+  `aria-pressed` state; it is operable by keyboard and does not rely on color alone.
+- [x] **b.** An explicit choice persists across reloads and sessions; otherwise the app follows
+  `prefers-color-scheme`. The root element receives the `dark` class and `color-scheme` before first paint so
+  dark-mode users do not see a light flash.
+- [x] **c.** Existing light and dark semantic tokens, status badges, dialogs, tables, forms, and shell surfaces
+  adapt with no hardcoded light-only text or surface; the stored preference is the non-sensitive
+  `eshop-admin-theme` value only, never an auth token.
+- [x] **d.** Automated tests cover a stored preference, the system-preference fallback, the toggle, the root
+  class, `color-scheme`, and persistence; the contrast script verifies both palettes.
+- [x] **e.** [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md), [`SCREEN_SPECIFICATIONS.md`](SCREEN_SPECIFICATIONS.md),
+  [`HANDOFF.md`](HANDOFF.md), and [`DEPLOYMENT.md`](DEPLOYMENT.md) describe the behavior and the upload path;
+  the production build remains same-origin with `VITE_API_BASE_URL=/api/v1`.
+
+**Verification record (2026-10-19, local build):** added `src/theme/ThemeContext.tsx`,
+`src/components/ThemeToggle.tsx`, a boot script in `index.html`, `color-scheme` tokens, and 3 theme tests.
+`npm run typecheck`, `npm run lint`, `npm run check:contrast` (34/34 pairs — 17 light + 17 dark), `npm test`
+(11 files, 85 tests), and `npm run build` pass. Production output: `index.html`, one CSS bundle
+(`index-tL7PdeFP.css`, ~37 kB), one JS bundle (`index-X4fCBd4x.js`, ~348 kB), and self-hosted Lato fonts.
+A local preview smoke test at 1200px confirmed: the OS-dark default rendered dark, the toggle switched to
+light, `localStorage["eshop-admin-theme"]` became `light`, and a reload kept the light theme. The prepared
+upload archive is `deploy/eshopverse-admin-dist.zip`; live upload is the owner's remaining deployment step
+(see [`DEPLOYMENT.md`](DEPLOYMENT.md)). No independent tester was assigned to this post-phase enhancement.

@@ -245,6 +245,55 @@ Use subtle separation rather than heavy shadows:
 | Status badge | Text label plus semantic color; never color alone |
 | Form section | Consistent label, helper/error text, field spacing, and save/cancel placement |
 | Confirmation dialog | Names the target and consequence; primary/secondary actions are consistent |
+| Theme toggle | Sun/moon icon button in the shell header and standalone screens; 44px minimum target, fixed accessible name, `aria-pressed`, visible focus ring, persisted light/dark choice |
+
+### Admin Web Theme (Light / Dark)
+
+**Status: IMPLEMENTED — UI-003 (2026-10-19).**
+
+The admin SPA supports a persisted light/dark theme. Light remains the baseline; dark uses the existing
+“Deep Space & OLED” coral/neutral tokens. The toggle appears in the authenticated shell header, on the sign-in
+screen, and on the standalone not-found and API-unreachable states. It does not appear on the transient
+full-page loading view.
+
+**Behavior**
+
+- With no saved choice, the app follows the operating system's `prefers-color-scheme` setting.
+- An explicit choice is stored as `eshop-admin-theme` (`light` or `dark`) in `localStorage`. This is a
+  non-sensitive display preference, not an auth token or session value; auth remains in the Sanctum cookies.
+- The inline boot script in `admin/index.html` applies the `dark` class and `color-scheme` before first paint,
+  so a dark-mode user does not see a light flash.
+- The root `color-scheme` and `<meta name="theme-color">` follow the active theme for native controls and
+  browser chrome. The toggle updates the icon, `aria-pressed`, and `title` without a page reload.
+- The same semantic tokens drive both themes. Page code uses `bg-background`, `bg-card`, `text-foreground`,
+  `text-muted-foreground`, `border-border`, and the status roles; it must not hardcode light-only surfaces.
+
+**Key web tokens** (source of truth: `admin/src/globals.css`):
+
+| Token | Light | Dark |
+|-------|-------|------|
+| `--background` | `#F5F6F7` | `#000000` |
+| `--card` | `#FFFFFF` | `#0D0D0E` |
+| `--foreground` | `#161616` | `#F0F0F4` |
+| `--primary` | `#F7767E` | `#FFB3B8` |
+| `--primary-foreground` | `#161616` | `#5F121C` |
+| `--primary-strong` | `#B92F3D` | `#FFB3B8` |
+| `--muted` | `#F1F1F3` | `#1A1C20` |
+| `--muted-foreground` | `#6B6B6B` | `#C4C6D0` |
+| `--border` | `#D8D8DE` | `#2D3037` |
+| `--ring` | `#B92F3D` | `#FFB3B8` |
+
+**Accessibility and verification**
+
+- `npm run check:contrast` verifies 17 light and 17 dark foreground/background pairs (text threshold 4.5:1;
+  focus-ring threshold 3:1). The current build passes 34/34; the script is the repeatable evidence, not the
+  token values alone.
+- The toggle has a 44px minimum target, a visible `focus-visible` ring, an accessible name (“Dark theme”), and
+  `aria-pressed`, so state is not conveyed by color or icon alone.
+- Theme behavior tests cover a stored preference, the OS fallback, the toggle, the root class, `color-scheme`,
+  and persistence.
+- Do not use dark mode as an excuse for low-contrast coral text: dark surfaces use the luminous coral
+  `#FFB3B8`, while light surfaces keep the darker `#B92F3D` for text and focus indicators (ADR-002).
 
 ---
 

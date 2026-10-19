@@ -76,16 +76,17 @@ M-17 Account belongs to AUTH-002 together with M-06–M-09: it presents only the
 - Sidebar destinations are **Products**, **Categories**, **Inventory**, and **Orders**, matching the approved admin capabilities. Sign out is in the account menu. Do not add destinations for overview/analytics, customers, notifications, transactions, or CMS.
 - Keep list pages task-oriented: filters above the table, primary action aligned with the page heading, row actions visible and keyboard accessible, and status expressed as text plus color.
 - Desktop uses a fixed 248px sidebar and content area capped near 1440px. Tablet collapses the sidebar; below 768px it becomes a drawer and tables reflow into labeled cards.
+- **Theme:** a light/dark toggle sits in the top bar beside the account menu and at the top-right of the sign-in, not-found, and API-unreachable screens. With no saved choice it follows the operating-system preference; an explicit choice persists across reloads. The toggle has a 44px minimum target, a visible focus ring, the accessible name “Dark theme”, and `aria-pressed`; it must not rely on icon or color alone. The inline boot script applies the saved theme before first paint. Detailed tokens and behavior: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) § Admin Web Theme.
 - Modern visual craftsmanship per `.agents/skills/my-ui-ux-skill/`:
   - **Asymmetric Bento Metrics:** Performance, stock, and orders displayed in high-density Bento grid modules (`BentoGrid.tsx`) with 1dp borders and subtle aurora glow.
   - **Vercel Engineering Standards:** Zero CLS (< 0.1) skeleton layouts, `tabular-nums` typography for financial and inventory rows, and accessible focus rings (`focus-visible:ring-2`).
-  - **Deep OLED Dark Mode:** Neutral dark surfaces (`bg-neutral-900`/`bg-neutral-950`) with frosted translucency (`GlassCard.tsx`) and compound modals (`CompoundModal.tsx`).
+  - **Deep OLED Dark Mode:** Neutral dark surfaces (`bg-neutral-900`/`bg-neutral-950`) with frosted translucency (`GlassCard.tsx`) and compound modals (`CompoundModal.tsx`); the same responsive shell and page components switch themes through semantic tokens, not duplicated layouts.
 
 ### Screen inventory
 
 | ID | Screen | Structure and primary behavior |
 |----|--------|--------------------------------|
-| A-01 | Admin sign in | Use the existing admin sign-in fields and actions. Apply the shared palette, typography, form, focus, loading, and error patterns; keep the authentication flow defined by AUTH-003. No admin self-registration. |
+| A-01 | Admin sign in | Use the existing admin sign-in fields and actions. Apply the shared palette, typography, form, focus, loading, and error patterns; keep the authentication flow defined by AUTH-003. Show the persisted light/dark toggle at the top-right without overlapping the card on narrow screens. No admin self-registration. |
 | A-02 | Products | Heading plus **Add product**; search, category/status filters only when supported by API; table columns: product/image, SKU, category, USD price, stock, status, actions. Pagination follows API metadata. Row actions open edit/details; archive follows the reviewed server behavior. |
 | A-03 | Create/edit product | One-column form on narrow screens and grouped two-column form on wide screens. Fields: name, description, USD price, optional SKU, category, active/inactive status, and ordered demo image URLs with preview. Stock is managed in A-05, not duplicated here. Show field validation, unsaved-change warning, **Save**, and **Cancel**. No binary upload control. |
 | A-04 | Categories | Heading plus **Add category**; searchable/sortable list with category name and display order; show product count only if the API returns it. Edit and reorder follow server support. Hide/disable destructive actions until category lifecycle is settled by the API/schema. |
@@ -113,6 +114,7 @@ M-17 Account belongs to AUTH-002 together with M-06–M-09: it presents only the
 | M-15–M-16 | ORD-002 |
 | A-06–A-07 | ORD-003 |
 | Shared accessibility, responsive, and consistency review | QUAL-002 |
+| Shared admin light/dark theme | UI-003 |
 
 ## Open contract alignment item
 

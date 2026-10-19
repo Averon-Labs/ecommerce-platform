@@ -70,6 +70,7 @@ EShop Verse is a portfolio project that demonstrates a complete single-store sho
 - Product and category management.
 - Inventory updates.
 - Order viewing and status updates.
+- Persisted light/dark theme preference for the admin interface (owner-requested UI-003, 2026-10-19).
 
 Customer account administration and analytics are deferred.
 

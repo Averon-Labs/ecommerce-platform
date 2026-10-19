@@ -222,7 +222,9 @@ Every screen is engineered with clear state handling via `StateContainerView`:
 
 ### What this component is
 
-A React 19 + TypeScript + Vite single-page dashboard for store operations, styled with Tailwind CSS 4 on the shared coral/neutral design system (self-hosted Lato). It talks to the backend through the admin REST endpoints only, authenticating with the first-party Laravel Sanctum session (HttpOnly cookie + echoed `XSRF-TOKEN`; no token in browser storage). The shell is a static sidebar at `≥768px` and a drawer below it; the four sections cover the first-release scope: products, categories, inventory, and orders.
+A React 19 + TypeScript + Vite single-page dashboard for store operations, styled with Tailwind CSS 4 on the shared coral/neutral design system (self-hosted Lato). It talks to the backend through the admin REST endpoints only, authenticating with the first-party Laravel Sanctum session (HttpOnly cookie + echoed `XSRF-TOKEN`; no auth token in browser storage). The shell is a static sidebar at `≥768px` and a drawer below it; the four sections cover the first-release scope: products, categories, inventory, and orders. A persisted light/dark theme toggle is available in the shell header and on sign-in; only the non-sensitive theme preference is stored in `localStorage`.
+
+The optional free-hosted demo is recorded in [`DEPLOYMENT.md`](DEPLOYMENT.md); the local setup below remains the reproducible path.
 
 ### Clean setup (Admin)
 
@@ -243,7 +245,7 @@ Admin checks (from `admin/`):
 npm run typecheck        # tsc --noEmit
 npm run lint             # eslint .
 npm test                 # Vitest + React Testing Library behavior tests
-npm run check:contrast   # WCAG 2.2 check for the admin token pairs
+npm run check:contrast   # WCAG 2.2 check for the light + dark admin token pairs
 npm run build            # type-check + production build (dist/)
 ```
 
@@ -257,7 +259,7 @@ npm run build            # type-check + production build (dist/)
 
 | ID | Screen | How to reach it | Key behaviors |
 |----|--------|-----------------|---------------|
-| **A-01** | **Admin sign in** | Open `http://localhost:5173` | Email + password with inline validation; throttle messages carry the retry hint; non-admin or expired sessions show a notice. |
+| **A-01** | **Admin sign in** | Open `http://localhost:5173` | Email + password with inline validation; throttle messages carry the retry hint; non-admin or expired sessions show a notice; the light/dark toggle is at the top-right and its choice persists. |
 | **A-02** | **Products** | Sidebar: **Products** | Search plus category/status filters, API pagination, row actions **Edit**/**Archive** (confirmation), responsive table-to-card layout on narrow screens. |
 | **A-03** | **Create/edit product** | **Add product** / row **Edit** | Grouped form (name, description, USD price, optional SKU, category, status, ordered demo image URLs with preview); unsaved-change guard; stock is managed in A-05, not here. |
 | **A-04** | **Categories** | Sidebar: **Categories** | Create/edit, archive/restore; archiving is refused with the server's conflict message while active products remain assigned. |
@@ -277,6 +279,6 @@ npm run build            # type-check + production build (dist/)
 - **Demo image URLs only** — no binary upload; product images are ordered URL strings with previews.
 - **Stock lives in Inventory (A-05)** and is never edited on the product form.
 - Desktop widths are the primary target; narrow screens fall back to the documented labelled card lists.
-- Dark-mode tokens exist but the first release exposes no theme toggle; deferred by product scope: analytics/overview, customer administration, CMS, and wishlist.
+- The light/dark preference is the only value stored in `localStorage` (`eshop-admin-theme`) and is non-sensitive; auth tokens and session state remain in Sanctum cookies. Deferred by product scope: analytics/overview, customer administration, CMS, and wishlist.
 - Local development runs over loopback HTTP; the session cookie gains `Secure` only in a TLS deployment (see [`SECURITY_REVIEW.md`](SECURITY_REVIEW.md) § Accepted non-production limitations).
 
