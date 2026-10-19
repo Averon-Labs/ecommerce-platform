@@ -171,7 +171,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Admin
 
 **Project phase gate:** see [Phase 3 in the Project Roadmap](ROADMAP.md).
 
-**Phase contribution PR:** steps 1–5 of this phase shipped together on `feature/admin-phase-3` — [PR #47](https://github.com/Averon-Labs/eshop-verse/pull/47) targeted `develop` and was merged 2026-10-17. Step 6 (UI-003) is a post-phase enhancement requested by the owner on 2026-10-19; it is delivered in a follow-up PR on `feature/admin-phase-3` without changing the historical PR #47 scope.
+**Phase contribution PR:** steps 1–5 of this phase shipped together on `feature/admin-phase-3` — [PR #47](https://github.com/Averon-Labs/eshop-verse/pull/47) targeted `develop` and was merged 2026-10-17. Step 6 (UI-003) is a post-phase enhancement requested by the owner on 2026-10-19; it is delivered in [PR #55](https://github.com/Averon-Labs/eshop-verse/pull/55) on `feature/admin-phase-3` without changing the historical PR #47 scope.
 
 ### Step 1 — QUAL-001 — Component contribution
 
