@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/canvas_background"
+    android:orientation="vertical">
+
+    <!-- Top Navigation App Bar -->
+    <LinearLayout
+        android:id="@+id/app_bar_favorites"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/spacing_lg"
+        android:paddingTop="@dimen/spacing_md"
+        android:paddingBottom="@dimen/spacing_md">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btn_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/catalog_cd_back"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/surface_card_frosted"
+            app:strokeColor="@color/border_hairline"
+            app:strokeWidth="@dimen/stroke_hairline">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/text_primary_ink"
+                android:contentDescription="@null" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/spacing_md"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_favorites_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/favorites_title"
+                android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                android:textColor="@color/text_primary_ink" />
+
+            <TextView
+                android:id="@+id/tv_favorites_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.EShopVerse.Supporting"
+                android:textColor="@color/color_muted_olive"
+                tools:text="3 items saved" />
+        </LinearLayout>
+
+        <!-- Toggle Grid / List View Mode -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btn_toggle_layout"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/favorites_switch_to_list"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/surface_card_frosted"
+            app:strokeColor="@color/border_hairline"
+            app:strokeWidth="@dimen/stroke_hairline">
+
+            <ImageView
+                android:id="@+id/iv_toggle_layout_icon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_view_list"
+                app:tint="@color/text_primary_ink"
+                android:contentDescription="@null" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/border_hairline" />
+
+    <!-- State Container Hosting Content & Empty State -->
+    <com.averonlabs.eshopverse.core.ui.view.StateContainerView
+        android:id="@+id/state_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/content_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!-- Favorites RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_favorites_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingHorizontal="6dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="80dp"
+                tools:listitem="@layout/item_product_card" />
+
+            <!-- Empty Wishlist State -->
+            <LinearLayout
+                android:id="@+id/layout_empty_state"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_xxl"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <ImageView
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:src="@drawable/ic_heart_outline"
+                    app:tint="@color/color_muted_olive"
+                    android:contentDescription="@null" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_lg"
+                    android:text="@string/favorites_empty_title"
+                    android:textAppearance="@style/TextAppearance.EShopVerse.ComponentTitle"
+                    android:textColor="@color/text_primary_ink" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xs"
+                    android:gravity="center"
+                    android:text="@string/favorites_empty_description"
+                    android:textAppearance="@style/TextAppearance.EShopVerse.Body"
+                    android:textColor="@color/text_secondary" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_empty_explore"
+                    style="@style/Widget.EShopVerse.Button.Filled"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xl"
+                    android:text="@string/catalog_action_explore" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </com.averonlabs.eshopverse.core.ui.view.StateContainerView>
+
+</LinearLayout>

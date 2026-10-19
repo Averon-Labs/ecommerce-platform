@@ -72,6 +72,10 @@
     <string name="favorites_action_cancel">Cancel</string>
     <string name="favorites_added">Added to favorites</string>
     <string name="favorites_removed">Removed from favorites</string>
+    <string name="favorites_switch_to_list">Switch to list view</string>
+    <string name="favorites_switch_to_grid">Switch to grid view</string>
+    <string name="theme_title">Appearance &amp; Theme</string>
+    <string name="theme_subtitle">Toggle between Dark and Light mode</string>
     <string name="catalog_cd_favorite_button">Toggle favorite for %1$s</string>
 
     <!-- Filter Bottom Sheet (FLT-001) -->

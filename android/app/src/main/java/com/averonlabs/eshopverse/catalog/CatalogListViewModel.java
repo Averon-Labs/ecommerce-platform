@@ -222,9 +222,16 @@ public class CatalogListViewModel extends ViewModel {
 
                 List<ProductSummary> displayItems = applyLocalFilters(loadedProducts);
                 if (displayItems.isEmpty()) {
+                    if (hasMore && hasActiveFilters()) {
+                        loadNextPage();
+                        return;
+                    }
                     productsState.setValue(UiState.empty());
                 } else {
                     productsState.setValue(UiState.content(Collections.unmodifiableList(new ArrayList<>(displayItems))));
+                    if (hasActiveFilters() && displayItems.size() < currentParams.getPerPage() && hasMore) {
+                        loadNextPage();
+                    }
                 }
             }
 
@@ -286,5 +293,11 @@ public class CatalogListViewModel extends ViewModel {
             filtered.add(p);
         }
         return filtered;
+    }
+
+    private boolean hasActiveFilters() {
+        return currentParams.getMinPrice() != null
+                || currentParams.getMaxPrice() != null
+                || Boolean.TRUE.equals(currentParams.getInStock());
     }
 }

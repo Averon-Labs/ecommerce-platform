@@ -288,16 +288,9 @@ public class OfflineMockInterceptor implements Interceptor {
                     + "\"timeline\":[{\"status\":\"confirmed\",\"at\":\"2026-10-12T18:00:00Z\"}]}}";
         }
 
-        if (path.endsWith("/auth/profile") || path.endsWith("/auth/me")) {
-            return "{\"data\":{\"id\":1,\"email\":\"alex.morgan@eshopverse.com\",\"firstName\":\"Alex\",\"lastName\":\"Morgan\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}";
-        }
-
-        if (path.endsWith("/auth/login") || path.endsWith("/auth/register") || path.endsWith("/auth/google")) {
-            return "{\"data\":{\"token\":\"demo-jwt-offline-token-sample\",\"expiresAt\":\"2027-01-15T10:00:00Z\",\"user\":{\"id\":1,\"email\":\"alex.morgan@eshopverse.com\",\"firstName\":\"Alex\",\"lastName\":\"Morgan\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}}";
-        }
-
         return null;
     }
+
 
     private static class MockProduct {
         final long id;
@@ -338,7 +331,7 @@ public class OfflineMockInterceptor implements Interceptor {
         }
     }
 
-    private static final MockProduct[] ALL_MOCK_PRODUCTS = new MockProduct[] {
+    private static final MockProduct[] BASE_MOCK_PRODUCTS = new MockProduct[] {
             // Shirts & Tops (Category 1)
             new MockProduct(101, "Classic White Oxford Shirt", "45.99", 1, "Shirts & Tops", "shirt_001",
                     "file:///android_asset/products/shirt_001.webp",
@@ -509,6 +502,47 @@ public class OfflineMockInterceptor implements Interceptor {
                     "file:///android_asset/products/bag_005.webp",
                     "Opulent evening pouch clutch in pleated nappa leather with magnetic frame closure and removable chain.", 12)
     };
+
+    private static final MockProduct[] ALL_MOCK_PRODUCTS = initMockProducts();
+
+    private static MockProduct[] initMockProducts() {
+        List<MockProduct> list = new ArrayList<>(Arrays.asList(BASE_MOCK_PRODUCTS));
+        String[][] suffixes = {
+                {" (Slim Edition)", " (Organic Cotton)", " (Vintage Wash)", " (Signature Series)"},
+                {" (Relaxed Fit)", " (Tailored Cut)", " (Everyday Stretch)", " (Classic Rinse)"},
+                {" (Evening Edition)", " (Garden Floral)", " (Summer Breeze)", " (Velvet Touch)"},
+                {" (Thermal Insulated)", " (Heritage Waxed)", " (Urban Minimal)", " (Storm Proof)"},
+                {" (Heavyweight 240gsm)", " (Slub Cotton)", " (Pocket Edition)", " (Garment Dyed)"},
+                {" (Seamless Flex)", " (Pro Compression)", " (Studio Edition)", " (Ventilated)"},
+                {" (Waterproof Gore)", " (Cloud Cushioned)", " (Heritage Leather)", " (Gum Sole)"},
+                {" (Handcrafted Leather)", " (Ribbed Merino)", " (Brushed Metallic)", " (Woven Texture)"},
+                {" (Distressed Finish)", " (Nubuck Grain)", " (Cognac Tan)", " (Midnight Matte)"},
+                {" (Waterproof Cordura)", " (Rolltop Commuter)", " (Waxed Canvas)", " (Modular Pouch)"}
+        };
+
+        for (MockProduct base : BASE_MOCK_PRODUCTS) {
+            int catIndex = base.categoryId - 1;
+            if (catIndex >= 0 && catIndex < suffixes.length) {
+                String[] varNames = suffixes[catIndex];
+                double basePrice = 45.00;
+                try {
+                    basePrice = Double.parseDouble(base.price);
+                } catch (Exception ignored) {}
+
+                for (int v = 0; v < varNames.length; v++) {
+                    long newId = 1000L * base.categoryId + (v + 1) * 100L + (base.id % 100);
+                    String newName = base.name + varNames[v];
+                    double newPriceVal = Math.round((basePrice + (v + 1) * 4.25) * 100.0) / 100.0;
+                    String newPrice = String.format(Locale.US, "%.2f", newPriceVal);
+                    String newSku = base.sku + "_v" + (v + 1);
+                    int newStock = 20 + (v * 7);
+                    list.add(new MockProduct(newId, newName, newPrice, base.categoryId, base.categoryName,
+                            newSku, base.imageUrl, base.description, newStock));
+                }
+            }
+        }
+        return list.toArray(new MockProduct[0]);
+    }
 
     private synchronized String handleCartRequest(String method, String path, Request request) {
         // DELETE /cart/items/{productId} -> remove line item

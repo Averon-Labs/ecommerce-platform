@@ -43,6 +43,10 @@ public class AuthRepository {
      * Checks if the user has an active, non-expired session token.
      */
     public boolean isSignedIn() {
+        if ("demo-jwt-offline-token-sample".equals(tokenStore.getToken())) {
+            tokenStore.clear();
+            return false;
+        }
         return !tokenStore.isExpired() && tokenStore.getToken() != null;
     }
 

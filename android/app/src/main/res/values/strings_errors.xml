@@ -26,4 +26,6 @@
     <string name="error_category_not_found">The selected category was not found.</string>
     <string name="error_rate_limited">Too many requests. Please wait a moment before trying again.</string>
     <string name="error_internal">An unexpected server error occurred. Please try again later.</string>
+    <string name="error_server_offline">Server is offline or unreachable. Please contact support. (سرور خاموش یا در دسترس نیست. با پشتیبانی تماس بگیرید)</string>
 </resources>
+

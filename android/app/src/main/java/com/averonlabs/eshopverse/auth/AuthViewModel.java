@@ -404,7 +404,12 @@ public class AuthViewModel extends ViewModel {
             return;
         }
 
-        // Generic / network timeout error
-        stateLiveData.postValue(UiState.error(R.string.error_internal, true));
+        // Generic / network timeout or server offline error
+        if (throwable instanceof java.io.IOException) {
+            stateLiveData.postValue(UiState.error(R.string.error_server_offline, true));
+            return;
+        }
+
+        stateLiveData.postValue(UiState.error(R.string.error_server_offline, true));
     }
 }
