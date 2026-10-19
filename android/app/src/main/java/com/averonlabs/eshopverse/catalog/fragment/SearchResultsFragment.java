@@ -22,6 +22,7 @@ import com.averonlabs.eshopverse.catalog.ProductGridAdapter;
 import com.averonlabs.eshopverse.catalog.ProductParams;
 import com.averonlabs.eshopverse.core.model.ProductSummary;
 import com.averonlabs.eshopverse.core.state.UiState;
+import com.averonlabs.eshopverse.core.ui.SkeletonAdapter;
 import com.averonlabs.eshopverse.core.ui.view.StateContainerView;
 import com.averonlabs.eshopverse.databinding.FragmentSearchResultsBinding;
 
@@ -71,11 +72,14 @@ public class SearchResultsFragment extends Fragment {
         binding.rvProducts.setLayoutManager(layoutManager);
 
         gridAdapter = new ProductGridAdapter(this::onProductClicked);
-        binding.rvProducts.setAdapter(gridAdapter);
+        binding.rvProducts.setAdapter(new SkeletonAdapter(R.layout.item_skeleton_product_card, 6));
 
         binding.rvProducts.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                if (binding.rvProducts.getAdapter() != gridAdapter) {
+                    return;
+                }
                 if (dy > 0) {
                     int visibleCount = layoutManager.getChildCount();
                     int totalCount = layoutManager.getItemCount();
@@ -160,10 +164,16 @@ public class SearchResultsFragment extends Fragment {
 
         switch (state.getStatus()) {
             case LOADING:
-                binding.stateContainer.setState(StateContainerView.State.LOADING, null, null, null);
+                if (binding.rvProducts.getAdapter() != gridAdapter || gridAdapter.getItemCount() == 0) {
+                    binding.rvProducts.setAdapter(new SkeletonAdapter(R.layout.item_skeleton_product_card, 6));
+                }
+                binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
                 break;
             case CONTENT:
                 binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
+                if (binding.rvProducts.getAdapter() != gridAdapter) {
+                    binding.rvProducts.setAdapter(gridAdapter);
+                }
                 if (state.getData() != null) {
                     gridAdapter.submitList(state.getData());
                 }
