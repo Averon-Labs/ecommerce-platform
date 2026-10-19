@@ -115,3 +115,18 @@ sequenceDiagram
 - Enforce audience check (`aud` claim must equal the configured Android/Web Google Client ID).
 - Prevent privilege escalation: Google-created users must always be initialized with `role = CUSTOMER` (never `ADMIN`).
 - Rate limiting: Apply `throttle:10,1` on `/api/v1/auth/google` to mitigate brute-force attacks.
+
+---
+
+## Implementation Notes (2026-10-19, owner-approved deviations)
+
+Owner decisions recorded in the canonical task (Backend Roadmap — Phase 1 — Step 4, AUTH-004) supersede the plan where they differ:
+
+1. **Sessions — Sanctum, not JWT:** the endpoint issues the same revocable Sanctum bearer session as password sign-in (ADR-007 / `docs/API_CONTRACT.md`). The plan's "JWT session token" wording is superseded.
+2. **Contract-first:** `docs/openapi.yaml` was updated first (owner-approved) with `POST /auth/google` (`signInWithGoogle`), the `GoogleAuthRequest` schema, `GOOGLE_ACCOUNT_CONFLICT`, and the `google-login` rate class; the implementation follows it.
+3. **Response/error semantics per contract:** `{data: AuthSession}` envelope; `201` when the account is created, `200` when it already exists; `422 VALIDATION_ERROR` for missing/oversized `idToken` (not `400`); `401 INVALID_CREDENTIALS` for invalid/expired/wrong-audience/unverified-email/suspended; `409 GOOGLE_ACCOUNT_CONFLICT` when the email is linked to a different Google subject; `500 INTERNAL_ERROR` fail-closed when `GOOGLE_CLIENT_ID` is unset or Google's keys are unavailable.
+4. **No new dependency:** the ID token is verified locally with `openssl_verify` against Google's JWKS (`auth-google:jwks`, cached 3600s, one refetch on unknown `kid`) instead of `google/apiclient` or the TokenInfo endpoint.
+5. **Paths in this repository:** the service lives at `backend/app/Services/GoogleAuthService.php`, the controller at `backend/app/Http/Controllers/GoogleAuthController.php` (no `Api/V1` subfolder), the request at `backend/app/Http/Requests/GoogleAuthRequest.php`; the shared session issuing was extracted to `backend/app/Services/AuthSessionIssuer.php` (used by AUTH-001 too); tests at `backend/tests/Feature/Auth/GoogleAuthTest.php` (hermetic via a local RSA key and a faked JWKS, no external calls).
+6. **Only the Google subject is persisted** (`users.google_id`); the raw ID token is never stored or logged; `password` is nullable for Google-only accounts.
+
+Verification (2026-10-19, owner-requested full recheck): `php artisan test` = 173 tests / 2202 assertions / 0 failures (16 in `tests/Feature/Auth/GoogleAuthTest.php`); `vendor/bin/pint --test` passed; migration up/down round-trip clean; `docs/openapi.yaml` Redocly lint = 0 errors / 2 accepted warnings. See Backend Roadmap — Phase 1 — Step 4 for the full record.

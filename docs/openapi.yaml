@@ -12,6 +12,10 @@
 # No item awaits an owner answer: every entry in x-open-decisions below was closed on
 # 2026-10-11 with its recorded decision. Owner acceptance on 2026-10-12 unblocked
 # endpoint implementation and client integration (Backend Phase 1 onward).
+#
+# 2026-10-19 (owner-approved change, AUTH-004): added POST /auth/google — Google
+# Sign-In / Sign-Up via server-verified Google ID token. Canonical task:
+# docs/BACKEND_ROADMAP.md — Phase 1 — Step 4.
 
 openapi: 3.1.0
 
@@ -59,7 +63,7 @@ tags:
   - name: Catalog
     description: Public product and category reads.
   - name: Customer auth
-    description: Customer registration, sign-in, profile, password reset.
+    description: Customer registration, sign-in (password and Google), profile, password reset.
   - name: Cart
     description: Signed-in customer cart. There is no guest cart.
   - name: Checkout
@@ -330,6 +334,85 @@ paths:
                         role: customer
                         status: active
         '401': { $ref: '#/components/responses/InvalidCredentials' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /auth/google:
+    post:
+      tags: [Customer auth]
+      operationId: signInWithGoogle
+      summary: Sign in or create an account with a Google ID token
+      description: |
+        Verifies the Google ID token server-side: RS256 signature against Google's published
+        keys, issuer, audience (the configured `GOOGLE_CLIENT_ID`), expiry, and the
+        verified-email claim. A verified identity signs in an existing Google-linked customer,
+        links the Google identity to an existing account with the same email, or creates a new
+        password-less customer account. New accounts are always `customer` role; no admin
+        account is ever created or escalated here. Only the Google account subject (`sub`) is
+        stored; the token itself is never stored or logged.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/GoogleAuthRequest' }
+            example:
+              idToken: eyJhbGciOiJSUzI1NiIsImtpZCI6ImUxMjM0NTY3ODkwIn0.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJzdWIiOiIxMjM0NTY3ODkwIiwiYXVkIjoiMTIzNDU2Nzg5MC1hcHBzLmdvb2dsZXVzZXJjb250ZW50LmNvbSIsImVtYWlsIjoic2FyYUBleGFtcGxlLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJleHAiOjE3OTk5OTk5OTl9.REPLACED-SIGNATURE
+      responses:
+        '200':
+          description: Signed in with an existing Google-linked account.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/AuthSession' }
+              examples:
+                signed-in-customer:
+                  summary: Bearer token plus the customer profile
+                  value:
+                    data:
+                      token: "1|abc123DEF456ghi789JKL012mno345PQR"
+                      expiresAt: "2026-11-10T09:30:00Z"
+                      user:
+                        id: 41
+                        email: sara@example.com
+                        firstName: Sara
+                        lastName: Nouri
+                        role: customer
+                        status: active
+        '201':
+          description: A new customer account was created for the verified Google identity.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/AuthSession' }
+              examples:
+                registered-with-google:
+                  summary: First Google sign-in creates the account
+                  value:
+                    data:
+                      token: "1|abc123DEF456ghi789JKL012mno345PQR"
+                      expiresAt: "2026-11-10T09:30:00Z"
+                      user:
+                        id: 57
+                        email: sara@example.com
+                        firstName: Sara
+                        lastName: Nouri
+                        role: customer
+                        status: active
+        '401': { $ref: '#/components/responses/InvalidCredentials' }
+        '409':
+          description: |
+            `GOOGLE_ACCOUNT_CONFLICT` — the email is already linked to a different
+            Google account.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
         '422': { $ref: '#/components/responses/ValidationError' }
         '429': { $ref: '#/components/responses/RateLimited' }
 
@@ -1973,6 +2056,19 @@ components:
         email: { type: string, format: email, maxLength: 254 }
         password: { type: string, format: password, maxLength: 72 }
 
+    GoogleAuthRequest:
+      type: object
+      required: [idToken]
+      additionalProperties: false
+      properties:
+        idToken:
+          type: string
+          minLength: 16
+          maxLength: 4096
+          description: |
+            Google Sign-In ID token (JWT) issued to the client. Verified server-side against
+            Google's published keys; never stored or logged.
+
     AuthSession:
       type: object
       required: [token, expiresAt, user]
@@ -2336,6 +2432,7 @@ x-error-codes:
   CSRF_TOKEN_MISMATCH: { status: 403, meaning: Admin mutation without a valid X-XSRF-TOKEN. }
   NOT_FOUND: { status: 404, meaning: Missing resource, or one the caller does not own. }
   EMAIL_ALREADY_REGISTERED: { status: 409, meaning: Registration email is taken. }
+  GOOGLE_ACCOUNT_CONFLICT: { status: 409, meaning: Email is already linked to a different Google account. }
   RESET_TOKEN_INVALID: { status: 422, meaning: Password-reset token is unknown or expired. }
   PRODUCT_UNAVAILABLE: { status: 409, meaning: Product is inactive or archived. }
   INSUFFICIENT_STOCK: { status: 409, meaning: Requested quantity exceeds available stock. }
@@ -2365,6 +2462,7 @@ x-rate-limit-classes:
   public-read: { limit: 120, window: 1m, key: ip, applies-to: [listCategories, listProducts, getProduct] }
   customer-login: { limit: 10, window: 1m, key: ip, reset-on-success: true, note: Also counts 5 consecutive failures per email for account lockout., applies-to: [loginCustomer] }
   customer-register: { limit: 5, window: 1h, key: ip, applies-to: [registerCustomer] }
+  google-login: { limit: 10, window: 1m, key: ip, applies-to: [signInWithGoogle] }
   password-reset: { limit: 3, window: 1h, key: email, secondary: { limit: 10, window: 1h, key: ip }, applies-to: [requestPasswordReset, confirmPasswordReset] }
   admin-login: { limit: 10, window: 1m, key: ip, applies-to: [loginAdmin] }
   customer-write: { limit: 60, window: 1m, key: token, applies-to: [logoutCustomer, updateCustomerProfile, addCartItem, clearCart, updateCartItem, removeCartItem, createCheckoutQuote, createOrder, submitSimulatedPayment] }

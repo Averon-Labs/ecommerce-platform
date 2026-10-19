@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'google' => [
+        // AUTH-004: the OAuth client ID whose `aud` claim POST /auth/google
+        // accepts. No secret is required to verify an ID token.
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+    ],
+
 ];
