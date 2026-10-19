@@ -256,7 +256,7 @@ Use subtle separation rather than heavy shadows:
 | Skeleton screens | Initial content loading |
 | Circular progress | Action in progress |
 | Linear progress | Page-level loading |
-| Shimmer effect | Not required; use static skeletons in the first release |
+| Shimmer effect | Subtle warm gradient pulse for image and card skeleton placeholders |
 
 ### Empty States
 
@@ -302,6 +302,13 @@ Per `.agents/skills/my-ui-ux-skill/`, EShop Verse bridges visual grandeur with s
 - **Tabular Figures:** Always apply `tabular-nums` (font-variant-numeric: tabular-nums) on order IDs, USD totals, stock counts, and timestamps for perfectly aligned data tables.
 - **Accessible Focus Rings:** Never remove focus rings without an accessible replacement; apply `focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2`.
 - **Unblocked Browser Behavior:** Never block native clipboard paste in input fields, never break middle-click tab opening on links, and maintain deep-linkable URL state for modal dialogs and tabs.
+
+### 5. Progressive Image Loading & Shimmer Skeleton Standards
+- **Zero Layout Shift Viewports:** Fixed container ratios (`app:layout_constraintDimensionRatio="1:1"` for product cards, `16:9` for promotional banners, `4:5` for detail galleries). Containers never resize when image downloads complete.
+- **Warm Shimmer Gradient:** Placeholders render a delicate shimmer sweep (`bg_placeholder_shimmer.xml`) transitioning between Warm Ivory (`#F5F2EA`), Soft Sandstone (`#FAF8F2`), and Natural Taupe (`#E8DEC7`). Dark mode utilizes Deep Charcoal (`#1E1E1E` to `#2A2A2A`).
+- **Editorial Brand Watermark:** Muted vector watermark (`ic_image_placeholder.xml`) provides a sense of luxury craft and brand identity during static loading states.
+- **Muted Error Fallback:** Network or decode failures render a discreet botanical watermark vector (`ic_image_placeholder_error.xml`); raw default broken image icons or jarring alert colors are prohibited.
+- **Hardware Cross-Fade:** Smooth 250ms asynchronous cross-fade on bitmap arrival prevents harsh flashing or visual popping.
 
 ---
 

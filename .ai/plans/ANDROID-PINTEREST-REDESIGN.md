@@ -277,3 +277,42 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Executed Android Lint `./gradlew :app:lintDebug`: passed with 0 errors.
   - Phase 7 (UX Polish, Data Loading Architecture, Stability & Real-time Search) completed, verified, and ready.
 
+---
+
+### Phase 8: Progressive Image Loading, Shimmer Skeleton, Curated Placeholders & Multi-Tier Caching
+
+> **Architectural Non-Negotiables (Modeled after Netflix, Pinterest, Digikala, Instagram):**
+> 1. **Immediate Data-First Rendering & Zero Layout Shift (CLS = 0):** Product info, pricing, badges, and titles render immediately (<100ms) without waiting for images. Every image container enforces fixed aspect ratios (1:1 square for catalog cards, 16:9 for banners, 4:5 for detail galleries) via `ConstraintLayout` dimension ratios to prevent layout jumps.
+> 2. **Curated Shimmer / Skeleton Placeholders:** While images download, viewports display an animated warm gradient shimmer (`bg_placeholder_shimmer.xml`) or editorial brand watermark silhouette (`ic_image_placeholder.xml`) instead of raw empty boxes.
+> 3. **Smooth Asynchronous Cross-Fade (250ms):** When the bitmap decodes, it smoothly cross-fades into place (`withCrossFade(250)`) preventing jarring pops or screen flicker.
+> 4. **Multi-Tier Intelligent Caching:** Tier 1 RAM memory cache for 0ms instantaneous display when scrolling back and forth; Tier 2 on-disk cache (`DiskCacheStrategy.AUTOMATIC`) for instant offline display across app sessions; hardware downsampling to exact ImageView dimensions.
+> 5. **Proactive Scroll Prefetching:** Preload off-screen image URLs (the next 4–6 items in scroll direction) ahead of the user's viewport so images are already cached before scrolling into view.
+> 6. **Editorial Graceful Error Fallbacks:** Network or decode failures render a discreet botanical watermark vector (`ic_image_placeholder_error.xml`) rather than generic broken image alert icons.
+
+- [ ] **Step 35: Luxury Shimmer/Skeleton Placeholder & Curated Error Fallback Vectors**
+  - Create `bg_placeholder_shimmer.xml` in `res/drawable/` with a refined warm gradient pulse (`#F5F2EA` -> `#FAF8F2` -> `#E8DEC7`) matching the Figma MUSE Warm Ivory / Sandstone palette.
+  - Create dark mode variant in `res/drawable-night/` (`#1E1E1E` -> `#2A2A2A` -> `#1E1E1E`).
+  - Create `ic_image_placeholder_error.xml` featuring a subtle, minimalist botanical leaf/sparkle brand vector in soft taupe/muted olive (`#C7B596` / `#6E7268`) avoiding jarring broken image icons.
+  - Define color tokens `placeholder_shimmer_base`, `placeholder_shimmer_highlight`, `placeholder_fallback_tint` across `colors.xml` and `colors.xml` (night).
+  - Verify drawables compile cleanly across Light and Dark themes.
+
+- [ ] **Step 36: Centralized Glide Configuration & Unified Image Loading Pipeline (`ImageLoaderHelper`)**
+  - Create `ImageLoaderHelper.java` in `com.eshopverse.customer.ui.common`:
+    - Unified helper method `loadImage(ImageView target, String url)` and overloaded variants.
+    - Applies `DiskCacheStrategy.AUTOMATIC`, `skipMemoryCache(false)`, `fitCenter()` / `centerCrop()`, and `DrawableTransitionOptions.withCrossFade(250)`.
+    - Automatically attaches `bg_placeholder_shimmer` / `ic_image_placeholder` placeholder and `ic_image_placeholder_error` fallback.
+  - Wire `ImageLoaderHelper` across `ProductGridAdapter.java`, `CartAdapter.java`, `ImageCarouselAdapter.java`, and `ReviewItemsAdapter.java`.
+  - Add unit test verification for helper configuration and null safety.
+
+- [ ] **Step 37: Proactive Scroll Prefetcher for RecyclerView Grids & Carousels**
+  - Attach proactive preloading `OnScrollListener` in `HomeFragment.java` and `ExploreFragment.java`:
+    - Tracks user scroll direction and looks ahead 4–6 items.
+    - Submits image URLs to Glide's preloader (`Glide.with(context).load(url).preload()`).
+  - Test rapid scrolling to ensure zero latency pop-in, zero frame drops, and smooth 60fps performance.
+
+- [ ] **Step 38: Verification, Test Suite & Android Lint**
+  - Run full unit test suite `./gradlew testDebugUnitTest` (must maintain 100% pass).
+  - Run `./gradlew :app:lintDebug` (must pass with 0 errors).
+  - Phase 8 verification complete.
+
+
