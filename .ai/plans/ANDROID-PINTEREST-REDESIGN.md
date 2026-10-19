@@ -348,10 +348,12 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
     - Attached 4 skeleton cards to `rvTrendingCarousel`, `rvBestsellersGrid`, `rvSpecialOffersCarousel`, and `rvEssentialsGrid`.
     - Seamlessly swapped to real data when `UiState.CONTENT` arrives with zero empty gaps or layout reflow.
 
-- [ ] **Step 42: Product Detail Screen Skeleton Loading**
+- [x] **Step 42: Product Detail Screen Skeleton Loading**
   - In `ProductDetailFragment.java` & `fragment_product_detail.xml`:
-    - Replace the `StateContainerView.State.LOADING` blanking with `layout_skeleton_product_detail`.
-    - Display skeleton image, title, price, and CTA bar from millisecond 0 while network data fetches.
+    - Replaced the `StateContainerView.State.LOADING` screen-blanking with `layout_skeleton_product_detail`.
+    - Displayed 320dp bento card with warm shimmer gradient, category pill, title bar, price bar, divider, and description lines from millisecond 0 while network data fetches.
+    - Preserved immediate clickability and visibility of the circular floating back button.
+    - Seamlessly swapped to real data when `UiState.CONTENT` arrives with zero UI flicker.
 
 - [ ] **Step 43: Verification, Test Suite & Android Lint**
   - Run full unit test suite `./gradlew testDebugUnitTest` (must maintain 100% pass).
