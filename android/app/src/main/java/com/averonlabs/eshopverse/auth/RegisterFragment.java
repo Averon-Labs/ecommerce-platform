@@ -112,7 +112,12 @@ public class RegisterFragment extends Fragment {
 
         binding.btnToSignIn.setOnClickListener(v -> {
             NavController navController = NavHostFragment.findNavController(this);
-            navController.popBackStack();
+            boolean popped = navController.popBackStack(R.id.signInFragment, false);
+            if (!popped) {
+                Bundle args = new Bundle();
+                args.putInt("returnToNavId", returnToNavId);
+                navController.navigate(R.id.signInFragment, args);
+            }
         });
     }
 
