@@ -26,6 +26,7 @@ import com.averonlabs.eshopverse.core.model.Category;
 import com.averonlabs.eshopverse.core.model.ProductSummary;
 import com.averonlabs.eshopverse.core.state.UiState;
 import com.averonlabs.eshopverse.core.ui.ImageLoaderHelper;
+import com.averonlabs.eshopverse.core.ui.SkeletonAdapter;
 import com.averonlabs.eshopverse.core.ui.ThemeManager;
 import com.averonlabs.eshopverse.databinding.FragmentHomeBinding;
 
@@ -82,24 +83,27 @@ public class HomeFragment extends Fragment {
     private void setupSections() {
         // Section 1: Trending This Week (Horizontal Carousel)
         trendingCarouselAdapter = new ProductGridAdapter(this::onProductClicked, true);
-        binding.rvTrendingCarousel.setAdapter(trendingCarouselAdapter);
+        binding.rvTrendingCarousel.setAdapter(new SkeletonAdapter(R.layout.item_skeleton_product_card, 4));
 
         // Section 2: Popular & Best Sellers (2-Column Grid)
         bestSellersAdapter = new ProductGridAdapter(this::onProductClicked, false);
-        binding.rvBestsellersGrid.setAdapter(bestSellersAdapter);
+        binding.rvBestsellersGrid.setAdapter(new SkeletonAdapter(R.layout.item_skeleton_product_card, 4));
 
         // Section 3: Special Offers (Horizontal Carousel)
         specialOffersAdapter = new ProductGridAdapter(this::onProductClicked, true);
-        binding.rvSpecialOffersCarousel.setAdapter(specialOffersAdapter);
+        binding.rvSpecialOffersCarousel.setAdapter(new SkeletonAdapter(R.layout.item_skeleton_product_card, 4));
 
         // Section 4: Curated Essentials (2-Column Grid)
         essentialsAdapter = new ProductGridAdapter(this::onProductClicked, false);
-        binding.rvEssentialsGrid.setAdapter(essentialsAdapter);
+        binding.rvEssentialsGrid.setAdapter(new SkeletonAdapter(R.layout.item_skeleton_product_card, 4));
     }
 
     private void setupCategories() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false);
         binding.rvHomeCategories.setLayoutManager(layoutManager);
+
+        // Immediately attach 8 skeleton mood circles so category row is never blank on initial render
+        binding.rvHomeCategories.setAdapter(new SkeletonAdapter(R.layout.item_skeleton_category_circle, 8));
 
         categoryViewModel.getCategoriesState().observe(getViewLifecycleOwner(), state -> {
             if (state != null && state.isContent() && state.getData() != null) {
@@ -183,14 +187,27 @@ public class HomeFragment extends Fragment {
                 List<ProductSummary> all = state.getData();
                 if (!all.isEmpty()) {
                     int total = all.size();
+                    if (binding.rvTrendingCarousel.getAdapter() != trendingCarouselAdapter) {
+                        binding.rvTrendingCarousel.setAdapter(trendingCarouselAdapter);
+                    }
                     trendingCarouselAdapter.submitList(all.subList(0, Math.min(8, total)));
+
                     if (total > 8) {
+                        if (binding.rvBestsellersGrid.getAdapter() != bestSellersAdapter) {
+                            binding.rvBestsellersGrid.setAdapter(bestSellersAdapter);
+                        }
                         bestSellersAdapter.submitList(all.subList(8, Math.min(12, total)));
                     }
                     if (total > 12) {
+                        if (binding.rvSpecialOffersCarousel.getAdapter() != specialOffersAdapter) {
+                            binding.rvSpecialOffersCarousel.setAdapter(specialOffersAdapter);
+                        }
                         specialOffersAdapter.submitList(all.subList(12, Math.min(20, total)));
                     }
                     if (total > 20) {
+                        if (binding.rvEssentialsGrid.getAdapter() != essentialsAdapter) {
+                            binding.rvEssentialsGrid.setAdapter(essentialsAdapter);
+                        }
                         essentialsAdapter.submitList(all.subList(20, Math.min(24, total)));
                     }
 
