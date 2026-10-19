@@ -334,16 +334,19 @@ Figma File: **"MUSE. / DESIGN SYSTEM & E-Commerce Mobile App"** (Node `6:80` fou
   - Created `layout_skeleton_product_detail.xml` in `res/layout/` mirroring the product detail screen structure.
   - Verified resource compilation via `./gradlew :app:processDebugResources` (100% pass).
 
-- [ ] **Step 40: Explore Screen Skeleton & Spinner Elimination**
-  - Replace the isolated `CircularProgressIndicator` screen-blanking in `ExploreFragment.java` & `fragment_explore.xml`.
-  - When loading begins or on initial entry, immediately display 6 skeleton product cards in the grid and 5 skeleton category chips in the horizontal chip bar.
-  - Seamlessly transition to real data when `UiState.CONTENT` is received without layout reflow.
+- [x] **Step 40: Explore Screen Skeleton & Spinner Elimination**
+  - Replaced isolated `CircularProgressIndicator` screen-blanking in `ExploreFragment.java`:
+    - Initially attached 6 skeleton cards (`item_skeleton_product_card`) to `rvProducts` and 5 skeleton chips (`item_skeleton_category_chip`) to `rvCategories` on view creation.
+    - Set `StateContainerView` state to `CONTENT` during initial loading so skeleton shimmer cards are visible from millisecond 0 without screen-blanking.
+    - Protected scroll prefetcher against skeleton adapter types.
+    - Extended skeleton loading to `CategoryProductsFragment.java` and `SearchResultsFragment.java`.
+    - Created unit tests in `SkeletonAdapterTest.java` (100% pass).
 
-- [ ] **Step 41: Home Screen Instant Skeleton Presentation**
-  - In `HomeFragment.java` & `fragment_home.xml`:
-    - On `onViewCreated()`, immediately show 8 skeleton category circles in `rvHomeCategories`.
-    - Immediately show 4 skeleton cards in `rvTrendingCarousel`, 4 skeleton cards in `rvBestsellersGrid`, and skeleton cards in subsequent rows.
-    - Smoothly replace skeleton placeholders with real items when `UiState.CONTENT` arrives.
+- [x] **Step 41: Home Screen Instant Skeleton Presentation**
+  - In `HomeFragment.java`:
+    - On `onViewCreated()`, immediately attached 8 skeleton mood circles (`item_skeleton_category_circle`) to `rvHomeCategories`.
+    - Attached 4 skeleton cards to `rvTrendingCarousel`, `rvBestsellersGrid`, `rvSpecialOffersCarousel`, and `rvEssentialsGrid`.
+    - Seamlessly swapped to real data when `UiState.CONTENT` arrives with zero empty gaps or layout reflow.
 
 - [ ] **Step 42: Product Detail Screen Skeleton Loading**
   - In `ProductDetailFragment.java` & `fragment_product_detail.xml`:
