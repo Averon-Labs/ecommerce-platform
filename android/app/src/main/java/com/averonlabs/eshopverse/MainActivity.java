@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                 binding.cardBottomNav.setLayoutParams(lp);
             }
 
-            updateContentBottomPadding();
+            updateBottomNavVisibility();
             return insets;
         });
 
@@ -73,15 +73,31 @@ public class MainActivity extends AppCompatActivity {
             navController = navHostFragment.getNavController();
             NavigationUI.setupWithNavController(binding.bottomNav, navController);
 
-            // Hide bottom navigation on non-root destinations
+            // Custom navigation item selection: ensure Home tab reliably pops back to root HomeFragment
+            // from any tab or depth, avoiding backstack lockups in NavigationUI
+            binding.bottomNav.setOnItemSelectedListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.homeFragment) {
+                    if (navController.getCurrentDestination() != null
+                            && navController.getCurrentDestination().getId() == R.id.homeFragment) {
+                        return true;
+                    }
+                    boolean popped = navController.popBackStack(R.id.homeFragment, false);
+                    if (!popped) {
+                        navController.navigate(R.id.homeFragment);
+                    }
+                    return true;
+                }
+                return NavigationUI.onNavDestinationSelected(item, navController);
+            });
+
+            binding.bottomNav.setOnItemReselectedListener(item -> {
+                // Prevent duplicate navigation / recreate on reselect
+            });
+
+            // Update bottom navigation visibility on destination changes
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-                int destId = destination.getId();
-                boolean isTopLevel = destId == R.id.homeFragment
-                        || destId == R.id.exploreFragment
-                        || destId == R.id.cartFragment
-                        || destId == R.id.accountFragment;
-                binding.cardBottomNav.setVisibility(isTopLevel ? View.VISIBLE : View.GONE);
-                updateContentBottomPadding();
+                updateBottomNavVisibility();
             });
         }
 
@@ -115,6 +131,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void updateBottomNavVisibility() {
+        if (binding == null) {
+            return;
+        }
+        int destId = navController != null && navController.getCurrentDestination() != null
+                ? navController.getCurrentDestination().getId() : 0;
+        boolean isTopLevel = destId == R.id.homeFragment
+                || destId == R.id.exploreFragment
+                || destId == R.id.cartFragment
+                || destId == R.id.accountFragment;
+
+        boolean isKeyboardVisible = lastIme != null && lastIme.bottom > 0;
+
+        binding.cardBottomNav.setVisibility(isTopLevel && !isKeyboardVisible ? View.VISIBLE : View.GONE);
+        updateContentBottomPadding();
+    }
+
     private void updateContentBottomPadding() {
         if (binding == null) {
             return;
@@ -124,6 +157,9 @@ public class MainActivity extends AppCompatActivity {
         int floatingNavHeight = 0;
         if (binding.cardBottomNav != null && binding.cardBottomNav.getVisibility() == View.VISIBLE) {
             int cardH = binding.cardBottomNav.getHeight();
+            if (cardH == 0) {
+                cardH = getResources().getDimensionPixelSize(R.dimen.nav_floating_height);
+            }
             int baseMargin = getResources().getDimensionPixelSize(R.dimen.nav_floating_margin_bottom);
             floatingNavHeight = cardH + baseMargin + systemBottom + getResources().getDimensionPixelSize(R.dimen.spacing_sm);
         }

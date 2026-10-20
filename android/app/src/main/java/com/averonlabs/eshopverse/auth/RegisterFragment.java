@@ -112,7 +112,12 @@ public class RegisterFragment extends Fragment {
 
         binding.btnToSignIn.setOnClickListener(v -> {
             NavController navController = NavHostFragment.findNavController(this);
-            navController.popBackStack();
+            boolean popped = navController.popBackStack(R.id.signInFragment, false);
+            if (!popped) {
+                Bundle args = new Bundle();
+                args.putInt("returnToNavId", returnToNavId);
+                navController.navigate(R.id.signInFragment, args);
+            }
         });
     }
 
@@ -176,11 +181,13 @@ public class RegisterFragment extends Fragment {
             }
 
             NavController navController = NavHostFragment.findNavController(this);
-            if (returnToNavId != 0 && returnToNavId != R.id.signInFragment) {
-                navController.popBackStack(R.id.signInFragment, true);
-                navController.navigate(returnToNavId);
-            } else {
-                navController.popBackStack(R.id.signInFragment, true);
+            int targetId = (returnToNavId != 0 && returnToNavId != R.id.signInFragment && returnToNavId != R.id.registerFragment)
+                    ? returnToNavId : R.id.accountFragment;
+            boolean popped = navController.popBackStack(targetId, false);
+            if (!popped) {
+                if (!navController.popBackStack()) {
+                    navController.navigate(targetId);
+                }
             }
         } else if (state.isError()) {
             binding.progressBar.setVisibility(View.GONE);

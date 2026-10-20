@@ -23,10 +23,12 @@ public final class ProductParams {
     @Nullable private final String q;
     @Nullable private final Long categoryId;
     @Nullable private final Boolean inStock;
+    @Nullable private final Double minPrice;
+    @Nullable private final Double maxPrice;
     @NonNull private final String sort;
 
     public ProductParams() {
-        this(1, DEFAULT_PER_PAGE, null, null, null, SORT_NEWEST);
+        this(1, DEFAULT_PER_PAGE, null, null, null, null, null, SORT_NEWEST);
     }
 
     public ProductParams(
@@ -37,11 +39,26 @@ public final class ProductParams {
             @Nullable Boolean inStock,
             @Nullable String sort
     ) {
+        this(page, perPage, q, categoryId, inStock, null, null, sort);
+    }
+
+    public ProductParams(
+            int page,
+            int perPage,
+            @Nullable String q,
+            @Nullable Long categoryId,
+            @Nullable Boolean inStock,
+            @Nullable Double minPrice,
+            @Nullable Double maxPrice,
+            @Nullable String sort
+    ) {
         this.page = Math.max(1, page);
         this.perPage = perPage > 0 ? perPage : DEFAULT_PER_PAGE;
         this.q = sanitizeQuery(q);
         this.categoryId = categoryId != null && categoryId > 0 ? categoryId : null;
         this.inStock = inStock;
+        this.minPrice = minPrice != null && minPrice >= 0.0 ? minPrice : null;
+        this.maxPrice = maxPrice != null && maxPrice >= 0.0 ? maxPrice : null;
         this.sort = sanitizeSort(sort);
     }
 
@@ -68,9 +85,39 @@ public final class ProductParams {
         return inStock;
     }
 
+    @Nullable
+    public Double getMinPrice() {
+        return minPrice;
+    }
+
+    @Nullable
+    public Double getMaxPrice() {
+        return maxPrice;
+    }
+
     @NonNull
     public String getSort() {
         return sort;
+    }
+
+    /**
+     * Calculates the number of user filters currently active that differ from default.
+     */
+    public int getActiveFilterCount() {
+        int count = 0;
+        if (!SORT_NEWEST.equals(sort)) {
+            count++;
+        }
+        if (Boolean.TRUE.equals(inStock)) {
+            count++;
+        }
+        if (minPrice != null && minPrice > 0.0) {
+            count++;
+        }
+        if (maxPrice != null && maxPrice < 200.0) {
+            count++;
+        }
+        return count;
     }
 
     /**
@@ -78,7 +125,7 @@ public final class ProductParams {
      */
     @NonNull
     public ProductParams withQuery(@Nullable String newQuery) {
-        return new ProductParams(1, perPage, newQuery, categoryId, inStock, sort);
+        return new ProductParams(1, perPage, newQuery, categoryId, inStock, minPrice, maxPrice, sort);
     }
 
     /**
@@ -86,7 +133,7 @@ public final class ProductParams {
      */
     @NonNull
     public ProductParams withCategoryId(@Nullable Long newCategoryId) {
-        return new ProductParams(1, perPage, q, newCategoryId, inStock, sort);
+        return new ProductParams(1, perPage, q, newCategoryId, inStock, minPrice, maxPrice, sort);
     }
 
     /**
@@ -94,7 +141,7 @@ public final class ProductParams {
      */
     @NonNull
     public ProductParams withSort(@Nullable String newSort) {
-        return new ProductParams(1, perPage, q, categoryId, inStock, newSort);
+        return new ProductParams(1, perPage, q, categoryId, inStock, minPrice, maxPrice, newSort);
     }
 
     /**
@@ -102,7 +149,15 @@ public final class ProductParams {
      */
     @NonNull
     public ProductParams withInStock(@Nullable Boolean newInStock) {
-        return new ProductParams(1, perPage, q, categoryId, newInStock, sort);
+        return new ProductParams(1, perPage, q, categoryId, newInStock, minPrice, maxPrice, sort);
+    }
+
+    /**
+     * Updates the price range filter and resets page to 1.
+     */
+    @NonNull
+    public ProductParams withPriceRange(@Nullable Double newMinPrice, @Nullable Double newMaxPrice) {
+        return new ProductParams(1, perPage, q, categoryId, inStock, newMinPrice, newMaxPrice, sort);
     }
 
     /**
@@ -110,7 +165,7 @@ public final class ProductParams {
      */
     @NonNull
     public ProductParams nextPage() {
-        return new ProductParams(page + 1, perPage, q, categoryId, inStock, sort);
+        return new ProductParams(page + 1, perPage, q, categoryId, inStock, minPrice, maxPrice, sort);
     }
 
     /**
@@ -118,7 +173,7 @@ public final class ProductParams {
      */
     @NonNull
     public ProductParams withPage(int newPage) {
-        return new ProductParams(newPage, perPage, q, categoryId, inStock, sort);
+        return new ProductParams(newPage, perPage, q, categoryId, inStock, minPrice, maxPrice, sort);
     }
 
     @Nullable
@@ -158,12 +213,14 @@ public final class ProductParams {
                 Objects.equals(q, that.q) &&
                 Objects.equals(categoryId, that.categoryId) &&
                 Objects.equals(inStock, that.inStock) &&
+                Objects.equals(minPrice, that.minPrice) &&
+                Objects.equals(maxPrice, that.maxPrice) &&
                 Objects.equals(sort, that.sort);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(page, perPage, q, categoryId, inStock, sort);
+        return Objects.hash(page, perPage, q, categoryId, inStock, minPrice, maxPrice, sort);
     }
 
     @NonNull
@@ -175,6 +232,8 @@ public final class ProductParams {
                 ", q='" + q + '\'' +
                 ", categoryId=" + categoryId +
                 ", inStock=" + inStock +
+                ", minPrice=" + minPrice +
+                ", maxPrice=" + maxPrice +
                 ", sort='" + sort + '\'' +
                 '}';
     }

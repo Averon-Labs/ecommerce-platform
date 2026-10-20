@@ -21,6 +21,7 @@ import com.averonlabs.eshopverse.core.model.AuthSession;
 import com.averonlabs.eshopverse.core.model.ProductSummary;
 import com.averonlabs.eshopverse.core.model.User;
 import com.averonlabs.eshopverse.core.state.UiState;
+import com.averonlabs.eshopverse.core.ui.ThemeManager;
 import com.averonlabs.eshopverse.core.ui.view.StateContainerView;
 import com.averonlabs.eshopverse.databinding.FragmentAccountBinding;
 import com.google.android.material.snackbar.Snackbar;
@@ -37,7 +38,6 @@ public class AccountFragment extends Fragment {
     private FragmentAccountBinding binding;
     private AuthViewModel authViewModel;
     private SessionViewModel sessionViewModel;
-    private ProductGridAdapter favoritesAdapter;
 
     @Nullable
     @Override
@@ -63,6 +63,7 @@ public class AccountFragment extends Fragment {
         setupTextWatchers();
         setupClickListeners();
         setupFavoritesSection();
+        setupThemeSection();
         observeViewModels();
     }
 
@@ -181,6 +182,7 @@ public class AccountFragment extends Fragment {
             if (binding == null) return;
             boolean signedIn = Boolean.TRUE.equals(isSignedIn);
             binding.layoutSignedIn.setVisibility(signedIn ? View.VISIBLE : View.GONE);
+            binding.layoutSignedInActions.setVisibility(signedIn ? View.VISIBLE : View.GONE);
             binding.layoutGuestState.setVisibility(signedIn ? View.GONE : View.VISIBLE);
             binding.tvAccountTitle.setText(signedIn ? R.string.auth_account_title : R.string.auth_sign_in_title);
         });
@@ -311,40 +313,37 @@ public class AccountFragment extends Fragment {
     }
 
     private void setupFavoritesSection() {
-        favoritesAdapter = new ProductGridAdapter(this::onFavoriteProductClicked, true);
-        binding.rvFavorites.setAdapter(favoritesAdapter);
+        binding.cardFavoritesNav.setOnClickListener(v -> {
+            try {
+                NavHostFragment.findNavController(this).navigate(R.id.action_accountFragment_to_favoritesFragment);
+            } catch (Exception e) {
+                try {
+                    NavHostFragment.findNavController(this).navigate(R.id.favoritesFragment);
+                } catch (Exception ignored) {}
+            }
+        });
 
         FavoritesRepository.getInstance(requireContext()).getFavorites().observe(getViewLifecycleOwner(), list -> {
             if (binding == null) return;
             int count = list != null ? list.size() : 0;
             binding.tvFavoritesCountBadge.setText(count + " " + (count == 1 ? "item" : "items"));
-
-            if (count == 0) {
-                binding.layoutFavoritesEmpty.setVisibility(View.VISIBLE);
-                binding.rvFavorites.setVisibility(View.GONE);
-                favoritesAdapter.submitList(Collections.emptyList());
-            } else {
-                binding.layoutFavoritesEmpty.setVisibility(View.GONE);
-                binding.rvFavorites.setVisibility(View.VISIBLE);
-                favoritesAdapter.submitList(list);
-            }
         });
     }
 
-    private void onFavoriteProductClicked(@NonNull ProductSummary product) {
-        if (!isAdded()) return;
-        Bundle args = new Bundle();
-        args.putLong("productId", product.getId());
-        try {
-            NavHostFragment.findNavController(this).navigate(
-                    R.id.action_accountFragment_to_productDetailFragment,
-                    args
-            );
-        } catch (Exception e) {
-            try {
-                NavHostFragment.findNavController(this).navigate(R.id.nav_catalog, args);
-            } catch (Exception ignored) {}
-        }
+    private void setupThemeSection() {
+        updateThemeVisuals();
+        binding.cardThemeToggle.setOnClickListener(v -> {
+            ThemeManager.toggleTheme(requireContext());
+            updateThemeVisuals();
+        });
+    }
+
+    private void updateThemeVisuals() {
+        if (binding == null || !isAdded()) return;
+        boolean isDark = ThemeManager.isDarkMode(requireContext());
+        binding.switchThemeMode.setChecked(isDark);
+        binding.ivAccountThemeIcon.setImageResource(isDark ? R.drawable.ic_light_mode : R.drawable.ic_dark_mode);
+        binding.tvThemeModeSubtitle.setText(isDark ? "Dark appearance active" : "Light appearance active");
     }
 
     @Override

@@ -494,6 +494,104 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 **Verification:** executed full clean release rehearsal command `.\gradlew.bat clean assembleDebug testDebugUnitTest lintDebug assembleDebugAndroidTest --no-daemon`; all 83 tasks succeeded with 0 test failures and 0 lint errors; recorded commit SHA `32138d5f98148ed5795f459f7712d6406c896ec4`, Gradle 9.4.1, AGP 9.2.1, Oracle Java 25 / 21 LTS toolchain. Phase 3 complete! All Android roadmap phases (0 through 3) are now 100% complete!
 
+## Phase 8 — Advanced Interactive Experience & UI/UX Polish
+
+### Step 1 — FAV-001 — Product Favorites Wishlist & 1:1 Square Detail Layout
+
+**Status:** `[x]`
+
+**Component contribution:** Implement customer favorites/wishlist toggling on product cards with unauthenticated login modal prompts, dedicated favorites carousel in AccountFragment, Google Auth client-side contract wiring, and enforce 1:1 square aspect ratio on detail image cards with smooth nested vertical scrolling.
+
+**Acceptance criteria:**
+- [x] **a.** Product cards have empty heart button toggling red when favorited by authenticated user.
+- [x] **b.** Unauthenticated taps trigger MaterialAlertDialog prompting sign in with navigation to AccountFragment.
+- [x] **c.** AccountFragment displays "My Favorites" Bento Card section with horizontal product carousel.
+- [x] **d.** Product detail images enforce strict 1:1 aspect ratio with NestedScrollView.
+
+**Verification:** implemented `FavoritesRepository`, wired favorite button on `ProductCardView` and `ProductDetailFragment`, added favorites carousel to `AccountFragment`, verified `FavoritesRepositoryTest` (100% pass), and confirmed 1:1 aspect ratio layout.
+
+### Step 2 — OPT-001 — Instantaneous Search & Optimistic Cart Updates
+
+**Status:** `[x]`
+
+**Component contribution:** Implement real-time instantaneous 150ms debounced search without requiring submit, and implement 0ms optimistic local updates for cart quantity steppers and deletions with background sync and graceful rollback.
+
+**Acceptance criteria:**
+- [x] **a.** Search box filters results in real-time as user types with 150ms debounce and no submit confirmation required.
+- [x] **b.** Cart quantity adjustments (+/-) compute line totals, subtotals, and badges in 0ms local arithmetic without locking UI controls.
+- [x] **c.** Cart item removals immediately purge items locally with background sync and rollback on network failure.
+- [x] **d.** Document "Instantaneous UI & Optimistic Updates Principle" in docs/DESIGN_SYSTEM.md.
+
+**Verification:** fixed parameter mismatch in `ApiRoutes.java`, debounced search in `ExploreFragment` and `SearchResultsFragment`, implemented local arithmetic in `CartViewModel`, unlocked steppers in `CartAdapter`, added unit tests in `CartViewModelTest` (100% pass), and updated `DESIGN_SYSTEM.md`.
+
+### Step 3 — NAV-001 — Navigation & Floating Bar Polish
+
+**Status:** `[x]`
+
+**Component contribution:** Guarantee 100% reliable Home tab navigation from any screen depth and eliminate duplicate insets and keyboard float on the floating bottom navigation bar.
+
+**Acceptance criteria:**
+- [x] **a.** Tapping the Home tab in the bottom navigation bar reliably pops back to HomeFragment from any screen depth.
+- [x] **b.** Disable duplicate system window insets padding inside BottomNavigationView (`paddingBottomSystemWindowInsets="false"`) ensuring consistent, symmetrical height across 3-button navigation devices (e.g. Galaxy A52).
+- [x] **c.** Bottom navigation automatically hides smoothly when the software keyboard (IME) is visible and restores upon dismiss.
+
+**Verification:** configured explicit `popBackStack(R.id.homeFragment, false)` in `MainActivity` bottom nav listener, disabled duplicate window insets on `BottomNavigationView` in `activity_main.xml`, implemented IME keyboard detection in window insets listener to auto-hide floating card when typing, and verified `testDebugUnitTest` (100% pass).
+
+### Step 4 — AUTH-006 — Customer Registration Hardening & Safe Back Navigation
+
+**Status:** `[x]`
+
+**Component contribution:** Eliminate NullPointerException in KeystoreTokenStore on registration by adding safe expiry fallback in AuthRepository and providing complete ISO-8601 mock payloads, and make post-registration back navigation robust against missing backstack entries.
+
+**Acceptance criteria:**
+- [x] **a.** AuthRepository provides safe fallback for missing/null `expiresAt` in `registerCustomer`, preventing NullPointerException in KeystoreTokenStore.
+- [x] **b.** OfflineMockInterceptor returns valid `expiresAt` ISO-8601 timestamps for `POST /auth/register`.
+- [x] **c.** RegisterFragment navigates smoothly back to the caller screen (e.g. AccountFragment) without crashing or relying on fragile backstack presence.
+- [x] **d.** Customer registration succeeds and updates authenticated session state cleanly.
+
+**Verification:** added safe fallback timestamp in `AuthRepository.persistSessionSafely`, updated `OfflineMockInterceptor` auth endpoints with valid `expiresAt` ISO-8601 strings, hardened post-auth navigation in `RegisterFragment` and `SignInFragment` with target popBackStack fallback, and added test in `AuthRepositoryTest.testRegisterSuccessWithMissingExpiresAtDoesNotCrash` (100% test suite pass).
+
+### Step 5 — AUTH-005 — Google Sign-In Hardening & Keystore Expiry Fix
+
+**Status:** `[x]`
+
+**Component contribution:** Fix NullPointerException during Google/mock sign-in by providing valid `expiresAt` timestamps and safe fallbacks in AuthRepository.
+
+**Acceptance criteria:**
+- [x] **a.** OfflineMockInterceptor returns valid `expiresAt` ISO-8601 timestamps on auth endpoints.
+- [x] **b.** AuthRepository handles missing or null expiry gracefully without throwing NullPointerException in KeystoreTokenStore.
+- [x] **c.** Google Sign-In button logs in smoothly without crashing the application.
+
+**Verification:** added safe expiry timestamp fallback in `AuthRepository.persistSessionSafely`, updated `/auth/google` in `OfflineMockInterceptor`, and added test in `AuthRepositoryTest.testGoogleLoginSuccessWithMissingExpiresAtDoesNotCrash` (100% test suite pass).
+
+### Step 6 — FLT-001 — Advanced Filter Bottom Sheet
+
+**Status:** `[x]`
+
+**Component contribution:** Replace unstyled popup sort with a full-featured, luxury Material 3 Filter Bottom Sheet matching Bento / Botanical Green design tokens.
+
+**Acceptance criteria:**
+- [x] **a.** Tapping filter icon next to search bar opens a modal BottomSheetDialogFragment.
+- [x] **b.** Provide single-select chips for sorting (Newest, Price: Low to High, Price: High to Low, Name: A to Z).
+- [x] **c.** Provide Material 3 RangeSlider for interactive price range filtering ($Min to $Max).
+- [x] **d.** Provide toggle switch for "In Stock Only" availability filtering.
+- [x] **e.** Display active filter count badge on the search filter button and offer "Clear All" and "Apply" actions.
+
+**Verification:** created `bottom_sheet_filter.xml` with botanical green accents and rounded surface, implemented `FilterBottomSheetDialogFragment.java` with single-selection ChipGroup, Material 3 RangeSlider ($0–$200), and MaterialSwitch, added dual client+server filter filtering in `CatalogListViewModel`, and verified filter count badge rendering on `ExploreFragment` via `ProductParamsTest` (100% test pass).
+
+### Step 7 — IMG-001 — Instant Image Engine & Cache Strategy
+
+**Status:** `[x]`
+
+**Component contribution:** Implement multi-tier aggressive disk caching and local asset fallback to deliver near 0ms image display.
+
+**Acceptance criteria:**
+- [x] **a.** Configure Glide with `DiskCacheStrategy.ALL` to eliminate repeated network fetches.
+- [x] **b.** Support local product image assets from `temp_data` for instantaneous offline catalog rendering.
+- [x] **c.** Verify zero-jank image loading with smooth crossfades and lookahead prefetching.
+
+**Verification:** updated `ImageLoaderHelper.java` to enforce `DiskCacheStrategy.ALL` across both load and preload methods, converted all 50 product catalog images to lightweight WebP assets under `android/app/src/main/assets/products/`, wired offline mock asset resolution in `OfflineMockInterceptor.java`, and verified lookahead prefetching on Home and Explore screens (`ImageLoaderHelperTest` 100% pass).
+
 ## External dependencies owned by other components
 
 These are the only cross-component items the Android tasks depend on. They are listed here **once** for

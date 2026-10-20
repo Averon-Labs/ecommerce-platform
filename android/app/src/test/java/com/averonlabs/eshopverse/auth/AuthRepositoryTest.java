@@ -465,5 +465,61 @@ public class AuthRepositoryTest {
         assertEquals(401, ex.getHttpStatus());
         assertFalse(authRepository.isSignedIn());
     }
+
+    @Test
+    public void testRegisterSuccessWithMissingExpiresAtDoesNotCrash() throws Exception {
+        String jsonWithoutExpiresAt = "{\"data\":{\"token\":\"test-register-token\",\"user\":{\"id\":10,\"email\":\"new@example.com\",\"firstName\":\"Jane\",\"lastName\":\"Doe\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}}";
+        mockWebServer.enqueue(new MockResponse().setResponseCode(201).setBody(jsonWithoutExpiresAt));
+
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<AuthSession> resultRef = new AtomicReference<>();
+
+        authRepository.registerCustomer("new@example.com", "password123", "Jane", "Doe", new AuthCallback<AuthSession>() {
+            @Override
+            public void onSuccess(AuthSession data) {
+                resultRef.set(data);
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                latch.countDown();
+            }
+        });
+
+        assertTrue(latch.await(3, TimeUnit.SECONDS));
+        assertNotNull(resultRef.get());
+        assertEquals("test-register-token", resultRef.get().getToken());
+        assertTrue(authRepository.isSignedIn());
+        assertEquals("test-register-token", tokenStore.getToken());
+    }
+
+    @Test
+    public void testGoogleLoginSuccessWithMissingExpiresAtDoesNotCrash() throws Exception {
+        String jsonWithoutExpiresAt = "{\"data\":{\"token\":\"test-google-token\",\"user\":{\"id\":11,\"email\":\"google@example.com\",\"firstName\":\"Google\",\"lastName\":\"User\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}}";
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(jsonWithoutExpiresAt));
+
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<AuthSession> resultRef = new AtomicReference<>();
+
+        authRepository.loginWithGoogle("valid-token-no-expiry", new AuthCallback<AuthSession>() {
+            @Override
+            public void onSuccess(AuthSession data) {
+                resultRef.set(data);
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                latch.countDown();
+            }
+        });
+
+        assertTrue(latch.await(3, TimeUnit.SECONDS));
+        assertNotNull(resultRef.get());
+        assertEquals("test-google-token", resultRef.get().getToken());
+        assertTrue(authRepository.isSignedIn());
+        assertEquals("test-google-token", tokenStore.getToken());
+    }
 }
 

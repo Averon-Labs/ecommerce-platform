@@ -95,7 +95,7 @@ public final class ImageLoaderHelper {
                 .load(url.trim())
                 .placeholder(placeholderRes)
                 .error(errorRes)
-                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .skipMemoryCache(false)
                 .transition(DrawableTransitionOptions.withCrossFade(DEFAULT_CROSS_FADE_DURATION_MS));
 
@@ -119,7 +119,7 @@ public final class ImageLoaderHelper {
 
         Glide.with(context.getApplicationContext())
                 .load(url.trim())
-                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .skipMemoryCache(false)
                 .preload();
     }

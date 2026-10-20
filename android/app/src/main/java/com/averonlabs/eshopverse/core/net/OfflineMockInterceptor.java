@@ -57,12 +57,12 @@ public class OfflineMockInterceptor implements Interceptor {
     }
 
     private static final List<MockCartItem> MOCK_CART_ITEMS = new ArrayList<>(Arrays.asList(
-            new MockCartItem(101, "Classic White Oxford Shirt", "file:///android_asset/products/shirt_001.jpg", 45.99, 1, 25)
+            new MockCartItem(101, "Classic White Oxford Shirt", "file:///android_asset/products/shirt_001.webp", 45.99, 1, 25)
     ));
 
     public static synchronized void resetMockCart() {
         MOCK_CART_ITEMS.clear();
-        MOCK_CART_ITEMS.add(new MockCartItem(101, "Classic White Oxford Shirt", "file:///android_asset/products/shirt_001.jpg", 45.99, 1, 25));
+        MOCK_CART_ITEMS.add(new MockCartItem(101, "Classic White Oxford Shirt", "file:///android_asset/products/shirt_001.webp", 45.99, 1, 25));
     }
 
     @NonNull
@@ -146,6 +146,30 @@ public class OfflineMockInterceptor implements Interceptor {
                 try { perPage = Math.max(1, Integer.parseInt(perPageParam)); } catch (Exception ignored) {}
             }
 
+            String sortParam = url.queryParameter("sort");
+            String inStockParam = url.queryParameter("inStock");
+            if (inStockParam == null) {
+                inStockParam = url.queryParameter("in_stock");
+            }
+            String minPriceParam = url.queryParameter("minPrice");
+            if (minPriceParam == null) {
+                minPriceParam = url.queryParameter("min_price");
+            }
+            String maxPriceParam = url.queryParameter("maxPrice");
+            if (maxPriceParam == null) {
+                maxPriceParam = url.queryParameter("max_price");
+            }
+
+            Double minPrice = null;
+            if (minPriceParam != null) {
+                try { minPrice = Double.parseDouble(minPriceParam); } catch (Exception ignored) {}
+            }
+            Double maxPrice = null;
+            if (maxPriceParam != null) {
+                try { maxPrice = Double.parseDouble(maxPriceParam); } catch (Exception ignored) {}
+            }
+            boolean inStockOnly = inStockParam != null && Boolean.parseBoolean(inStockParam);
+
             List<MockProduct> filtered = new ArrayList<>();
             for (MockProduct p : ALL_MOCK_PRODUCTS) {
                 if (categoryIdParam != null && !categoryIdParam.isEmpty()) {
@@ -163,7 +187,25 @@ public class OfflineMockInterceptor implements Interceptor {
                         continue;
                     }
                 }
+                if (inStockOnly && p.stockQuantity <= 0) {
+                    continue;
+                }
+                if (minPrice != null || maxPrice != null) {
+                    try {
+                        double price = Double.parseDouble(p.price);
+                        if (minPrice != null && price < minPrice) continue;
+                        if (maxPrice != null && price > maxPrice) continue;
+                    } catch (Exception ignored) {}
+                }
                 filtered.add(p);
+            }
+
+            if ("price_asc".equalsIgnoreCase(sortParam)) {
+                filtered.sort((a, b) -> Double.compare(Double.parseDouble(a.price), Double.parseDouble(b.price)));
+            } else if ("price_desc".equalsIgnoreCase(sortParam)) {
+                filtered.sort((a, b) -> Double.compare(Double.parseDouble(b.price), Double.parseDouble(a.price)));
+            } else if ("name_asc".equalsIgnoreCase(sortParam)) {
+                filtered.sort((a, b) -> a.name.compareToIgnoreCase(b.name));
             }
 
             int totalItems = filtered.size();
@@ -246,16 +288,9 @@ public class OfflineMockInterceptor implements Interceptor {
                     + "\"timeline\":[{\"status\":\"confirmed\",\"at\":\"2026-10-12T18:00:00Z\"}]}}";
         }
 
-        if (path.endsWith("/auth/profile") || path.endsWith("/auth/me")) {
-            return "{\"data\":{\"id\":1,\"email\":\"alex.morgan@eshopverse.com\",\"firstName\":\"Alex\",\"lastName\":\"Morgan\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}";
-        }
-
-        if (path.endsWith("/auth/login") || path.endsWith("/auth/register") || path.endsWith("/auth/google")) {
-            return "{\"data\":{\"token\":\"demo-jwt-offline-token-sample\",\"user\":{\"id\":1,\"email\":\"alex.morgan@eshopverse.com\",\"firstName\":\"Alex\",\"lastName\":\"Morgan\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}}";
-        }
-
         return null;
     }
+
 
     private static class MockProduct {
         final long id;
@@ -296,177 +331,218 @@ public class OfflineMockInterceptor implements Interceptor {
         }
     }
 
-    private static final MockProduct[] ALL_MOCK_PRODUCTS = new MockProduct[] {
+    private static final MockProduct[] BASE_MOCK_PRODUCTS = new MockProduct[] {
             // Shirts & Tops (Category 1)
             new MockProduct(101, "Classic White Oxford Shirt", "45.99", 1, "Shirts & Tops", "shirt_001",
-                    "file:///android_asset/products/shirt_001.jpg",
+                    "file:///android_asset/products/shirt_001.webp",
                     "Tailored from crisp, breathable 100% organic cotton oxford fabric. Features a neat button-down collar and curved hem.", 25),
             new MockProduct(102, "Silk Navy Blouse", "68.50", 1, "Shirts & Tops", "shirt_002",
-                    "file:///android_asset/products/shirt_002.jpg",
+                    "file:///android_asset/products/shirt_002.webp",
                     "Luxurious mulberry silk blouse with an elegant fluid drape, hidden front placket, and mother-of-pearl buttons.", 18),
             new MockProduct(103, "Striped Casual Shirt", "39.99", 1, "Shirts & Tops", "shirt_003",
-                    "file:///android_asset/products/shirt_003.jpg",
+                    "file:///android_asset/products/shirt_003.webp",
                     "Relaxed-fit yarn-dyed stripe shirt cut from lightweight washed cotton for effortless weekend styling.", 30),
             new MockProduct(104, "Oversized Cream Linen Top", "52.00", 1, "Shirts & Tops", "shirt_004",
-                    "file:///android_asset/products/shirt_004.jpg",
+                    "file:///android_asset/products/shirt_004.webp",
                     "Airy pure European linen shirt designed with a dropped shoulder silhouette and breathable natural texture.", 22),
             new MockProduct(105, "Burgundy Velvet Blouse", "72.99", 1, "Shirts & Tops", "shirt_005",
-                    "file:///android_asset/products/shirt_005.jpg",
+                    "file:///android_asset/products/shirt_005.webp",
                     "Sumptuous plush velvet in rich burgundy with gathered cuff detailing and a subtle keyhole neckline.", 15),
 
             // Pants & Jeans (Category 2)
             new MockProduct(106, "Classic Blue Denim Jeans", "59.99", 2, "Pants & Jeans", "pants_001",
-                    "file:///android_asset/products/pants_001.jpg",
+                    "file:///android_asset/products/pants_001.webp",
                     "Timeless straight-leg five-pocket jeans crafted from authentic 12.5oz ring-spun cotton denim with vintage rinse.", 35),
             new MockProduct(107, "Black Skinny Jeans", "49.50", 2, "Pants & Jeans", "pants_002",
-                    "file:///android_asset/products/pants_002.jpg",
+                    "file:///android_asset/products/pants_002.webp",
                     "Form-flattering high-rise skinny jeans with high-recovery stretch denim that holds shape all day.", 28),
             new MockProduct(108, "Beige Linen Trousers", "65.00", 2, "Pants & Jeans", "pants_003",
-                    "file:///android_asset/products/pants_003.jpg",
+                    "file:///android_asset/products/pants_003.webp",
                     "Relaxed wide-leg trousers tailored in premium breathable beige linen with pleat front and elasticized back waist.", 20),
             new MockProduct(109, "Dark Navy Chinos", "54.99", 2, "Pants & Jeans", "pants_004",
-                    "file:///android_asset/products/pants_004.jpg",
+                    "file:///android_asset/products/pants_004.webp",
                     "Versatile smart-casual slim-fit chinos crafted from stretch cotton twill with welted back pockets.", 32),
             new MockProduct(110, "White Wide-Leg Pants", "62.50", 2, "Pants & Jeans", "pants_005",
-                    "file:///android_asset/products/pants_005.jpg",
+                    "file:///android_asset/products/pants_005.webp",
                     "Sophisticated high-waisted fluid trousers featuring clean front creases and generous wide hems.", 19),
 
             // Dresses (Category 3)
             new MockProduct(111, "Black Midi Wrap Dress", "79.99", 3, "Dresses", "dress_001",
-                    "file:///android_asset/products/dress_001.jpg",
+                    "file:///android_asset/products/dress_001.webp",
                     "Classic flattering wrap silhouette in premium matte jersey with adjustable tie waist and flutter hem.", 24),
             new MockProduct(112, "Floral Summer Dress", "54.00", 3, "Dresses", "dress_002",
-                    "file:///android_asset/products/dress_002.jpg",
+                    "file:///android_asset/products/dress_002.webp",
                     "Breezy lightweight tiered sundress decorated with delicate botanical watercolor florals and sweetheart neckline.", 30),
             new MockProduct(113, "Navy Blue Shift Dress", "68.50", 3, "Dresses", "dress_003",
-                    "file:///android_asset/products/dress_003.jpg",
+                    "file:///android_asset/products/dress_003.webp",
                     "Understated minimalist shift dress with clean architectural seams and jewel neckline in smooth crepe.", 20),
             new MockProduct(114, "Emerald Green Satin Dress", "89.99", 3, "Dresses", "dress_004",
-                    "file:///android_asset/products/dress_004.jpg",
+                    "file:///android_asset/products/dress_004.webp",
                     "Sensational emerald satin slip dress featuring cowl neckline, bias cut for graceful drape, and side slit.", 14),
             new MockProduct(115, "Striped Casual Shirt Dress", "59.50", 3, "Dresses", "dress_005",
-                    "file:///android_asset/products/dress_005.jpg",
+                    "file:///android_asset/products/dress_005.webp",
                     "Crisp cotton poplin shirt dress featuring classic pinstripes, fabric sash belt, and chest patch pocket.", 25),
 
             // Jackets & Coats (Category 4)
             new MockProduct(116, "Classic Black Leather Jacket", "145.00", 4, "Jackets & Coats", "jacket_001",
-                    "file:///android_asset/products/jacket_001.jpg",
+                    "file:///android_asset/products/jacket_001.webp",
                     "Iconic asymmetrical biker jacket handcrafted from supple full-grain lambskin with heavy brushed silver hardware.", 12),
             new MockProduct(117, "Camel Wool Coat", "125.50", 4, "Jackets & Coats", "jacket_002",
-                    "file:///android_asset/products/jacket_002.jpg",
+                    "file:///android_asset/products/jacket_002.webp",
                     "Tailored double-breasted longline coat crafted from a warm wool-blend in sophisticated camel tan.", 16),
             new MockProduct(118, "Denim Jacket Blue", "69.99", 4, "Jackets & Coats", "jacket_003",
-                    "file:///android_asset/products/jacket_003.jpg",
+                    "file:///android_asset/products/jacket_003.webp",
                     "Heritage trucker denim jacket with vintage wash fading, button flap pockets, and adjustable waist tabs.", 26),
             new MockProduct(119, "Quilted Puffer Jacket", "99.00", 4, "Jackets & Coats", "jacket_004",
-                    "file:///android_asset/products/jacket_004.jpg",
+                    "file:///android_asset/products/jacket_004.webp",
                     "Ultralight water-repellent ripstop shell insulated with high-loft thermal down alternative for cold weather.", 20),
             new MockProduct(120, "Suede Biker Jacket", "135.99", 4, "Jackets & Coats", "jacket_005",
-                    "file:///android_asset/products/jacket_005.jpg",
+                    "file:///android_asset/products/jacket_005.webp",
                     "Sumptuous cognac genuine suede leather jacket with moto collar, zipper cuffs, and satin lining.", 14),
 
             // T-Shirts (Category 5)
             new MockProduct(121, "Classic White T-Shirt", "24.99", 5, "T-Shirts", "tshirt_001",
-                    "file:///android_asset/products/tshirt_001.jpg",
+                    "file:///android_asset/products/tshirt_001.webp",
                     "The essential everyday crewneck t-shirt made of 100% combed ringspun cotton with smooth handfeel.", 50),
             new MockProduct(122, "Graphic Print T-Shirt", "34.50", 5, "T-Shirts", "tshirt_002",
-                    "file:///android_asset/products/tshirt_002.jpg",
+                    "file:///android_asset/products/tshirt_002.webp",
                     "Contemporary artistic screen-printed graphic tee with relaxed streetwear fit and vintage enzyme wash.", 35),
             new MockProduct(123, "Soft Gray Melange Tee", "28.99", 5, "T-Shirts", "tshirt_003",
-                    "file:///android_asset/products/tshirt_003.jpg",
+                    "file:///android_asset/products/tshirt_003.webp",
                     "Heathered gray tri-blend tee offering incredible softness, shape retention, and breathable drape.", 40),
             new MockProduct(124, "Navy Striped T-Shirt", "31.00", 5, "T-Shirts", "tshirt_004",
-                    "file:///android_asset/products/tshirt_004.jpg",
+                    "file:///android_asset/products/tshirt_004.webp",
                     "French Breton-inspired nautical stripe crewneck knit from premium compact jersey cotton.", 30),
             new MockProduct(125, "Oversized Vintage Tee", "38.50", 5, "T-Shirts", "tshirt_005",
-                    "file:///android_asset/products/tshirt_005.jpg",
+                    "file:///android_asset/products/tshirt_005.webp",
                     "Heavyweight 220gsm vintage-washed boxy t-shirt with dropped shoulders and thick ribbed collar.", 28),
 
             // Activewear (Category 6)
             new MockProduct(126, "Black Yoga Leggings", "64.99", 6, "Activewear", "active_001",
-                    "file:///android_asset/products/active_001.jpg",
+                    "file:///android_asset/products/active_001.webp",
                     "High-waisted buttery-soft moisture-wicking compression leggings with 4-way stretch and hidden pocket.", 45),
             new MockProduct(127, "Sports Performance Bra", "52.00", 6, "Activewear", "active_002",
-                    "file:///android_asset/products/active_002.jpg",
+                    "file:///android_asset/products/active_002.webp",
                     "Medium-impact racerback sports bra with removable padding and breathable mesh zone ventilation.", 38),
             new MockProduct(128, "Gray Joggers", "54.50", 6, "Activewear", "active_003",
-                    "file:///android_asset/products/active_003.jpg",
+                    "file:///android_asset/products/active_003.webp",
                     "Cozy french terry athletic sweatpants with tapered cuffs, deep zip pockets, and drawstring waistband.", 35),
             new MockProduct(129, "White Tank Top", "35.99", 6, "Activewear", "active_004",
-                    "file:///android_asset/products/active_004.jpg",
+                    "file:///android_asset/products/active_004.webp",
                     "Ultra-breathable seamless athletic tank with scoop neck and quick-dry sweat-wicking technology.", 40),
             new MockProduct(130, "Teal Running Shorts", "42.00", 6, "Activewear", "active_005",
-                    "file:///android_asset/products/active_005.jpg",
+                    "file:///android_asset/products/active_005.webp",
                     "Lightweight athletic running shorts with built-in antimicrobial liner and reflective visibility accents.", 30),
 
             // Shoes (Category 7)
             new MockProduct(131, "White Leather Sneakers", "89.99", 7, "Shoes", "shoe_001",
-                    "file:///android_asset/products/shoe_001.jpg",
+                    "file:///android_asset/products/shoe_001.webp",
                     "Minimalist low-top sneakers in crisp white nappa leather with cushioned memory foam insole.", 25),
             new MockProduct(132, "Black Leather Loafers", "99.50", 7, "Shoes", "shoe_002",
-                    "file:///android_asset/products/shoe_002.jpg",
+                    "file:///android_asset/products/shoe_002.webp",
                     "Modern penny loafers crafted in polished black calfskin with flexible rubber sole for effortless refinement.", 20),
             new MockProduct(133, "Brown Chelsea Boots", "125.00", 7, "Shoes", "shoe_003",
-                    "file:///android_asset/products/shoe_003.jpg",
+                    "file:///android_asset/products/shoe_003.webp",
                     "Rich oiled brown leather Chelsea boots with durable elastic side panels and Goodyear-welted rubber soles.", 18),
             new MockProduct(134, "Nude Ballet Flats", "65.99", 7, "Shoes", "shoe_004",
-                    "file:///android_asset/products/shoe_004.jpg",
+                    "file:///android_asset/products/shoe_004.webp",
                     "Ultra-flexible glove leather ballet flats with rounded toe, cushioned arch support, and tonal trim.", 22),
             new MockProduct(135, "Red Stiletto Heels", "110.00", 7, "Shoes", "shoe_005",
-                    "file:///android_asset/products/shoe_005.jpg",
+                    "file:///android_asset/products/shoe_005.webp",
                     "Head-turning scarlet pointed-toe pumps crafted in smooth leather with elegant 85mm slim heels.", 15),
 
             // Accessories (Category 8)
             new MockProduct(136, "Black Leather Belt", "42.50", 8, "Accessories", "acc_001",
-                    "file:///android_asset/products/acc_001.jpg",
+                    "file:///android_asset/products/acc_001.webp",
                     "Vegetable-tanned full-grain leather belt finished with a brushed silver buckle and beveled burnished edges.", 40),
             new MockProduct(137, "Cashmere Scarf", "78.99", 8, "Accessories", "acc_002",
-                    "file:///android_asset/products/acc_002.jpg",
+                    "file:///android_asset/products/acc_002.webp",
                     "Ultra-warm 100% pure Mongolian cashmere scarf woven with soft fringed ends in versatile oat heather.", 25),
             new MockProduct(138, "Wool Gloves", "35.00", 8, "Accessories", "acc_003",
-                    "file:///android_asset/products/acc_003.jpg",
+                    "file:///android_asset/products/acc_003.webp",
                     "Knit merino wool winter gloves equipped with touchscreen-sensitive conductive fingertips.", 35),
             new MockProduct(139, "Silk Hair Scarf", "29.99", 8, "Accessories", "acc_004",
-                    "file:///android_asset/products/acc_004.jpg",
+                    "file:///android_asset/products/acc_004.webp",
                     "Lightweight printed silk twill square scarf featuring refined hand-rolled edges and hand-drawn motif.", 30),
             new MockProduct(140, "Leather Cuff Bracelet", "48.50", 8, "Accessories", "acc_005",
-                    "file:///android_asset/products/acc_005.jpg",
+                    "file:///android_asset/products/acc_005.webp",
                     "Artisanal double-wrap braided leather wristband with magnetic matte-black stainless steel closure.", 25),
 
             // Leather & Suede (Category 9)
             new MockProduct(141, "Premium Black Leather Pants", "145.99", 9, "Leather & Suede", "leather_001",
-                    "file:///android_asset/products/leather_001.jpg",
+                    "file:///android_asset/products/leather_001.webp",
                     "Statement high-rise straight-leg trousers cut from supple genuine leather with smooth satin lining.", 12),
             new MockProduct(142, "Brown Suede Jacket", "135.00", 9, "Leather & Suede", "leather_002",
-                    "file:///android_asset/products/leather_002.jpg",
+                    "file:///android_asset/products/leather_002.webp",
                     "Western-inspired zip trucker jacket crafted in velvety brown goat suede with tailored point collar.", 15),
             new MockProduct(143, "Cognac Leather Skirt", "129.50", 9, "Leather & Suede", "leather_003",
-                    "file:///android_asset/products/leather_003.jpg",
+                    "file:///android_asset/products/leather_003.webp",
                     "A-line midi skirt fashioned from butter-soft cognac lambskin leather with hidden rear zip.", 14),
             new MockProduct(144, "Black Suede Dress", "158.99", 9, "Leather & Suede", "leather_004",
-                    "file:///android_asset/products/leather_004.jpg",
+                    "file:///android_asset/products/leather_004.webp",
                     "Exquisite sleeveless mini dress tailored from fine black suede with flattering seam contours.", 10),
             new MockProduct(145, "Tan Leather Shirt", "119.99", 9, "Leather & Suede", "leather_005",
-                    "file:///android_asset/products/leather_005.jpg",
+                    "file:///android_asset/products/leather_005.webp",
                     "Oversized leather overshirt in warm tan with snap front closures and large chest flap pockets.", 16),
 
             // Bags & Backpacks (Category 10)
             new MockProduct(146, "Black Leather Tote Bag", "99.99", 10, "Bags & Backpacks", "bag_001",
-                    "file:///android_asset/products/bag_001.jpg",
+                    "file:///android_asset/products/bag_001.webp",
                     "Spacious structured everyday tote bag crafted from pebble leather with dedicated laptop divider.", 24),
             new MockProduct(147, "Cognac Leather Shoulder Bag", "124.50", 10, "Bags & Backpacks", "bag_002",
-                    "file:///android_asset/products/bag_002.jpg",
+                    "file:///android_asset/products/bag_002.webp",
                     "Chic crescent baguette bag in warm cognac leather with gleaming hardware and comfortable wide strap.", 18),
             new MockProduct(148, "Navy Canvas Backpack", "64.99", 10, "Bags & Backpacks", "bag_003",
-                    "file:///android_asset/products/bag_003.jpg",
+                    "file:///android_asset/products/bag_003.webp",
                     "Durable 16oz waxed cotton canvas daypack with leather strap accents, laptop sleeve, and brass hardware.", 28),
             new MockProduct(149, "Beige Crossbody Bag", "79.00", 10, "Bags & Backpacks", "bag_004",
-                    "file:///android_asset/products/bag_004.jpg",
+                    "file:///android_asset/products/bag_004.webp",
                     "Compact hands-free crossbody bag crafted in neutral beige pebble leather with adjustable guitar strap.", 22),
             new MockProduct(150, "Luxury Designer Clutch", "189.99", 10, "Bags & Backpacks", "bag_005",
-                    "file:///android_asset/products/bag_005.jpg",
+                    "file:///android_asset/products/bag_005.webp",
                     "Opulent evening pouch clutch in pleated nappa leather with magnetic frame closure and removable chain.", 12)
     };
+
+    private static final MockProduct[] ALL_MOCK_PRODUCTS = initMockProducts();
+
+    private static MockProduct[] initMockProducts() {
+        List<MockProduct> list = new ArrayList<>(Arrays.asList(BASE_MOCK_PRODUCTS));
+        String[][] suffixes = {
+                {" (Slim Edition)", " (Organic Cotton)", " (Vintage Wash)", " (Signature Series)"},
+                {" (Relaxed Fit)", " (Tailored Cut)", " (Everyday Stretch)", " (Classic Rinse)"},
+                {" (Evening Edition)", " (Garden Floral)", " (Summer Breeze)", " (Velvet Touch)"},
+                {" (Thermal Insulated)", " (Heritage Waxed)", " (Urban Minimal)", " (Storm Proof)"},
+                {" (Heavyweight 240gsm)", " (Slub Cotton)", " (Pocket Edition)", " (Garment Dyed)"},
+                {" (Seamless Flex)", " (Pro Compression)", " (Studio Edition)", " (Ventilated)"},
+                {" (Waterproof Gore)", " (Cloud Cushioned)", " (Heritage Leather)", " (Gum Sole)"},
+                {" (Handcrafted Leather)", " (Ribbed Merino)", " (Brushed Metallic)", " (Woven Texture)"},
+                {" (Distressed Finish)", " (Nubuck Grain)", " (Cognac Tan)", " (Midnight Matte)"},
+                {" (Waterproof Cordura)", " (Rolltop Commuter)", " (Waxed Canvas)", " (Modular Pouch)"}
+        };
+
+        for (MockProduct base : BASE_MOCK_PRODUCTS) {
+            int catIndex = base.categoryId - 1;
+            if (catIndex >= 0 && catIndex < suffixes.length) {
+                String[] varNames = suffixes[catIndex];
+                double basePrice = 45.00;
+                try {
+                    basePrice = Double.parseDouble(base.price);
+                } catch (Exception ignored) {}
+
+                for (int v = 0; v < varNames.length; v++) {
+                    long newId = 1000L * base.categoryId + (v + 1) * 100L + (base.id % 100);
+                    String newName = base.name + varNames[v];
+                    double newPriceVal = Math.round((basePrice + (v + 1) * 4.25) * 100.0) / 100.0;
+                    String newPrice = String.format(Locale.US, "%.2f", newPriceVal);
+                    String newSku = base.sku + "_v" + (v + 1);
+                    int newStock = 20 + (v * 7);
+                    list.add(new MockProduct(newId, newName, newPrice, base.categoryId, base.categoryName,
+                            newSku, base.imageUrl, base.description, newStock));
+                }
+            }
+        }
+        return list.toArray(new MockProduct[0]);
+    }
 
     private synchronized String handleCartRequest(String method, String path, Request request) {
         // DELETE /cart/items/{productId} -> remove line item

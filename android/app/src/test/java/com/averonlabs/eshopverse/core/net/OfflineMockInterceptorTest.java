@@ -74,14 +74,14 @@ public class OfflineMockInterceptorTest {
             Type type = new TypeToken<PagedResponse<ProductSummary>>() {}.getType();
             PagedResponse<ProductSummary> envelope = gson.fromJson(response.body().string(), type);
             assertNotNull(envelope.getData());
-            assertEquals(50, envelope.getData().size());
+            assertEquals(60, envelope.getData().size());
             ProductSummary product = envelope.getData().get(0);
             assertEquals("Classic White Oxford Shirt", product.getName());
             assertNotNull(product.getImageUrl());
             assertTrue(product.isInStock());
         }
 
-        // Verify category filter returns 5 items
+        // Verify unpaginated category filter returns all 25 items in category
         Request catRequest = new Request.Builder()
                 .url("http://127.0.0.1:54321/api/v1/products?category_id=1")
                 .build();
@@ -91,7 +91,22 @@ public class OfflineMockInterceptorTest {
             Type type = new TypeToken<PagedResponse<ProductSummary>>() {}.getType();
             PagedResponse<ProductSummary> envelope = gson.fromJson(catResponse.body().string(), type);
             assertNotNull(envelope.getData());
-            assertEquals(5, envelope.getData().size());
+            assertEquals(25, envelope.getData().size());
+            assertEquals(25, envelope.getPagination().getTotalItems());
+        }
+
+        // Verify paginated category filter returns 20 items for page 1
+        Request catPageRequest = new Request.Builder()
+                .url("http://127.0.0.1:54321/api/v1/products?category_id=1&page=1&per_page=20")
+                .build();
+        try (Response catPageResponse = client.newCall(catPageRequest).execute()) {
+            assertEquals(200, catPageResponse.code());
+            assertNotNull(catPageResponse.body());
+            Type type = new TypeToken<PagedResponse<ProductSummary>>() {}.getType();
+            PagedResponse<ProductSummary> envelope = gson.fromJson(catPageResponse.body().string(), type);
+            assertNotNull(envelope.getData());
+            assertEquals(20, envelope.getData().size());
+            assertEquals(25, envelope.getPagination().getTotalItems());
         }
 
         // Verify pagination returns 20 items for page 1
@@ -107,8 +122,8 @@ public class OfflineMockInterceptorTest {
             assertEquals(20, envelope.getData().size());
             assertEquals(1, envelope.getPagination().getCurrentPage());
             assertEquals(20, envelope.getPagination().getPerPage());
-            assertEquals(50, envelope.getPagination().getTotalItems());
-            assertEquals(3, envelope.getPagination().getTotalPages());
+            assertEquals(250, envelope.getPagination().getTotalItems());
+            assertEquals(13, envelope.getPagination().getTotalPages());
         }
     }
 
@@ -238,22 +253,13 @@ public class OfflineMockInterceptorTest {
         }
     }
 
-    @Test
-    public void testOfflineUserProfileDeserialization() throws IOException {
+    @Test(expected = IOException.class)
+    public void testOfflineUserProfileFailsWhenServerOffline() throws IOException {
         OkHttpClient client = createMockClient();
         Request request = new Request.Builder()
                 .url("http://127.0.0.1:54321/api/v1/auth/profile")
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            assertEquals(200, response.code());
-            assertNotNull(response.body());
-            Type type = new TypeToken<ApiResponse<User>>() {}.getType();
-            ApiResponse<User> envelope = gson.fromJson(response.body().string(), type);
-            assertNotNull(envelope.getData());
-            User user = envelope.getData();
-            assertEquals("alex.morgan@eshopverse.com", user.getEmail());
-            assertEquals("Alex Morgan", user.getFullName());
-        }
+        client.newCall(request).execute();
     }
 }

@@ -69,6 +69,19 @@
         <action
             android:id="@+id/action_accountFragment_to_productDetailFragment"
             app:destination="@id/nav_catalog" />
+        <action
+            android:id="@+id/action_accountFragment_to_favoritesFragment"
+            app:destination="@id/favoritesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/favoritesFragment"
+        android:name="com.averonlabs.eshopverse.catalog.fragment.FavoritesFragment"
+        android:label="@string/favorites_title"
+        tools:layout="@layout/fragment_favorites">
+        <action
+            android:id="@+id/action_favoritesFragment_to_productDetailFragment"
+            app:destination="@id/nav_catalog" />
     </fragment>
 
     <fragment

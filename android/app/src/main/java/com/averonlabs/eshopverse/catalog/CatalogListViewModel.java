@@ -127,6 +127,27 @@ public class CatalogListViewModel extends ViewModel {
     }
 
     /**
+     * Updates sort, price range, and in-stock filters in a single atomic update, resetting pagination to page 1.
+     */
+    public void setFilters(
+            @NonNull String sort,
+            @Nullable Double minPrice,
+            @Nullable Double maxPrice,
+            @Nullable Boolean inStock
+    ) {
+        ProductParams updated = currentParams
+                .withSort(sort)
+                .withPriceRange(minPrice, maxPrice)
+                .withInStock(inStock);
+        if (!Objects.equals(currentParams, updated)) {
+            this.currentParams = updated;
+            this.paramsLiveData.setValue(currentParams);
+            this.inFlight = false;
+            loadFirstPage();
+        }
+    }
+
+    /**
      * Loads the first page of products, clearing any existing pagination state.
      */
     public void loadFirstPage() {
@@ -199,10 +220,18 @@ public class CatalogListViewModel extends ViewModel {
                     totalCountLiveData.setValue(loadedProducts.size());
                 }
 
-                if (loadedProducts.isEmpty()) {
+                List<ProductSummary> displayItems = applyLocalFilters(loadedProducts);
+                if (displayItems.isEmpty()) {
+                    if (hasMore && hasActiveFilters()) {
+                        loadNextPage();
+                        return;
+                    }
                     productsState.setValue(UiState.empty());
                 } else {
-                    productsState.setValue(UiState.content(Collections.unmodifiableList(new ArrayList<>(loadedProducts))));
+                    productsState.setValue(UiState.content(Collections.unmodifiableList(new ArrayList<>(displayItems))));
+                    if (hasActiveFilters() && displayItems.size() < currentParams.getPerPage() && hasMore) {
+                        loadNextPage();
+                    }
                 }
             }
 
@@ -227,5 +256,48 @@ public class CatalogListViewModel extends ViewModel {
                 }
             }
         });
+    }
+
+    private List<ProductSummary> applyLocalFilters(List<ProductSummary> items) {
+        if (items == null || items.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Double min = currentParams.getMinPrice();
+        Double max = currentParams.getMaxPrice();
+        Boolean inStockOnly = currentParams.getInStock();
+
+        if (min == null && max == null && !Boolean.TRUE.equals(inStockOnly)) {
+            return items;
+        }
+
+        List<ProductSummary> filtered = new ArrayList<>();
+        for (ProductSummary p : items) {
+            if (p == null) {
+                continue;
+            }
+            if (Boolean.TRUE.equals(inStockOnly) && !p.isInStock()) {
+                continue;
+            }
+            if (min != null || max != null) {
+                try {
+                    double val = Double.parseDouble(p.getPrice());
+                    if (min != null && val < min) {
+                        continue;
+                    }
+                    if (max != null && val > max) {
+                        continue;
+                    }
+                } catch (Exception ignored) {
+                }
+            }
+            filtered.add(p);
+        }
+        return filtered;
+    }
+
+    private boolean hasActiveFilters() {
+        return currentParams.getMinPrice() != null
+                || currentParams.getMaxPrice() != null
+                || Boolean.TRUE.equals(currentParams.getInStock());
     }
 }

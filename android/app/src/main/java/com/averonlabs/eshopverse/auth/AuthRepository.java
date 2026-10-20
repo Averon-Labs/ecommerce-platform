@@ -43,6 +43,10 @@ public class AuthRepository {
      * Checks if the user has an active, non-expired session token.
      */
     public boolean isSignedIn() {
+        if ("demo-jwt-offline-token-sample".equals(tokenStore.getToken())) {
+            tokenStore.clear();
+            return false;
+        }
         return !tokenStore.isExpired() && tokenStore.getToken() != null;
     }
 
@@ -64,7 +68,7 @@ public class AuthRepository {
             ) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     AuthSession session = response.body().getData();
-                    tokenStore.save(session.getToken(), session.getExpiresAt());
+                    persistSessionSafely(session);
                     callback.onSuccess(session);
                 } else {
                     callback.onError(parseError(response));
@@ -98,7 +102,7 @@ public class AuthRepository {
             ) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     AuthSession session = response.body().getData();
-                    tokenStore.save(session.getToken(), session.getExpiresAt());
+                    persistSessionSafely(session);
                     callback.onSuccess(session);
                 } else {
                     callback.onError(parseError(response));
@@ -135,7 +139,7 @@ public class AuthRepository {
             ) {
                 if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
                     AuthSession session = response.body().getData();
-                    tokenStore.save(session.getToken(), session.getExpiresAt());
+                    persistSessionSafely(session);
                     callback.onSuccess(session);
                 } else {
                     callback.onError(parseError(response));
@@ -361,5 +365,14 @@ public class AuthRepository {
             }
         }
         return 60; // Safe default lockout seconds
+    }
+
+    private void persistSessionSafely(@NonNull AuthSession session) {
+        String token = session.getToken();
+        String expiresAt = session.getExpiresAt();
+        if (expiresAt == null || expiresAt.trim().isEmpty()) {
+            expiresAt = "2027-01-15T10:00:00Z";
+        }
+        tokenStore.save(token, expiresAt);
     }
 }

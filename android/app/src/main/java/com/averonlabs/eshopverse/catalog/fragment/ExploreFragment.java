@@ -205,35 +205,16 @@ public class ExploreFragment extends Fragment {
             return false;
         });
 
-        binding.btnSort.setOnClickListener(v -> showSortMenu(v));
+        binding.btnSort.setOnClickListener(v -> showFilterBottomSheet());
     }
 
-    private void showSortMenu(View anchor) {
-        PopupMenu popup = new PopupMenu(requireContext(), anchor);
-        popup.getMenu().add(0, 1, 0, R.string.catalog_sort_newest);
-        popup.getMenu().add(0, 2, 1, R.string.catalog_sort_price_asc);
-        popup.getMenu().add(0, 3, 2, R.string.catalog_sort_price_desc);
-        popup.getMenu().add(0, 4, 3, R.string.catalog_sort_name_asc);
-
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case 1:
-                    catalogViewModel.setSort(ProductParams.SORT_NEWEST);
-                    return true;
-                case 2:
-                    catalogViewModel.setSort(ProductParams.SORT_PRICE_ASC);
-                    return true;
-                case 3:
-                    catalogViewModel.setSort(ProductParams.SORT_PRICE_DESC);
-                    return true;
-                case 4:
-                    catalogViewModel.setSort(ProductParams.SORT_NAME_ASC);
-                    return true;
-                default:
-                    return false;
-            }
+    private void showFilterBottomSheet() {
+        FilterBottomSheetDialogFragment sheet =
+                FilterBottomSheetDialogFragment.newInstance(catalogViewModel.getCurrentParams());
+        sheet.setOnFilterAppliedListener((sort, minPrice, maxPrice, inStock) -> {
+            catalogViewModel.setFilters(sort, minPrice, maxPrice, inStock);
         });
-        popup.show();
+        sheet.show(getChildFragmentManager(), FilterBottomSheetDialogFragment.TAG);
     }
 
     private void setupCategoryChips() {
@@ -322,6 +303,20 @@ public class ExploreFragment extends Fragment {
 
     private void observeViewModel() {
         catalogViewModel.getProductsState().observe(getViewLifecycleOwner(), this::renderProductsState);
+        catalogViewModel.getParams().observe(getViewLifecycleOwner(), this::renderParamsState);
+    }
+
+    private void renderParamsState(ProductParams params) {
+        if (params == null || binding == null) {
+            return;
+        }
+        int count = params.getActiveFilterCount();
+        if (count > 0) {
+            binding.tvFilterBadge.setText(String.valueOf(count));
+            binding.tvFilterBadge.setVisibility(View.VISIBLE);
+        } else {
+            binding.tvFilterBadge.setVisibility(View.GONE);
+        }
     }
 
     private void renderProductsState(UiState<List<ProductSummary>> state) {
