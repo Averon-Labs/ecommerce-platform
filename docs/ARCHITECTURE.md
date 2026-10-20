@@ -113,31 +113,36 @@ docs/       → Shared documentation
 
 Modeled after industry-leading consumer platforms (Netflix, Pinterest, Digikala, Instagram), all client presentation layers must strictly follow these core progressive loading principles:
 
-1. **Immediate Data-First Rendering & Zero Layout Shift (CLS = 0):**
-   - Textual and structural metadata (titles, prices, discounts, stock status, ratings, category badges) must render immediately (<100ms) upon receiving local or network payloads. UI rendering must never block or wait for remote image assets to download.
-   - All image viewports must enforce fixed aspect ratios (1:1 square for catalog cards, 16:9 for banners, 4:5 for detail galleries) via `ConstraintLayout` dimension ratios or fixed dimensions. The layout must never jump, reflow, or jitter when an image completes loading.
+1. **Text-First Immediate Rendering & Independent Asynchronous Image Loading (Core Law):**
+   - **Zero UI-Blocking:** Textual and structural metadata (titles, prices, discounts, stock status, ratings, category badges) must bind and render synchronously on the UI thread immediately (<100ms) upon receiving payloads. UI presentation must NEVER block, wait, or defer rendering for image assets to download.
+   - **Decoupled Asynchronous Streaming:** Image URLs are transmitted in the lightweight JSON payload; binary images are never bundled or downloaded synchronously. Each image is dispatched as an independent background worker job (via `ImageLoaderHelper` / Glide). If any image fails or experiences latency, adjacent text and items remain fully interactive and visible.
+   - **Zero Cumulative Layout Shift (CLS = 0):** All image viewports must enforce fixed aspect ratios (1:1 square for catalog cards, 16:9 for banners, 4:5 for detail galleries) via `ConstraintLayout` dimension ratios or fixed pixel dimensions. `wrap_content` is strictly forbidden on network image containers. The layout must never jump, reflow, or jitter when an image completes loading.
 
 2. **Curated Shimmer / Skeleton Placeholders (Never Blank Boxes):**
-   - While image bytes are streaming and decoding, viewports must display a subtle, elegant shimmer or skeleton placeholder (`bg_placeholder_shimmer`) harmonized with the brand palette (warm ivory to soft sandstone in light mode; muted charcoal in dark mode).
+   - While image bytes are streaming and decoding in the background, viewports must immediately display a subtle, elegant shimmer or skeleton placeholder (`bg_placeholder_shimmer`) harmonized with the brand palette (warm ivory to soft sandstone in light mode; muted charcoal in dark mode).
    - Static states use an editorial boutique brand watermark silhouette (`@drawable/ic_image_placeholder`), giving the user a visual sense of life and polish rather than a raw, empty container.
 
-3. **Smooth Asynchronous Cross-Fade Transitions (200–300ms):**
+3. **Smooth Asynchronous Cross-Fade Transitions (200–250ms):**
    - When the byte stream is decoded into a hardware bitmap, it must seamlessly replace the placeholder using a hardware-accelerated cross-fade (`DrawableTransitionOptions.withCrossFade(250)`).
    - Abrupt image popping, flickering, or white flashes during load are strictly prohibited.
 
-4. **Multi-Tier Intelligent Caching (RAM + Disk):**
+4. **Viewport-Scoped Lazy Loading & Request Cancellation:**
+   - Image loading is strictly on-demand: only viewports entering the visible window initiate downloads.
+   - When an item scrolls out of view or is recycled (`onViewRecycled`), pending network and decoding tasks for that `ImageView` must be cancelled immediately (`ImageLoaderHelper.clear(imageView)`) to preserve bandwidth and background thread capacity.
+
+5. **Multi-Tier Intelligent Caching (RAM + Disk):**
    - **Tier 1 (RAM Memory Cache):** Fast LRU cache in system RAM (`skipMemoryCache(false)`) providing 0ms instantaneous display when scrolling back and forth or switching tabs.
-   - **Tier 2 (Disk Cache):** Persistent on-disk cache (`DiskCacheStrategy.AUTOMATIC`) ensuring previously viewed assets are available offline and across app restarts without redundant network calls.
+   - **Tier 2 (Disk Cache):** Persistent on-disk cache (`DiskCacheStrategy.ALL` / `AUTOMATIC`) ensuring previously viewed assets are available offline and across app restarts without redundant network calls.
    - **Hardware Downsampling:** Images must decode strictly to the physical pixel bounds of the target ImageView to eliminate wasted memory and prevent OutOfMemory (OOM) exceptions.
 
-5. **Proactive Scroll Prefetching & Incremental Lazy Loading:**
+6. **Proactive Scroll Prefetching & Incremental Lazy Loading:**
    - Catalog queries must be paginated in manageable 20-item batches.
    - As the user scrolls near the end of the loaded batch (e.g. items 15–18), the next page slice must automatically trigger in the background, appending new items without disrupting user scroll position or momentum.
    - Off-screen images (the next 4–6 visible items in the user's scroll direction) must be proactively prefetched into Glide's cache so that they are already in memory when entering the viewport.
 
-6. **Editorial Graceful Error Fallbacks (No Ugly Broken Icons):**
+7. **Editorial Graceful Error Fallbacks (No Ugly Broken Icons):**
    - Network errors, 404s, or decoding failures must never render a raw broken image icon, red alert marker, or blank hole.
-   - Failed images must display an elegant, muted luxury fallback vector (`@drawable/ic_image_placeholder_error`) in harmonious brand tints, maintaining visual dignity and clean aesthetic continuity.
+   - Failed images must display an elegant, muted luxury fallback vector (`@drawable/bg_placeholder_error`) in harmonious brand tints, maintaining visual dignity and clean aesthetic continuity.
 
 ---
 
