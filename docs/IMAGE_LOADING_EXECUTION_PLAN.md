@@ -6,6 +6,11 @@ This document defines the actionable, checkable implementation plan for applying
 > - Core Architecture Law: [`docs/ARCHITECTURE.md`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/docs/ARCHITECTURE.md#L112-L142)
 > - Android Rules: [`android/AGENTS.md`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/AGENTS.md#L121-L135)
 > - Dedicated Agent Skill: [`.agents/skills/text-first-async-image-loading/SKILL.md`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/.agents/skills/text-first-async-image-loading/SKILL.md)
+>
+> **دسترسی سریع به فایل‌های تفکیک‌شده:**
+> - 📱 **[فایل اختصاصی اندروید: docs/IMAGE_LOADING_ANDROID.md](file:///d:/Ham/Code___/for_fiverr/eshop-verse/docs/IMAGE_LOADING_ANDROID.md)**
+> - 💻 **[فایل اختصاصی ادمین و بک‌اند: docs/IMAGE_LOADING_ADMIN_BACKEND.md](file:///d:/Ham/Code___/for_fiverr/eshop-verse/docs/IMAGE_LOADING_ADMIN_BACKEND.md)**
+> - 🔗 [پرش به بخش دوم (ادمین و بک‌اند) در همین صفحه](#بخش-دوم-داشبورد-ادمین-و-بکاند-part-2-admin-dashboard--backend-api)
 
 ---
 
