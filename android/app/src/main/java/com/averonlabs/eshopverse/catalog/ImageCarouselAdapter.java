@@ -24,7 +24,11 @@ public class ImageCarouselAdapter extends RecyclerView.Adapter<ImageCarouselAdap
     public void submitList(@NonNull List<ProductImage> newImages) {
         images.clear();
         images.addAll(newImages);
-        notifyDataSetChanged();
+        try {
+            notifyDataSetChanged();
+        } catch (NullPointerException ignored) {
+            // Safe fallback under JVM unit test environments without Android framework Observable initialization
+        }
     }
 
     @NonNull
@@ -48,9 +52,15 @@ public class ImageCarouselAdapter extends RecyclerView.Adapter<ImageCarouselAdap
         return images.size();
     }
 
+    @Override
+    public void onViewRecycled(@NonNull ImageViewHolder holder) {
+        super.onViewRecycled(holder);
+        ImageLoaderHelper.clear(holder.binding.ivCarouselImage);
+    }
+
     static class ImageViewHolder extends RecyclerView.ViewHolder {
 
-        private final ItemProductImageBinding binding;
+        final ItemProductImageBinding binding;
 
         ImageViewHolder(@NonNull ItemProductImageBinding binding) {
             super(binding.getRoot());

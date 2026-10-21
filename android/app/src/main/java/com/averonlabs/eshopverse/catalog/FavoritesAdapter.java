@@ -112,6 +112,16 @@ public class FavoritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     @Override
+    public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewRecycled(holder);
+        if (holder instanceof GridViewHolder) {
+            ImageLoaderHelper.clear(((GridViewHolder) holder).binding.ivProductImage);
+        } else if (holder instanceof LinearViewHolder) {
+            ImageLoaderHelper.clear(((LinearViewHolder) holder).binding.ivProductImage);
+        }
+    }
+
+    @Override
     public int getItemCount() {
         return items.size();
     }
