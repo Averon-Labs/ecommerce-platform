@@ -20,7 +20,7 @@ import com.averonlabs.eshopverse.databinding.ItemReviewLineBinding;
  */
 public class ReviewItemsAdapter extends ListAdapter<CartItem, ReviewItemsAdapter.ReviewViewHolder> {
 
-    private static final DiffUtil.ItemCallback<CartItem> DIFF_CALLBACK = new DiffUtil.ItemCallback<CartItem>() {
+    static final DiffUtil.ItemCallback<CartItem> DIFF_CALLBACK = new DiffUtil.ItemCallback<CartItem>() {
         @Override
         public boolean areItemsTheSame(@NonNull CartItem oldItem, @NonNull CartItem newItem) {
             return oldItem.getProductId() == newItem.getProductId();
@@ -52,8 +52,14 @@ public class ReviewItemsAdapter extends ListAdapter<CartItem, ReviewItemsAdapter
         holder.bind(getItem(position));
     }
 
+    @Override
+    public void onViewRecycled(@NonNull ReviewViewHolder holder) {
+        super.onViewRecycled(holder);
+        ImageLoaderHelper.clear(holder.binding.ivReviewItemImage);
+    }
+
     static class ReviewViewHolder extends RecyclerView.ViewHolder {
-        private final ItemReviewLineBinding binding;
+        final ItemReviewLineBinding binding;
 
         ReviewViewHolder(@NonNull ItemReviewLineBinding binding) {
             super(binding.getRoot());

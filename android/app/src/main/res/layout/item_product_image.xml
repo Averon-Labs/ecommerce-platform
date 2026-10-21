@@ -9,6 +9,7 @@
         android:layout_height="match_parent"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
+        android:background="@drawable/bg_placeholder_shimmer"
         android:src="@drawable/ic_image_placeholder" />
 
 </FrameLayout>

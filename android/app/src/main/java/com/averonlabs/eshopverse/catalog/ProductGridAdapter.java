@@ -102,6 +102,12 @@ public class ProductGridAdapter extends RecyclerView.Adapter<ProductGridAdapter.
     }
 
     @Override
+    public void onViewRecycled(@NonNull ProductViewHolder holder) {
+        super.onViewRecycled(holder);
+        ImageLoaderHelper.clear(holder.binding.ivProductImage);
+    }
+
+    @Override
     public int getItemCount() {
         return items.size();
     }

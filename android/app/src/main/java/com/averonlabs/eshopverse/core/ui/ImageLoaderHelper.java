@@ -83,29 +83,45 @@ public final class ImageLoaderHelper {
             return;
         }
 
+        Context context = imageView.getContext();
+        if (context instanceof android.app.Activity) {
+            android.app.Activity activity = (android.app.Activity) context;
+            if (activity.isDestroyed() || activity.isFinishing()) {
+                return;
+            }
+        }
+
         if (url == null || url.trim().isEmpty()) {
-            Glide.with(imageView.getContext())
-                    .load(errorRes)
-                    .placeholder(placeholderRes)
-                    .into(imageView);
+            try {
+                Glide.with(context)
+                        .load(errorRes)
+                        .placeholder(placeholderRes)
+                        .into(imageView);
+            } catch (Exception ignored) {
+                // Ignore lifecycle-bound exceptions on detached views
+            }
             return;
         }
 
-        var requestBuilder = Glide.with(imageView.getContext())
-                .load(url.trim())
-                .placeholder(placeholderRes)
-                .error(errorRes)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .skipMemoryCache(false)
-                .transition(DrawableTransitionOptions.withCrossFade(DEFAULT_CROSS_FADE_DURATION_MS));
+        try {
+            var requestBuilder = Glide.with(context)
+                    .load(url.trim())
+                    .placeholder(placeholderRes)
+                    .error(errorRes)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .skipMemoryCache(false)
+                    .transition(DrawableTransitionOptions.withCrossFade(DEFAULT_CROSS_FADE_DURATION_MS));
 
-        if (centerCrop) {
-            requestBuilder.centerCrop();
-        } else {
-            requestBuilder.fitCenter();
+            if (centerCrop) {
+                requestBuilder.centerCrop();
+            } else {
+                requestBuilder.fitCenter();
+            }
+
+            requestBuilder.into(imageView);
+        } catch (Exception ignored) {
+            // Ignore lifecycle-bound exceptions on detached views
         }
-
-        requestBuilder.into(imageView);
     }
 
     /**
@@ -117,11 +133,16 @@ public final class ImageLoaderHelper {
             return;
         }
 
-        Glide.with(context.getApplicationContext())
-                .load(url.trim())
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .skipMemoryCache(false)
-                .preload();
+        try {
+            Context appContext = context.getApplicationContext();
+            Glide.with(appContext)
+                    .load(url.trim())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .skipMemoryCache(false)
+                    .preload();
+        } catch (Exception ignored) {
+            // Safe preloading fallback
+        }
     }
 
     /**
@@ -140,10 +161,24 @@ public final class ImageLoaderHelper {
 
     /**
      * Clears pending or active Glide requests from the given ImageView.
+     * Essential for RecyclerView.Adapter.onViewRecycled() to free background threads.
      */
     public static void clear(@Nullable ImageView imageView) {
-        if (imageView != null && imageView.getContext() != null) {
-            Glide.with(imageView.getContext()).clear(imageView);
+        if (imageView == null || imageView.getContext() == null) {
+            return;
+        }
+
+        try {
+            Context context = imageView.getContext();
+            if (context instanceof android.app.Activity) {
+                android.app.Activity activity = (android.app.Activity) context;
+                if (activity.isDestroyed() || activity.isFinishing()) {
+                    return;
+                }
+            }
+            Glide.with(context).clear(imageView);
+        } catch (Exception ignored) {
+            // Safely ignore lifecycle-bound clear exceptions
         }
     }
 }

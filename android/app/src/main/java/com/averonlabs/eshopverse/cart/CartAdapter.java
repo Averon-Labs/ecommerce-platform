@@ -96,6 +96,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartItemViewHo
     }
 
     @Override
+    public void onViewRecycled(@NonNull CartItemViewHolder holder) {
+        super.onViewRecycled(holder);
+        ImageLoaderHelper.clear(holder.binding.ivCartItemImage);
+    }
+
+    @Override
     public int getItemCount() {
         return items.size();
     }
