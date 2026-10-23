@@ -2431,6 +2431,7 @@ x-error-codes:
   FORBIDDEN: { status: 403, meaning: Authenticated but not permitted. }
   CSRF_TOKEN_MISMATCH: { status: 403, meaning: Admin mutation without a valid X-XSRF-TOKEN. }
   NOT_FOUND: { status: 404, meaning: Missing resource, or one the caller does not own. }
+  METHOD_NOT_ALLOWED: { status: 405, meaning: The path exists but not for this HTTP method. }
   EMAIL_ALREADY_REGISTERED: { status: 409, meaning: Registration email is taken. }
   GOOGLE_ACCOUNT_CONFLICT: { status: 409, meaning: Email is already linked to a different Google account. }
   RESET_TOKEN_INVALID: { status: 422, meaning: Password-reset token is unknown or expired. }

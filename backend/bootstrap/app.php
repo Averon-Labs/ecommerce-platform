@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -77,6 +78,22 @@ return Application::configure(basePath: dirname(__DIR__))
             }
 
             return ApiError::response(404, 'NOT_FOUND', 'The requested resource was not found.');
+        });
+
+        // Clients (including the Android app) parse the same error envelope
+        // for every failure; keep 405 out of the framework's default shape.
+        $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request): ?JsonResponse {
+            if (! $request->is('api/*')) {
+                return null;
+            }
+
+            return ApiError::response(
+                405,
+                'METHOD_NOT_ALLOWED',
+                'The HTTP method is not supported for this endpoint.',
+                [],
+                $e->getHeaders(),
+            );
         });
 
         $exceptions->render(function (ThrottleRequestsException $e, Request $request): ?JsonResponse {

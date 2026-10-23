@@ -167,6 +167,7 @@ All error responses follow a consistent format:
 | 401 | Unauthorized — authentication required |
 | 403 | Forbidden — insufficient permissions |
 | 404 | Not Found — resource does not exist |
+| 405 | Method Not Allowed — the path exists but not for this HTTP method |
 | 409 | Conflict — resource conflict (e.g., duplicate) |
 | 422 | Unprocessable Entity — syntactically valid request with invalid field values |
 | 429 | Too Many Requests — rate limited |
