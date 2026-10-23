@@ -14,6 +14,17 @@ class ConfirmPasswordResetRequest extends ApiFormRequest
     }
 
     /**
+     * The reset token is stored per lowercased email; normalize the input
+     * so confirmation matches regardless of how the client sends it.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (is_string($this->input('email'))) {
+            $this->merge(['email' => strtolower(trim($this->input('email')))]);
+        }
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function rules(): array

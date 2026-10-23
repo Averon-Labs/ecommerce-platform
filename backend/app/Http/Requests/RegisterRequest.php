@@ -15,6 +15,17 @@ class RegisterRequest extends ApiFormRequest
     }
 
     /**
+     * Email is case-insensitive; normalize it before validation so the
+     * duplicate check always sees the same value the model stores.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (is_string($this->input('email'))) {
+            $this->merge(['email' => strtolower(trim($this->input('email')))]);
+        }
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function rules(): array
