@@ -247,6 +247,10 @@ paths:
       tags: [Customer auth]
       operationId: registerCustomer
       summary: Create a customer account and return a bearer token
+      description: |
+        The email is trimmed and stored lowercase. An email that differs only by
+        letter case from an existing account is treated as already registered
+        (`409 EMAIL_ALREADY_REGISTERED`).
       security: []
       requestBody:
         required: true
@@ -296,6 +300,7 @@ paths:
       operationId: loginCustomer
       summary: Sign in and return a bearer token
       description: |
+        The email match is case-insensitive and leading/trailing whitespace is ignored.
         Failed attempts are counted per email. After 5 consecutive failures the account is
         locked for 15 minutes and the response is `429` with code `ACCOUNT_LOCKED` and a
         `Retry-After` header. A locked or suspended account must not disclose whether the
@@ -2431,6 +2436,7 @@ x-error-codes:
   FORBIDDEN: { status: 403, meaning: Authenticated but not permitted. }
   CSRF_TOKEN_MISMATCH: { status: 403, meaning: Admin mutation without a valid X-XSRF-TOKEN. }
   NOT_FOUND: { status: 404, meaning: Missing resource, or one the caller does not own. }
+  METHOD_NOT_ALLOWED: { status: 405, meaning: The path exists but not for this HTTP method. }
   EMAIL_ALREADY_REGISTERED: { status: 409, meaning: Registration email is taken. }
   GOOGLE_ACCOUNT_CONFLICT: { status: 409, meaning: Email is already linked to a different Google account. }
   RESET_TOKEN_INVALID: { status: 422, meaning: Password-reset token is unknown or expired. }

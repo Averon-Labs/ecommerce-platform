@@ -29,6 +29,19 @@ class LoginTest extends TestCase
             ->assertOk();
     }
 
+    public function test_login_accepts_email_with_different_letter_case(): void
+    {
+        $this->registerCustomer();
+
+        $response = $this->postJson('/api/v1/auth/login', [
+            'email' => 'CUSTOMER@Example.COM',
+            'password' => 'Password123',
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('data.user.email', 'customer@example.com');
+    }
+
     public function test_login_wrong_password_and_unknown_email_return_identical_vague_error(): void
     {
         $this->registerCustomer();

@@ -17,4 +17,11 @@ class ApiRoutingTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    public function test_wrong_method_on_api_v1_path_returns405_error_envelope(): void
+    {
+        $response = $this->postJson('/api/v1/products');
+
+        $this->assertApiError($response, 405, 'METHOD_NOT_ALLOWED');
+    }
 }

@@ -6,7 +6,7 @@
 
 - Git
 - For Android development: Android Studio, JDK 17+
-- For Backend development: a PHP release supported by the selected Laravel stable release (PHP 8.4 as selected), MySQL 8.x reachable over the network (hosted, not local), and Composer
+- For Backend development: a PHP release supported by the selected Laravel stable release (PHP 8.3+; 8.4.25 verified), MySQL 8.x reachable over the network (hosted, not local), and Composer
 - For Admin development: Node.js LTS and npm
 
 ### Clone and Setup
@@ -113,7 +113,7 @@ Android Phase 0 also adds the layers the screen tasks depend on; their prerequis
 
 | Component | Selected version / choice |
 |-----------|---------------------------|
-| PHP | **8.4.25** CLI (installed via winget `PHP.PHP.8.4`); extensions enabled in `php.ini`: `curl`, `fileinfo`, `mbstring`, `openssl`, `pdo_mysql`, `mysqli`, `zip`, plus the framework defaults (`ctype`, `dom`, `json`, `tokenizer`, `xml`, `PDO`) |
+| PHP | **8.4.25** CLI locally (installed via winget `PHP.PHP.8.4`), with **8.3+** supported on hosts. `composer.json` pins `config.platform.php` to **8.3.36**, so the same lockfile runs on the PHP 8.3 demo hosts and the PHP 8.4 development/CI runners. Extensions enabled in `php.ini`: `curl`, `fileinfo`, `mbstring`, `openssl`, `pdo_mysql`, `mysqli`, `zip`, plus the framework defaults (`ctype`, `dom`, `json`, `tokenizer`, `xml`, `PDO`) |
 | Composer | **2.10.3** |
 | Framework | **Laravel 13** — skeleton `laravel/laravel` v13.11.0, locked `laravel/framework` **v13.35.0** in `backend/composer.lock` |
 | Test runner | **PHPUnit 12.5.38** through `php artisan test` |
@@ -121,7 +121,7 @@ Android Phase 0 also adds the layers the screen tasks depend on; their prerequis
 | Database | **MySQL 8.4** (`utf8mb4`, `utf8mb4_unicode_ci`, strict mode) — local zip-based MySQL 8.4.0 on `127.0.0.1:3306` (no admin rights, no Windows service). Two databases on the same server: `eshopverse_dev` for development and `eshopverse_test` as the disposable test database. A hosted MySQL 8+ service over TLS replaces it by filling the same `DB_*` values in `.env` |
 | Node.js / Vite | Not required for API work. `package.json` and `vite.config.js` exist in the skeleton but only build frontend assets; no backend command below depends on Node |
 
-**Prerequisites:** PHP 8.4 with the extensions above on `PATH`, Composer 2 on `PATH`, and a reachable MySQL 8.0+ server with the two databases below. The verified workflow is the local zip-based MySQL 8.4 described under *Local MySQL setup* below.
+**Prerequisites:** PHP 8.3+ (8.4.25 verified locally) with the extensions above on `PATH`, Composer 2 on `PATH`, and a reachable MySQL 8.0+ server with the two databases below. The verified workflow is the local zip-based MySQL 8.4 described under *Local MySQL setup* below.
 
 ```sql
 CREATE DATABASE eshopverse_dev CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -150,7 +150,7 @@ A hosted MySQL 8+ service is a drop-in replacement: fill the same `DB_*` values 
 composer install
 
 # First-time setup
-Copy-Item .env.example .env     # then fill DB_HOST / DB_PORT / DB_DATABASE / DB_USERNAME / DB_PASSWORD (MYSQL_ATTR_SSL_CA only for hosted TLS)
+Copy-Item .env.example .env     # then fill DB_HOST / DB_PORT / DB_DATABASE / DB_USERNAME / DB_PASSWORD (MYSQL_ATTR_SSL_CA or DB_SSL_CA only for hosted TLS)
 php artisan key:generate
 
 # Migrations (development database from .env)
@@ -192,16 +192,28 @@ php artisan serve        # http://127.0.0.1:8000  (health: GET /up)
 | `vendor\bin\pint --test` | ✔ `{"result":"passed"}` |
 | `php artisan serve` | ✔ `GET /up` → 200 |
 
-The OpenAPI contract (`docs/openapi.yaml`) was **not modified** in Phase 3, so the accepted Redocly lint baseline recorded under *OpenAPI contract lint (FND-004)* — 0 errors, 2 intentional warnings — still holds unchanged.
+The OpenAPI contract (`docs/openapi.yaml`) was **not modified** in the 2026-10-14 Phase 3 run, so the accepted Redocly lint baseline recorded under *OpenAPI contract lint (FND-004)* — 0 errors, 2 intentional warnings — still held for that run. The 2026-10-24 hardening adds the `METHOD_NOT_ALLOWED` (405) error code documented under *Error Response Conventions*.
 
 The development database for this run is the **local zip-based MySQL 8.4** workflow described above. Host and credentials live only in `.env`.
+
+**Verification status (re-verified 2026-10-24, backend hardening + PHP 8.3 parity)** — executed on `fix/backend-phase-3` with the PHP 8.3.36 Composer platform and the local MySQL 8.4.0 server:
+
+| Command | Result |
+|---------|--------|
+| `composer install` | ✔ exit 0 — lockfile resolves under `config.platform.php` 8.3.36 |
+| `composer validate --strict` | ✔ `./composer.json is valid` |
+| `composer audit` | ✔ `No security vulnerability advisories found` |
+| `php artisan test` | ✔ 180 tests, 2229 assertions, 0 failures, 1 skipped (MySQL rejects the case-only duplicate fixture, so the collision guard only runs on case-sensitive drivers such as SQLite) |
+| `vendor\bin\pint --test` | ✔ `{"tool":"pint","result":"passed"}` |
+
+The skipped test is `EmailNormalizationMigrationTest::test_migration_fails_loudly_when_case_variants_collide`; MySQL's `utf8mb4_unicode_ci` unique index makes that data state impossible to insert. The lowercase-rewrite test still asserts the raw stored value (not a collation-insensitive `WHERE`), so it fails if the migration does not run.
 
 **TLS:** `docs/SECURITY.md` requires encrypted database connections where the hosting provider
 supports it. The local workflow binds to `127.0.0.1` loopback only — traffic never leaves the
 machine, so no TLS is involved. When a hosted MySQL 8+ service replaces it:
 
 - Download `ca.pem` from the MySQL service console (the development copy lives outside the repository).
-- Set `MYSQL_ATTR_SSL_CA=<path to ca.pem>` in `.env`; `config/database.php` then enables TLS and
+- Set `MYSQL_ATTR_SSL_CA=<path to ca.pem>` (or the equivalent `DB_SSL_CA`) in `.env`; `config/database.php` then enables TLS and
   sets `MYSQL_ATTR_SSL_VERIFY_SERVER_CERT`, so an unauthenticated connection fails instead of
   silently falling back to plaintext.
 - Never use a hosted MySQL older than 8.0, or one that offers no TLS, for development credentials.

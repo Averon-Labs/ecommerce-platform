@@ -14,6 +14,16 @@ class RequestPasswordResetRequest extends ApiFormRequest
     }
 
     /**
+     * Email is case-insensitive; normalize before the account lookup.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (is_string($this->input('email'))) {
+            $this->merge(['email' => strtolower(trim($this->input('email')))]);
+        }
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function rules(): array

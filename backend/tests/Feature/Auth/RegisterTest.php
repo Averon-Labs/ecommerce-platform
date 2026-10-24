@@ -71,6 +71,30 @@ class RegisterTest extends TestCase
         $this->assertTrue($expiresAt->equalTo(Carbon::parse('2026-10-12 12:00:00')->addDays(30)));
     }
 
+    public function test_register_normalizes_email_to_lowercase(): void
+    {
+        $response = $this->postJson('/api/v1/auth/register', $this->validPayload([
+            'email' => '  Ada@Example.COM ',
+        ]));
+
+        $response->assertStatus(201)
+            ->assertJsonPath('data.user.email', 'ada@example.com');
+
+        $this->assertDatabaseHas('users', ['email' => 'ada@example.com']);
+    }
+
+    public function test_register_rejects_duplicate_email_regardless_of_letter_case(): void
+    {
+        $this->registerCustomer(['email' => 'ada@example.com']);
+
+        $response = $this->postJson('/api/v1/auth/register', $this->validPayload([
+            'email' => 'ADA@Example.com',
+        ]));
+
+        $this->assertApiError($response, 409, 'EMAIL_ALREADY_REGISTERED');
+        $this->assertSame(1, User::query()->whereRaw('LOWER(email) = ?', ['ada@example.com'])->count());
+    }
+
     public function test_register_rejects_duplicate_email_with_conflict(): void
     {
         $this->registerCustomer(['email' => 'ada@example.com']);

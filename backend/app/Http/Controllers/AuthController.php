@@ -40,7 +40,9 @@ class AuthController extends Controller
         $data = $request->validated();
 
         // The contract answers a taken email with 409 EMAIL_ALREADY_REGISTERED.
-        if (User::where('email', $data['email'])->exists()) {
+        // Compare case-insensitively so a legacy row with different casing
+        // cannot be duplicated; new rows are stored lowercase by the model.
+        if (User::whereRaw('LOWER(email) = ?', [$data['email']])->exists()) {
             throw new ApiException(409, 'EMAIL_ALREADY_REGISTERED', 'The email is already registered.');
         }
 

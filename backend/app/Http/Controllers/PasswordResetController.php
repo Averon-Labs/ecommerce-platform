@@ -22,11 +22,12 @@ class PasswordResetController extends Controller
         $email = $request->string('email')->toString();
 
         // Only deliver a reset link to an existing account; the response
-        // is identical either way.
-        $user = User::where('email', $email)->first();
+        // is identical either way. Match case-insensitively for legacy rows
+        // and use the stored email so the token is keyed consistently.
+        $user = User::whereRaw('LOWER(email) = ?', [$email])->first();
 
         if ($user !== null) {
-            Password::broker()->sendResetLink(['email' => $email]);
+            Password::broker()->sendResetLink(['email' => $user->email]);
         }
 
         return response()->json([], 202);
@@ -34,9 +35,12 @@ class PasswordResetController extends Controller
 
     public function confirm(ConfirmPasswordResetRequest $request): Response
     {
+        $email = $request->string('email')->toString();
+        $storedEmail = User::whereRaw('LOWER(email) = ?', [$email])->value('email') ?? $email;
+
         $status = Password::broker()->reset(
             [
-                'email' => $request->string('email')->toString(),
+                'email' => $storedEmail,
                 'token' => $request->string('token')->toString(),
                 'password' => $request->string('password')->toString(),
             ],

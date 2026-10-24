@@ -60,10 +60,10 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA') ?: env('DB_SSL_CA'),
                 // Verify the server certificate whenever a CA is configured,
                 // so an encrypted connection is also an authenticated one.
-                Mysql::ATTR_SSL_VERIFY_SERVER_CERT => env('MYSQL_ATTR_SSL_CA') ? true : null,
+                Mysql::ATTR_SSL_VERIFY_SERVER_CERT => (env('MYSQL_ATTR_SSL_CA') ?: env('DB_SSL_CA')) ? true : null,
             ]) : [],
         ],
 
@@ -83,7 +83,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA') ?: env('DB_SSL_CA'),
             ]) : [],
         ],
 

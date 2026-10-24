@@ -16,11 +16,11 @@ class PasswordResetTest extends TestCase
     /**
      * Capture the raw reset token delivered through the (faked) mail flow.
      */
-    private function captureResetToken(User $user): string
+    private function captureResetToken(User $user, ?string $requestEmail = null): string
     {
         Notification::fake();
 
-        $this->postJson('/api/v1/auth/password-reset', ['email' => $user->email])
+        $this->postJson('/api/v1/auth/password-reset', ['email' => $requestEmail ?? $user->email])
             ->assertStatus(202);
 
         $token = null;
@@ -105,6 +105,24 @@ class PasswordResetTest extends TestCase
             'email' => 'customer@example.com',
             'password' => 'Password123',
         ])->assertStatus(401);
+
+        $this->postJson('/api/v1/auth/login', [
+            'email' => 'customer@example.com',
+            'password' => 'NewPass456',
+        ])->assertOk();
+    }
+
+    public function test_reset_flow_accepts_email_with_different_letter_case(): void
+    {
+        $user = User::factory()->create(['email' => 'customer@example.com']);
+
+        $resetToken = $this->captureResetToken($user, 'Customer@Example.COM');
+
+        $this->postJson('/api/v1/auth/password-reset/confirm', [
+            'email' => 'CUSTOMER@example.COM',
+            'token' => $resetToken,
+            'password' => 'NewPass456',
+        ])->assertNoContent();
 
         $this->postJson('/api/v1/auth/login', [
             'email' => 'customer@example.com',

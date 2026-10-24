@@ -6,6 +6,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -30,6 +31,18 @@ class User extends Authenticatable
         'role' => 'customer',
         'status' => 'active',
     ];
+
+    /**
+     * Emails are case-insensitive: store them lowercase so sign-up, sign-in,
+     * password reset, and Google account linking always resolve the same
+     * account (clients such as Android keyboards auto-capitalize input).
+     */
+    protected function email(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value): string => strtolower(trim($value)),
+        );
+    }
 
     /**
      * Get the attributes that should be cast.
