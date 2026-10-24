@@ -258,6 +258,8 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Backend contribution (2026-10-14):** `tests/Feature/Quality/ApiQualityStateTest.php` verifies the two contract behaviors every screen depends on: (1) every failure path — 401 `UNAUTHENTICATED`, 404 `NOT_FOUND`, 409 `CART_EMPTY`, 422 `VALIDATION_ERROR` — returns the single documented `{error:{code,message[,details]}}` envelope so a client can render one generic error state, and (2) every empty result — the cart-less cart read, an empty order list, a no-match catalog search, and a page requested past the end — returns a well-formed payload (correct `pagination` with `totalPages` 0) so screens show an empty state rather than a dead end. This proves the server supports consistent loading/empty/error/success/retry states at the contract layer; the Android/admin rendering of those states is their components' contribution.
 
+**Backend follow-up (2026-10-24):** Wrong HTTP methods on `/api/*` now return the shared error envelope with `405 METHOD_NOT_ALLOWED`; the code is added to `docs/openapi.yaml` and `docs/API_CONTRACT.md`, and `ApiRoutingTest` pins it.
+
 ### Step 3 — QUAL-003 — Component contribution
 
 **Canonical task:** [QUAL-003 in the Project Roadmap](ROADMAP.md). The task scope, status, acceptance criteria, and verification record live only in that canonical entry.
@@ -265,6 +267,8 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 **Component contribution:** Review authentication, authorization, validation, rate limits, data protection, logging, and dependency risks.
 
 **Backend contribution (2026-10-14):** Findings record in [`SECURITY_REVIEW.md`](SECURITY_REVIEW.md). One in-scope, high-risk finding was **fixed**: the contract's `global` 300/min/ip rate limiter (`x-rate-limit-classes`, which applies to every operation in addition to narrower classes) was not implemented — the "global-only" operations (`getCart`, `listOrders`, `getOrder`, `getCustomerProfile`, all admin reads, `password-reset/confirm`) carried no throttle at all. It is now registered in `AppServiceProvider` and appended to the whole `api` middleware group in `bootstrap/app.php`, stacking with the narrower per-route limiters; regression test `RateLimitRegressionTest` pins it. Remaining checks passed with no defects: `composer audit` clean, `composer validate --strict` valid, no committed secrets (`.env` git-ignored, `.env.example` placeholders only), Eloquent/parameterized queries only, user-safe error envelope with no stack traces/SQL/paths, bcrypt hashing, no PII/token logging, object-level ownership returns 404 not 403. Accepted non-production limitations (simulated payment, loopback HTTP, demo-tuned limits) are recorded per `SECURITY.md`.
+
+**Backend follow-up (2026-10-24):** Email identity handling is now consistently case-insensitive across registration, sign-in, and password reset. `User` stores trimmed lowercase addresses, request objects normalize input, legacy rows are migrated by `2026_10_23_000100_normalize_user_emails.php`, and the migration aborts instead of merging case-only duplicate accounts. Regression tests cover each flow.
 
 ### Step 4 — QUAL-004 — Component contribution
 
@@ -281,3 +285,5 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 **Component contribution:** Run documented backend and OpenAPI checks from a clean checkout and report exact commands and outcomes.
 
 **Backend contribution (2026-10-14):** Ran the documented backend checks on the committed tree and recorded exact commands and results in the `DEVELOPMENT.md` verification table: `composer install` (exit 0), `.env` from `.env.example` + `key:generate` (no secret checked in), `composer validate --strict` (valid), `composer audit` (no advisories), `php artisan migrate:fresh --seed` (15 migrations, seeded demo store), `php artisan test` (153 tests, 2062 assertions, 0 failures), and `vendor\bin\pint --test` (passed). `docs/openapi.yaml` was not modified this phase, so the accepted Redocly lint baseline (0 errors, 2 intentional warnings from FND-004) still holds unchanged. The `phpunit.xml`-enforced test database (`eshopverse_test`) keeps runs isolated from the development database.
+
+**Backend re-verification (2026-10-24):** With `config.platform.php` pinned to 8.3.36, `composer install`, `composer validate --strict`, and `composer audit` pass; MySQL 8.4.0 reports 180 tests / 2,229 assertions / 179 passed / 1 skipped (the MySQL-impossible case-collision fixture); Pint passes; and Redocly validates `docs/openapi.yaml` with 0 errors and the 2 accepted server warnings. Exact commands and outputs are in `DEVELOPMENT.md`.
