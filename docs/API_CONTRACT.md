@@ -140,6 +140,7 @@ All error responses follow a consistent format:
 - Android authenticates with revocable Sanctum bearer tokens in the `Authorization` header.
 - The first-party React admin uses Sanctum's cookie/session flow and CSRF protections; it must share a compatible top-level domain with the API.
 - The demo requires an account for checkout. There is no guest checkout.
+- Email addresses are **case-insensitive**: the backend trims and lowercases them on registration, treats addresses that differ only by case as the same account, and matches sign-in and password-reset requests regardless of input casing.
 - Google Sign-In (`POST /auth/google`, owner-approved AUTH-004, 2026-10-19) verifies a Google ID token server-side (signature, issuer, audience, expiry, verified email) and issues the same revocable Sanctum bearer session as password sign-in. New Google accounts are always `customer` role; no admin account is ever created or escalated through this endpoint.
 - The backend enforces customer ownership and admin roles on every protected resource. Hiding a control in the UI is not authorization.
 
