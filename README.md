@@ -8,7 +8,7 @@ A portfolio e-commerce application with an Android customer app, REST API, and a
 
 EShop Verse is a single-store portfolio project for an international audience. The Android customer app and admin dashboard use the same REST API. The first release uses English UI and sample USD prices, and checkout uses a simulated payment flow.
 
-> **Optional live demo:** <https://eshopverse.byethost8.com> — free ByetHost hosting with the admin SPA and
+> **Optional live demo:** <https://eshopverse.wasmer.app/login> — hosting with the admin SPA and
 > Laravel API on the same origin. It is a portfolio demo, not a production service; setup, limitations, and
 > the upload archive are recorded in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
