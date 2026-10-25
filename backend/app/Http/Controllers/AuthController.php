@@ -77,10 +77,21 @@ class AuthController extends Controller
         $user = User::where('email', $email)->first();
         $passwordMatches = Hash::check($password, $user?->password ?? self::TIMING_DUMMY_HASH);
 
-        if ($user === null || ! $passwordMatches || $user->status !== 'active') {
+        if ($user === null || ! $passwordMatches) {
             $this->lockout->registerFailure($email);
 
             throw new ApiException(401, 'INVALID_CREDENTIALS', 'The email or password is incorrect.');
+        }
+
+        // AUTH-B02: only disclose the account state after the password proves
+        // ownership, so an unauthenticated caller never learns whether the
+        // email exists or is deactivated.
+        if ($user->status !== 'active') {
+            throw new ApiException(
+                403,
+                'ACCOUNT_DISABLED',
+                'This account has been deactivated. Please contact support.',
+            );
         }
 
         $this->lockout->clear($email);

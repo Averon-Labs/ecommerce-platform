@@ -124,7 +124,7 @@ class GoogleAuthTest extends TestCase
         $this->assertApiError($response, 409, 'GOOGLE_ACCOUNT_CONFLICT');
     }
 
-    public function test_google_sign_in_rejects_suspended_account_without_disclosure(): void
+    public function test_google_sign_in_rejects_suspended_account_with_account_disabled(): void
     {
         User::factory()->create([
             'email' => 'grace@example.com',
@@ -134,7 +134,11 @@ class GoogleAuthTest extends TestCase
 
         $response = $this->postJson('/api/v1/auth/google', ['idToken' => $this->token()]);
 
-        $this->assertApiError($response, 401, 'INVALID_CREDENTIALS');
+        $this->assertApiError($response, 403, 'ACCOUNT_DISABLED');
+        $this->assertSame(
+            'This account has been deactivated. Please contact support.',
+            $response->json('error.message'),
+        );
     }
 
     public function test_google_sign_in_rejects_expired_token(): void

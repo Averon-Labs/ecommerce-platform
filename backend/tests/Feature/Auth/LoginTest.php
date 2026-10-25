@@ -60,7 +60,7 @@ class LoginTest extends TestCase
         $this->assertSame($wrongPassword->json(), $unknownEmail->json());
     }
 
-    public function test_login_does_not_disclose_suspended_account_with_correct_password(): void
+    public function test_login_rejects_suspended_account_with_account_disabled(): void
     {
         User::factory()->create([
             'email' => 'suspended@example.com',
@@ -73,6 +73,28 @@ class LoginTest extends TestCase
             'password' => 'Password123',
         ]);
 
+        $this->assertApiError($response, 403, 'ACCOUNT_DISABLED');
+        $this->assertSame(
+            'This account has been deactivated. Please contact support.',
+            $response->json('error.message'),
+        );
+    }
+
+    public function test_login_does_not_disclose_suspended_account_with_wrong_password(): void
+    {
+        User::factory()->create([
+            'email' => 'suspended@example.com',
+            'password' => 'Password123',
+            'status' => 'suspended',
+        ]);
+
+        $response = $this->postJson('/api/v1/auth/login', [
+            'email' => 'suspended@example.com',
+            'password' => 'WrongPass123',
+        ]);
+
+        // Without the correct password the response must stay identical to
+        // any other failed sign-in, so account existence is never disclosed.
         $this->assertApiError($response, 401, 'INVALID_CREDENTIALS');
     }
 
