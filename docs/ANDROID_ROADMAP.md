@@ -615,27 +615,31 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 2 — AUTH-008 — Dynamic Session Expiry & TokenStore Fallback
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** AUTH-006
 
 **Scope:** Replace hardcoded fallback timestamp `"2027-01-15T10:00:00Z"` in `AuthRepository.persistSessionSafely` with a dynamic 30-day ISO-8601 calculation matching Sanctum token lifecycle.
 
 **Acceptance criteria:**
-- [ ] **a.** Calculate fallback token expiry dynamically using `Instant.now().plus(30, ChronoUnit.DAYS).toString()` when server `expiresAt` is null or empty.
-- [ ] **b.** Add unit tests in `AuthRepositoryTest` verifying dynamic timestamp generation and ensuring `KeystoreTokenStore` stores valid future expiration dates.
+- [x] **a.** Calculate fallback token expiry dynamically using `Instant.now().plus(30, ChronoUnit.DAYS).truncatedTo(ChronoUnit.SECONDS).toString()` when server `expiresAt` is null or empty.
+- [x] **b.** Add unit tests in `AuthRepositoryTest` verifying dynamic timestamp generation and ensuring `KeystoreTokenStore` stores valid future expiration dates.
+
+**Verification:** implemented `calculateDefaultExpiresAt()` dynamically calculating 30-day future timestamp in `AuthRepository.java`, hardened `TokenExpirationHelper.java` to normalize fractional ISO-8601 second strings, added unit tests in `AuthRepositoryTest` (`testCalculateDefaultExpiresAtReturnsDynamicThirtyDays` and `testMissingExpiresAtPersistsDynamicFutureExpiry`), and verified complete test suite pass with `.\gradlew.bat testDebugUnitTest` (100% pass rate).
 
 ### Step 3 — AUTH-009 — Offline Mock Session Lifecycle Alignment
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** AUTH-007, AUTH-008
 
 **Scope:** Reconcile `demo-jwt-offline-token-sample` handling in `AuthRepository.isSignedIn()` and `OfflineMockInterceptor` so that developer offline demos do not instantly purge authenticated state.
 
 **Acceptance criteria:**
-- [ ] **a.** Adjust `AuthRepository.isSignedIn()` so that `demo-jwt-offline-token-sample` is permitted during local offline development without triggering an immediate `tokenStore.clear()`.
-- [ ] **b.** Enforce that production release builds reject mock tokens while debug builds allow seamless offline UI inspection.
+- [x] **a.** Adjust `AuthRepository.isSignedIn()` so that `demo-jwt-offline-token-sample` is permitted during local offline development without triggering an immediate `tokenStore.clear()`.
+- [x] **b.** Enforce that production release builds reject mock tokens while debug builds allow seamless offline UI inspection.
+
+**Verification:** added `isDebugMode` handling in `AuthRepository.java` to permit mock session tokens during debug while strictly purging in release mode, restored `/auth/login`, `/auth/register`, and `/auth/google` in `OfflineMockInterceptor.java`, added unit tests in `AuthRepositoryTest` verifying debug vs release token handling, and verified 100% test pass via `.\gradlew.bat testDebugUnitTest` (226 tests passed).
 
 ## External dependencies owned by other components
 

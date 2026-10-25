@@ -288,6 +288,10 @@ public class OfflineMockInterceptor implements Interceptor {
                     + "\"timeline\":[{\"status\":\"confirmed\",\"at\":\"2026-10-12T18:00:00Z\"}]}}";
         }
 
+        if (path.endsWith("/auth/login") || path.endsWith("/auth/register") || path.endsWith("/auth/google")) {
+            return "{\"data\":{\"token\":\"demo-jwt-offline-token-sample\",\"expiresAt\":\"2030-01-01T00:00:00Z\",\"user\":{\"id\":1,\"email\":\"alex.morgan@eshopverse.com\",\"firstName\":\"Alex\",\"lastName\":\"Morgan\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}}";
+        }
+
         return null;
     }
 

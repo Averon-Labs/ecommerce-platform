@@ -3,6 +3,7 @@ package com.averonlabs.eshopverse.auth;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.averonlabs.eshopverse.BuildConfig;
 import com.averonlabs.eshopverse.core.error.ApiErrorCodes;
 import com.averonlabs.eshopverse.core.model.AuthSession;
 import com.averonlabs.eshopverse.core.model.GoogleAuthRequest;
@@ -33,17 +34,27 @@ public class AuthRepository {
 
     private final ApiRoutes apiRoutes;
     private final TokenStore tokenStore;
+    private final boolean isDebugMode;
 
     public AuthRepository(@NonNull ApiRoutes apiRoutes, @NonNull TokenStore tokenStore) {
+        this(apiRoutes, tokenStore, BuildConfig.DEBUG);
+    }
+
+    public AuthRepository(
+            @NonNull ApiRoutes apiRoutes,
+            @NonNull TokenStore tokenStore,
+            boolean isDebugMode
+    ) {
         this.apiRoutes = Objects.requireNonNull(apiRoutes, "apiRoutes cannot be null");
         this.tokenStore = Objects.requireNonNull(tokenStore, "tokenStore cannot be null");
+        this.isDebugMode = isDebugMode;
     }
 
     /**
      * Checks if the user has an active, non-expired session token.
      */
     public boolean isSignedIn() {
-        if ("demo-jwt-offline-token-sample".equals(tokenStore.getToken())) {
+        if (!isDebugMode && "demo-jwt-offline-token-sample".equals(tokenStore.getToken())) {
             tokenStore.clear();
             return false;
         }
@@ -367,11 +378,18 @@ public class AuthRepository {
         return 60; // Safe default lockout seconds
     }
 
+    public static String calculateDefaultExpiresAt() {
+        return java.time.Instant.now()
+                .plus(30, java.time.temporal.ChronoUnit.DAYS)
+                .truncatedTo(java.time.temporal.ChronoUnit.SECONDS)
+                .toString();
+    }
+
     private void persistSessionSafely(@NonNull AuthSession session) {
         String token = session.getToken();
         String expiresAt = session.getExpiresAt();
         if (expiresAt == null || expiresAt.trim().isEmpty()) {
-            expiresAt = "2027-01-15T10:00:00Z";
+            expiresAt = calculateDefaultExpiresAt();
         }
         tokenStore.save(token, expiresAt);
     }

@@ -61,6 +61,21 @@ public final class TokenExpirationHelper {
 
         String pattern;
         if (s.contains(".")) {
+            int dotIndex = s.indexOf('.');
+            int plusIndex = s.indexOf('+', dotIndex);
+            int minusIndex = s.indexOf('-', dotIndex);
+            int tzIndex = plusIndex != -1 ? plusIndex : minusIndex;
+            if (tzIndex != -1) {
+                String millisPart = s.substring(dotIndex + 1, tzIndex);
+                if (millisPart.length() > 3) {
+                    millisPart = millisPart.substring(0, 3);
+                } else {
+                    while (millisPart.length() < 3) {
+                        millisPart += "0";
+                    }
+                }
+                s = s.substring(0, dotIndex + 1) + millisPart + s.substring(tzIndex);
+            }
             pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
         } else {
             pattern = "yyyy-MM-dd'T'HH:mm:ssZ";
