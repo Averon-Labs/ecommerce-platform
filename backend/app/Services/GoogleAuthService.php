@@ -7,6 +7,7 @@ use App\Support\GoogleIdentity;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -42,6 +43,10 @@ class GoogleAuthService
         $audiences = $this->configuredAudiences();
 
         if ($audiences === []) {
+            // AUTH-B01: make the misconfiguration visible in server logs instead
+            // of leaving only a generic 500 in monitoring.
+            Log::error('Google Auth failed: GOOGLE_CLIENT_ID is not configured in .env (set GOOGLE_CLIENT_ID or GOOGLE_CLIENT_IDS).');
+
             // Fail closed: without an expected audience no token can be trusted.
             $this->serverError();
         }

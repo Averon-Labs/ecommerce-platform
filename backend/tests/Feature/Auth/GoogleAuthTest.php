@@ -7,6 +7,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 /**
@@ -230,6 +231,7 @@ class GoogleAuthTest extends TestCase
 
     public function test_google_sign_in_fails_closed_when_client_id_is_not_configured(): void
     {
+        Log::spy();
         config([
             'services.google.client_id' => null,
             'services.google.client_ids' => '',
@@ -239,6 +241,14 @@ class GoogleAuthTest extends TestCase
 
         $this->assertApiError($response, 500, 'INTERNAL_ERROR');
         $this->assertSame(0, User::count());
+
+        // AUTH-B01: the misconfiguration must be actionable in server logs.
+        // The generic exception log may add another error entry, so only the
+        // presence of the explicit configuration message matters.
+        Log::shouldHaveReceived('error')
+            ->atLeast()
+            ->once()
+            ->withArgs(fn (string $message): bool => str_contains($message, 'GOOGLE_CLIENT_ID is not configured'));
     }
 
     public function test_google_sign_in_accepts_an_additional_comma_separated_audience(): void
