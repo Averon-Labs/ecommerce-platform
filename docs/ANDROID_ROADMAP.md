@@ -629,15 +629,17 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 3 — AUTH-009 — Offline Mock Session Lifecycle Alignment
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** AUTH-007, AUTH-008
 
 **Scope:** Reconcile `demo-jwt-offline-token-sample` handling in `AuthRepository.isSignedIn()` and `OfflineMockInterceptor` so that developer offline demos do not instantly purge authenticated state.
 
 **Acceptance criteria:**
-- [ ] **a.** Adjust `AuthRepository.isSignedIn()` so that `demo-jwt-offline-token-sample` is permitted during local offline development without triggering an immediate `tokenStore.clear()`.
-- [ ] **b.** Enforce that production release builds reject mock tokens while debug builds allow seamless offline UI inspection.
+- [x] **a.** Adjust `AuthRepository.isSignedIn()` so that `demo-jwt-offline-token-sample` is permitted during local offline development without triggering an immediate `tokenStore.clear()`.
+- [x] **b.** Enforce that production release builds reject mock tokens while debug builds allow seamless offline UI inspection.
+
+**Verification:** added `isDebugMode` handling in `AuthRepository.java` to permit mock session tokens during debug while strictly purging in release mode, restored `/auth/login`, `/auth/register`, and `/auth/google` in `OfflineMockInterceptor.java`, added unit tests in `AuthRepositoryTest` verifying debug vs release token handling, and verified 100% test pass via `.\gradlew.bat testDebugUnitTest` (226 tests passed).
 
 ## External dependencies owned by other components
 
