@@ -7,6 +7,7 @@ use App\Support\GoogleIdentity;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 /**
@@ -39,10 +40,14 @@ class GoogleAuthService
      */
     public function verify(string $idToken): GoogleIdentity
     {
-        $clientId = config('services.google.client_id');
+        $audiences = $this->configuredAudiences();
 
-        if (! is_string($clientId) || $clientId === '') {
-            // Fail closed: without the expected audience no token can be trusted.
+        if ($audiences === []) {
+            // AUTH-B01: make the misconfiguration visible in server logs instead
+            // of leaving only a generic 500 in monitoring.
+            Log::error('Google Auth failed: GOOGLE_CLIENT_ID is not configured in .env (set GOOGLE_CLIENT_ID or GOOGLE_CLIENT_IDS).');
+
+            // Fail closed: without an expected audience no token can be trusted.
             $this->serverError();
         }
 
@@ -66,7 +71,7 @@ class GoogleAuthService
             $this->reject();
         }
 
-        $this->verifyClaims($claims, $clientId);
+        $this->verifyClaims($claims, $audiences);
         $this->verifySignature($encodedHeader.'.'.$encodedPayload, $signature, $header['kid']);
 
         [$firstName, $lastName] = $this->extractName($claims);
@@ -80,9 +85,47 @@ class GoogleAuthService
     }
 
     /**
-     * @param  array<string, mixed>  $claims
+     * Every first-party OAuth client ID this deployment trusts.
+     *
+     * `services.google.client_id` may be a single string or an array, and
+     * `services.google.client_ids` may be an array or a comma-separated
+     * string, so Android, web, and iOS clients can share one deployment.
+     * Blank entries are ignored and duplicates keep their first position.
+     *
+     * @return array<int, string>
      */
-    private function verifyClaims(array $claims, string $clientId): void
+    private function configuredAudiences(): array
+    {
+        $primary = config('services.google.client_id');
+        $additional = config('services.google.client_ids', '');
+
+        $candidates = array_merge(
+            is_array($primary) ? $primary : [$primary],
+            is_array($additional) ? $additional : explode(',', (string) $additional),
+        );
+
+        $audiences = [];
+
+        foreach ($candidates as $candidate) {
+            if (! is_string($candidate)) {
+                continue;
+            }
+
+            $candidate = trim($candidate);
+
+            if ($candidate !== '' && ! in_array($candidate, $audiences, true)) {
+                $audiences[] = $candidate;
+            }
+        }
+
+        return $audiences;
+    }
+
+    /**
+     * @param  array<string, mixed>  $claims
+     * @param  array<int, string>  $audiences
+     */
+    private function verifyClaims(array $claims, array $audiences): void
     {
         $now = now()->getTimestamp();
 
@@ -93,9 +136,23 @@ class GoogleAuthService
         }
 
         $audience = $claims['aud'] ?? null;
-        $audienceMatches = is_string($audience)
-            ? hash_equals($clientId, $audience)
-            : (is_array($audience) && in_array($clientId, $audience, true));
+        $claimedAudiences = is_string($audience) ? [$audience] : (is_array($audience) ? $audience : []);
+
+        $audienceMatches = false;
+
+        foreach ($claimedAudiences as $claimed) {
+            if (! is_string($claimed)) {
+                continue;
+            }
+
+            foreach ($audiences as $trusted) {
+                if (hash_equals($trusted, $claimed)) {
+                    $audienceMatches = true;
+
+                    break 2;
+                }
+            }
+        }
 
         if (! $audienceMatches) {
             $this->reject();

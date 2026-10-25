@@ -36,9 +36,14 @@ return [
     ],
 
     'google' => [
-        // AUTH-004: the OAuth client ID whose `aud` claim POST /auth/google
-        // accepts. No secret is required to verify an ID token.
+        // AUTH-004/AUTH-B03: the OAuth client IDs whose `aud` claim
+        // POST /auth/google accepts. `client_id` is the primary (Android) Web
+        // application client; `client_ids` may list additional first-party
+        // clients (web/iOS) as a comma-separated string. A token is accepted
+        // when its audience matches any configured ID. No secret is required
+        // to verify an ID token.
         'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_ids' => env('GOOGLE_CLIENT_IDS', ''),
     ],
 
 ];

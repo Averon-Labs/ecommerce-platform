@@ -39,10 +39,12 @@ class GoogleAuthController extends Controller
         }
 
         if ($user->status !== 'active') {
+            // AUTH-B02: the Google identity is verified, so the real account
+            // state can be reported instead of a misleading credential error.
             throw new ApiException(
-                401,
-                'INVALID_CREDENTIALS',
-                'The Google sign-in credential is invalid or expired.',
+                403,
+                'ACCOUNT_DISABLED',
+                'This account has been deactivated. Please contact support.',
             );
         }
 
