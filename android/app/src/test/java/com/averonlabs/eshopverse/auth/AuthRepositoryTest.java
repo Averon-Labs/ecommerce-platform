@@ -13,6 +13,7 @@ import com.averonlabs.eshopverse.core.model.User;
 import com.averonlabs.eshopverse.core.net.ApiClient;
 import com.averonlabs.eshopverse.core.net.ApiException;
 import com.averonlabs.eshopverse.core.storage.InMemoryTokenStore;
+import com.averonlabs.eshopverse.core.storage.TokenExpirationHelper;
 
 import org.junit.After;
 import org.junit.Before;
@@ -520,6 +521,49 @@ public class AuthRepositoryTest {
         assertEquals("test-google-token", resultRef.get().getToken());
         assertTrue(authRepository.isSignedIn());
         assertEquals("test-google-token", tokenStore.getToken());
+    }
+
+    @Test
+    public void testCalculateDefaultExpiresAtReturnsDynamicThirtyDays() {
+        String defaultExpiresAt = AuthRepository.calculateDefaultExpiresAt();
+        assertNotNull(defaultExpiresAt);
+        assertFalse(defaultExpiresAt.isEmpty());
+
+        long epochMillis = TokenExpirationHelper.parseIso8601(defaultExpiresAt);
+        long now = System.currentTimeMillis();
+        long diffDays = (epochMillis - now) / (1000L * 60 * 60 * 24);
+
+        assertTrue("Expected ~30 days in future, got diffDays: " + diffDays, diffDays >= 29 && diffDays <= 31);
+    }
+
+    @Test
+    public void testMissingExpiresAtPersistsDynamicFutureExpiry() throws Exception {
+        String jsonWithoutExpiresAt = "{\"data\":{\"token\":\"test-dynamic-expiry-token\",\"user\":{\"id\":12,\"email\":\"dynamic@example.com\",\"firstName\":\"Dyn\",\"lastName\":\"User\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}}";
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody(jsonWithoutExpiresAt));
+
+        CountDownLatch latch = new CountDownLatch(1);
+        authRepository.loginWithGoogle("valid-token", new AuthCallback<AuthSession>() {
+            @Override
+            public void onSuccess(AuthSession data) {
+                latch.countDown();
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                latch.countDown();
+            }
+        });
+
+        assertTrue(latch.await(3, TimeUnit.SECONDS));
+        assertNotNull(tokenStore.read());
+        String storedExpiry = tokenStore.read().getExpiresAt();
+        assertNotNull(storedExpiry);
+
+        long expiryMillis = TokenExpirationHelper.parseIso8601(storedExpiry);
+        long now = System.currentTimeMillis();
+        long diffDays = (expiryMillis - now) / (1000L * 60 * 60 * 24);
+        assertTrue(diffDays >= 29 && diffDays <= 31);
+        assertFalse(tokenStore.isExpired());
     }
 }
 

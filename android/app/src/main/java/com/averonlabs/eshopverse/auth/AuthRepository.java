@@ -367,11 +367,18 @@ public class AuthRepository {
         return 60; // Safe default lockout seconds
     }
 
+    public static String calculateDefaultExpiresAt() {
+        return java.time.Instant.now()
+                .plus(30, java.time.temporal.ChronoUnit.DAYS)
+                .truncatedTo(java.time.temporal.ChronoUnit.SECONDS)
+                .toString();
+    }
+
     private void persistSessionSafely(@NonNull AuthSession session) {
         String token = session.getToken();
         String expiresAt = session.getExpiresAt();
         if (expiresAt == null || expiresAt.trim().isEmpty()) {
-            expiresAt = "2027-01-15T10:00:00Z";
+            expiresAt = calculateDefaultExpiresAt();
         }
         tokenStore.save(token, expiresAt);
     }

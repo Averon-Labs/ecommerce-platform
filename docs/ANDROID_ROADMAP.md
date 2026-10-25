@@ -615,15 +615,17 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 2 — AUTH-008 — Dynamic Session Expiry & TokenStore Fallback
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** AUTH-006
 
 **Scope:** Replace hardcoded fallback timestamp `"2027-01-15T10:00:00Z"` in `AuthRepository.persistSessionSafely` with a dynamic 30-day ISO-8601 calculation matching Sanctum token lifecycle.
 
 **Acceptance criteria:**
-- [ ] **a.** Calculate fallback token expiry dynamically using `Instant.now().plus(30, ChronoUnit.DAYS).toString()` when server `expiresAt` is null or empty.
-- [ ] **b.** Add unit tests in `AuthRepositoryTest` verifying dynamic timestamp generation and ensuring `KeystoreTokenStore` stores valid future expiration dates.
+- [x] **a.** Calculate fallback token expiry dynamically using `Instant.now().plus(30, ChronoUnit.DAYS).truncatedTo(ChronoUnit.SECONDS).toString()` when server `expiresAt` is null or empty.
+- [x] **b.** Add unit tests in `AuthRepositoryTest` verifying dynamic timestamp generation and ensuring `KeystoreTokenStore` stores valid future expiration dates.
+
+**Verification:** implemented `calculateDefaultExpiresAt()` dynamically calculating 30-day future timestamp in `AuthRepository.java`, hardened `TokenExpirationHelper.java` to normalize fractional ISO-8601 second strings, added unit tests in `AuthRepositoryTest` (`testCalculateDefaultExpiresAtReturnsDynamicThirtyDays` and `testMissingExpiresAtPersistsDynamicFutureExpiry`), and verified complete test suite pass with `.\gradlew.bat testDebugUnitTest` (100% pass rate).
 
 ### Step 3 — AUTH-009 — Offline Mock Session Lifecycle Alignment
 
