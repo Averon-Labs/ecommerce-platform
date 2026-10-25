@@ -31,7 +31,10 @@ class GoogleAuthTest extends TestCase
     {
         parent::setUp();
 
-        config(['services.google.client_id' => self::CLIENT_ID]);
+        config([
+            'services.google.client_id' => self::CLIENT_ID,
+            'services.google.client_ids' => '',
+        ]);
         Cache::flush();
 
         Http::fake([
@@ -227,11 +230,61 @@ class GoogleAuthTest extends TestCase
 
     public function test_google_sign_in_fails_closed_when_client_id_is_not_configured(): void
     {
-        config(['services.google.client_id' => null]);
+        config([
+            'services.google.client_id' => null,
+            'services.google.client_ids' => '',
+        ]);
 
         $response = $this->postJson('/api/v1/auth/google', ['idToken' => $this->token()]);
 
         $this->assertApiError($response, 500, 'INTERNAL_ERROR');
+        $this->assertSame(0, User::count());
+    }
+
+    public function test_google_sign_in_accepts_an_additional_comma_separated_audience(): void
+    {
+        config(['services.google.client_ids' => 'web-client-id, ios-client-id']);
+
+        $response = $this->postJson('/api/v1/auth/google', [
+            'idToken' => $this->token(['aud' => 'ios-client-id']),
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.user.email', 'grace@example.com');
+    }
+
+    public function test_google_sign_in_accepts_an_array_of_configured_client_ids(): void
+    {
+        config(['services.google.client_id' => [self::CLIENT_ID, 'web-client-id']]);
+
+        $response = $this->postJson('/api/v1/auth/google', [
+            'idToken' => $this->token(['aud' => 'web-client-id']),
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.user.email', 'grace@example.com');
+    }
+
+    public function test_google_sign_in_accepts_an_array_audience_claim_with_a_trusted_id(): void
+    {
+        config(['services.google.client_ids' => 'web-client-id']);
+
+        $response = $this->postJson('/api/v1/auth/google', [
+            'idToken' => $this->token(['aud' => ['unknown-client-id', 'web-client-id']]),
+        ]);
+
+        $response->assertCreated();
+    }
+
+    public function test_google_sign_in_rejects_audience_outside_the_configured_whitelist(): void
+    {
+        config(['services.google.client_ids' => 'web-client-id, ios-client-id']);
+
+        $response = $this->postJson('/api/v1/auth/google', [
+            'idToken' => $this->token(['aud' => 'untrusted-client-id']),
+        ]);
+
+        $this->assertApiError($response, 401, 'INVALID_CREDENTIALS');
         $this->assertSame(0, User::count());
     }
 
