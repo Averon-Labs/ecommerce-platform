@@ -31,6 +31,7 @@ public class SignInFragment extends Fragment {
     private FragmentSignInBinding binding;
     private AuthViewModel authViewModel;
     private SessionViewModel sessionViewModel;
+    private GoogleAuthManager googleAuthManager;
     private int returnToNavId = R.id.homeFragment;
 
     @Override
@@ -59,6 +60,7 @@ public class SignInFragment extends Fragment {
         AuthViewModelFactory factory = new AuthViewModelFactory(requireContext());
         authViewModel = new ViewModelProvider(this, factory).get(AuthViewModel.class);
         sessionViewModel = new ViewModelProvider(requireActivity(), factory).get(SessionViewModel.class);
+        googleAuthManager = new GoogleAuthManager(requireContext());
 
         binding.stateContainer.setContentView(binding.scrollContent);
 
@@ -101,7 +103,25 @@ public class SignInFragment extends Fragment {
         });
 
         binding.btnGoogleSignIn.setOnClickListener(v -> {
-            authViewModel.loginWithGoogle("mock_google_id_token_demo");
+            if (getActivity() == null) return;
+            googleAuthManager.startSignIn(requireActivity(), new GoogleAuthManager.GoogleAuthCallback() {
+                @Override
+                public void onSuccess(@NonNull String idToken) {
+                    authViewModel.loginWithGoogle(idToken);
+                }
+
+                @Override
+                public void onCancelled() {
+                    // User dismissed the credential picker; keep form interactive
+                }
+
+                @Override
+                public void onError(@NonNull String errorMessage) {
+                    if (binding != null) {
+                        Snackbar.make(binding.getRoot(), errorMessage, Snackbar.LENGTH_LONG).show();
+                    }
+                }
+            });
         });
 
         binding.btnToRegister.setOnClickListener(v -> {
