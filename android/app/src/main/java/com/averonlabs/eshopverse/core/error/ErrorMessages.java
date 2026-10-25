@@ -22,6 +22,7 @@ public final class ErrorMessages {
         CODE_TO_RESOURCE.put(ApiErrorCodes.UNAUTHENTICATED, R.string.error_unauthenticated);
         CODE_TO_RESOURCE.put(ApiErrorCodes.INVALID_CREDENTIALS, R.string.error_invalid_credentials);
         CODE_TO_RESOURCE.put(ApiErrorCodes.ACCOUNT_LOCKED, R.string.error_account_locked);
+        CODE_TO_RESOURCE.put(ApiErrorCodes.ACCOUNT_DISABLED, R.string.error_account_disabled);
         CODE_TO_RESOURCE.put(ApiErrorCodes.FORBIDDEN, R.string.error_forbidden);
         CODE_TO_RESOURCE.put(ApiErrorCodes.CSRF_TOKEN_MISMATCH, R.string.error_csrf_token_mismatch);
         CODE_TO_RESOURCE.put(ApiErrorCodes.NOT_FOUND, R.string.error_not_found);

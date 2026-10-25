@@ -233,5 +233,25 @@ public class AuthViewModelTest {
         assertNotNull(state);
         assertTrue(state.isError());
     }
+
+    @Test
+    public void testLoginAccountDisabledMapsToEmailFieldAndUiState() {
+        ApiException apiEx = new ApiException(403, ApiErrorCodes.ACCOUNT_DISABLED, "This account has been deactivated. Please contact support.", null);
+
+        doAnswer(invocation -> {
+            AuthCallback<AuthSession> cb = invocation.getArgument(2);
+            cb.onError(apiEx);
+            return null;
+        }).when(authRepository).loginCustomer(eq("disabled@example.com"), eq("secret123"), any());
+
+        viewModel.login("disabled@example.com", "secret123");
+
+        assertFalse(viewModel.isSubmitting());
+        UiState<AuthSession> state = viewModel.getLoginState().getValue();
+        assertNotNull(state);
+        assertTrue(state.isError());
+        assertEquals(R.string.error_account_disabled, state.getMessageRes());
+        assertEquals(Integer.valueOf(R.string.error_account_disabled), viewModel.getEmailErrorRes().getValue());
+    }
 }
 

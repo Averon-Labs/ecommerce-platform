@@ -12,7 +12,7 @@ public class ErrorMessagesTest {
 
     @Test
     public void testAllDocumentedCodesHaveExplicitMapping() {
-        assertEquals(25, ApiErrorCodes.ALL_CODES.size());
+        assertEquals(26, ApiErrorCodes.ALL_CODES.size());
 
         for (String code : ApiErrorCodes.ALL_CODES) {
             assertTrue("Code should be explicitly mapped: " + code, ErrorMessages.hasExplicitMapping(code));
@@ -21,6 +21,11 @@ public class ErrorMessagesTest {
                     R.string.error_generic, resId);
             assertTrue("Resource ID must be valid", resId > 0);
         }
+    }
+
+    @Test
+    public void testAccountDisabledMapping() {
+        assertEquals(R.string.error_account_disabled, ErrorMessages.getMessageRes(ApiErrorCodes.ACCOUNT_DISABLED));
     }
 
     @Test
