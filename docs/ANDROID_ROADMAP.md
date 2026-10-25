@@ -641,6 +641,26 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 **Verification:** added `isDebugMode` handling in `AuthRepository.java` to permit mock session tokens during debug while strictly purging in release mode, restored `/auth/login`, `/auth/register`, and `/auth/google` in `OfflineMockInterceptor.java`, added unit tests in `AuthRepositoryTest` verifying debug vs release token handling, and verified 100% test pass via `.\gradlew.bat testDebugUnitTest` (226 tests passed).
 
+## Phase 10 — Identity Contract Synchronization & Deactivated Account Handling
+
+**Cross-component release check:** ensure client handles 403 `ACCOUNT_DISABLED` responses from `POST /auth/login` and `POST /auth/google` per Backend Phase 4.
+
+### Step 1 — AUTH-010 — Deactivated Account Error Alignment & Telemetry
+
+**Status:** `[x]`
+
+**Depends on:** AUTH-007, AUTH-008, AUTH-009
+
+**Scope:** Support server-returned 403 `ACCOUNT_DISABLED` in `ApiErrorCodes`, `ErrorMessages`, and `AuthViewModel`, providing user-facing messaging when an account is deactivated without generic error fallbacks.
+
+**Acceptance criteria:**
+- [x] **a.** Define `ACCOUNT_DISABLED` constant in `ApiErrorCodes.java` and include in `ALL_CODES`.
+- [x] **b.** Map `ACCOUNT_DISABLED` to `R.string.error_account_disabled` in `ErrorMessages.java` and define user-friendly string in `strings_errors.xml`.
+- [x] **c.** Route `ACCOUNT_DISABLED` in `AuthViewModel.java` to set email error state and alert message.
+- [x] **d.** Add unit tests in `ErrorMessagesTest` and `AuthViewModelTest` asserting proper mapping and state handling.
+
+**Verification:** added `ACCOUNT_DISABLED` to `ApiErrorCodes.java`, `strings_errors.xml`, and `ErrorMessages.java`, updated `AuthViewModel.java` to map deactivated accounts to email error field, added unit tests in `ErrorMessagesTest` (26 codes verified) and `AuthViewModelTest.testLoginAccountDisabledMapsToEmailFieldAndUiState`, and verified complete test suite pass with `.\gradlew.bat testDebugUnitTest` (100% pass rate).
+
 ## External dependencies owned by other components
 
 These are the only cross-component items the Android tasks depend on. They are listed here **once** for

@@ -395,6 +395,8 @@ public class AuthViewModel extends ViewModel {
                 emailErrorRes.postValue(R.string.error_email_already_registered);
             } else if (ApiErrorCodes.INVALID_CREDENTIALS.equals(apiException.getCode())) {
                 passwordErrorRes.postValue(R.string.error_invalid_credentials);
+            } else if (ApiErrorCodes.ACCOUNT_DISABLED.equals(apiException.getCode())) {
+                emailErrorRes.postValue(R.string.error_account_disabled);
             } else if (ApiErrorCodes.RESET_TOKEN_INVALID.equals(apiException.getCode())) {
                 resetTokenErrorRes.postValue(R.string.auth_error_reset_token_invalid_state);
             }

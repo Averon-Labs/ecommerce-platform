@@ -5,6 +5,7 @@
     <string name="error_unauthenticated">Your session has expired. Please sign in again.</string>
     <string name="error_invalid_credentials">Invalid email or password.</string>
     <string name="error_account_locked">Too many consecutive failures. Your account is temporarily locked.</string>
+    <string name="error_account_disabled">This account has been deactivated. Please contact support.</string>
     <string name="error_forbidden">You do not have permission to perform this action.</string>
     <string name="error_csrf_token_mismatch">Security token mismatch. Please reload and try again.</string>
     <string name="error_not_found">The requested item could not be found.</string>
