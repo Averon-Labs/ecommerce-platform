@@ -592,6 +592,51 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 **Verification:** updated `ImageLoaderHelper.java` to enforce `DiskCacheStrategy.ALL` across both load and preload methods, converted all 50 product catalog images to lightweight WebP assets under `android/app/src/main/assets/products/`, wired offline mock asset resolution in `OfflineMockInterceptor.java`, and verified lookahead prefetching on Home and Explore screens (`ImageLoaderHelperTest` 100% pass).
 
+## Phase 9 — Production Authentication & Identity Modernization
+
+**Cross-component release check:** ensure Google client ID and token contracts are aligned with the Backend Roadmap.
+
+### Step 1 — AUTH-007 — Google Credential Manager Integration
+
+**Status:** `[x]`
+
+**Depends on:** AUTH-005
+
+**Scope:** Replace hardcoded `"mock_google_id_token_demo"` with genuine Android Credential Manager API, integrating Google ID token acquisition and error handling in SignInFragment and RegisterFragment.
+
+**Acceptance criteria:**
+- [x] **a.** Add `androidx.credentials:credentials`, `androidx.credentials:credentials-play-services-auth`, and `com.google.android.libraries.identity.googleid:googleid` dependencies to `build.gradle.kts` and `libs.versions.toml`.
+- [x] **b.** Configure Google Web Client ID in `strings.xml` and expose safely via `BuildConfig.GOOGLE_WEB_CLIENT_ID`.
+- [x] **c.** Integrate `CredentialManager.getCredentialAsync` in `SignInFragment` and `RegisterFragment` via a reusable `GoogleAuthManager` helper.
+- [x] **d.** Extract genuine Google ID token from `GoogleIdTokenCredential` and dispatch to `AuthViewModel.loginWithGoogle(idToken)`.
+- [x] **e.** Handle user cancellation (`GetCredentialCancellationException`) and unsupported device state (`NoCredentialException`) gracefully without UI locking or app crash.
+
+**Verification:** added Credential Manager and GoogleID dependencies in `libs.versions.toml` and `build.gradle.kts`, exposed `BuildConfig.GOOGLE_WEB_CLIENT_ID`, created `GoogleAuthManager.java` encapsulating CredentialManager execution and token parsing, wired Google Sign-In into `SignInFragment` and `RegisterFragment`, and verified clean test execution via `GoogleAuthManagerTest` and `.\gradlew.bat testDebugUnitTest` (219 tests pass, 100% pass rate).
+
+### Step 2 — AUTH-008 — Dynamic Session Expiry & TokenStore Fallback
+
+**Status:** `[ ]`
+
+**Depends on:** AUTH-006
+
+**Scope:** Replace hardcoded fallback timestamp `"2027-01-15T10:00:00Z"` in `AuthRepository.persistSessionSafely` with a dynamic 30-day ISO-8601 calculation matching Sanctum token lifecycle.
+
+**Acceptance criteria:**
+- [ ] **a.** Calculate fallback token expiry dynamically using `Instant.now().plus(30, ChronoUnit.DAYS).toString()` when server `expiresAt` is null or empty.
+- [ ] **b.** Add unit tests in `AuthRepositoryTest` verifying dynamic timestamp generation and ensuring `KeystoreTokenStore` stores valid future expiration dates.
+
+### Step 3 — AUTH-009 — Offline Mock Session Lifecycle Alignment
+
+**Status:** `[ ]`
+
+**Depends on:** AUTH-007, AUTH-008
+
+**Scope:** Reconcile `demo-jwt-offline-token-sample` handling in `AuthRepository.isSignedIn()` and `OfflineMockInterceptor` so that developer offline demos do not instantly purge authenticated state.
+
+**Acceptance criteria:**
+- [ ] **a.** Adjust `AuthRepository.isSignedIn()` so that `demo-jwt-offline-token-sample` is permitted during local offline development without triggering an immediate `tokenStore.clear()`.
+- [ ] **b.** Enforce that production release builds reject mock tokens while debug builds allow seamless offline UI inspection.
+
 ## External dependencies owned by other components
 
 These are the only cross-component items the Android tasks depend on. They are listed here **once** for

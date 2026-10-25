@@ -3,6 +3,7 @@ plugins {
 }
 
 val apiBaseUrlOverride = providers.gradleProperty("apiBaseUrl")
+val googleWebClientIdOverride = providers.gradleProperty("googleWebClientId")
 
 android {
     namespace = "com.averonlabs.eshopverse"
@@ -34,6 +35,11 @@ android {
                 "API_BASE_URL",
                 "\"${apiBaseUrlOverride.orElse("http://10.0.2.2:8081/api/v1").get()}\""
             )
+            buildConfigField(
+                "String",
+                "GOOGLE_WEB_CLIENT_ID",
+                "\"${googleWebClientIdOverride.orElse("828340620853-examplewebclient.apps.googleusercontent.com").get()}\""
+            )
         }
 
         release {
@@ -42,6 +48,11 @@ android {
                 "String",
                 "API_BASE_URL",
                 "\"${apiBaseUrlOverride.orElse("https://api.eshopverse.example.com/api/v1").get()}\""
+            )
+            buildConfigField(
+                "String",
+                "GOOGLE_WEB_CLIENT_ID",
+                "\"${googleWebClientIdOverride.orElse("828340620853-examplewebclient.apps.googleusercontent.com").get()}\""
             )
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -85,6 +96,9 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
     implementation(libs.glide)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)

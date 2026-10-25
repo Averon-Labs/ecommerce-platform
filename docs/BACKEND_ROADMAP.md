@@ -287,3 +287,47 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 **Backend contribution (2026-10-14):** Ran the documented backend checks on the committed tree and recorded exact commands and results in the `DEVELOPMENT.md` verification table: `composer install` (exit 0), `.env` from `.env.example` + `key:generate` (no secret checked in), `composer validate --strict` (valid), `composer audit` (no advisories), `php artisan migrate:fresh --seed` (15 migrations, seeded demo store), `php artisan test` (153 tests, 2062 assertions, 0 failures), and `vendor\bin\pint --test` (passed). `docs/openapi.yaml` was not modified this phase, so the accepted Redocly lint baseline (0 errors, 2 intentional warnings from FND-004) still holds unchanged. The `phpunit.xml`-enforced test database (`eshopverse_test`) keeps runs isolated from the development database.
 
 **Backend re-verification (2026-10-24):** With `config.platform.php` pinned to 8.3.36, `composer install`, `composer validate --strict`, and `composer audit` pass; MySQL 8.4.0 reports 180 tests / 2,229 assertions / 179 passed / 1 skipped (the MySQL-impossible case-collision fixture); Pint passes; and Redocly validates `docs/openapi.yaml` with 0 errors and the 2 accepted server warnings. Exact commands and outputs are in `DEVELOPMENT.md`.
+
+## Phase 4 — Authentication Hardening & Identity Services
+
+**Project phase gate:** see [Phase 4 in the Project Roadmap](ROADMAP.md).
+
+### Step 1 — AUTH-B01 — Google Auth Configuration Hardening & Diagnostics
+
+**Status:** `[ ]`
+
+**Depends on:** AUTH-004
+
+**Scope:** Enhance `GoogleAuthService` error diagnostics and configuration validation so that unconfigured `GOOGLE_CLIENT_ID` produces clear server logs rather than generic internal errors.
+
+**Acceptance criteria:**
+- [ ] **a.** Log an explicit warning via `Log::error` when `GOOGLE_CLIENT_ID` is missing from environment configuration before terminating verification.
+- [ ] **b.** Provide documented setup guidance in `backend/.env.example` and `docs/DEPLOYMENT.md` for Web Client ID provisioning.
+- [ ] **c.** Verify clean test execution and assert that misconfigured client ID produces appropriate log telemetry.
+
+### Step 2 — AUTH-B02 — User Status Differentiation & Inactive Account Rejection
+
+**Status:** `[ ]`
+
+**Depends on:** AUTH-001, AUTH-004
+
+**Scope:** Distinguish inactive/suspended accounts (`status !== 'active'`) from invalid credentials, returning contract-friendly 403 `ACCOUNT_DISABLED` instead of 401 `INVALID_CREDENTIALS`.
+
+**Acceptance criteria:**
+- [ ] **a.** In `AuthController::login` and `GoogleAuthController::login`, check if user exists and is inactive, throwing `ApiException(403, 'ACCOUNT_DISABLED', ...)` instead of `INVALID_CREDENTIALS`.
+- [ ] **b.** Update `docs/openapi.yaml` error codes and add feature tests in `LoginTest` and `GoogleAuthTest` asserting 403 response for deactivated accounts.
+- [ ] **c.** Confirm error envelope matches standard contract schema `{error: {code: "ACCOUNT_DISABLED", message: "..."}}`.
+
+### Step 3 — AUTH-B03 — Multi-Audience Support for Google Identity
+
+**Status:** `[ ]`
+
+**Depends on:** AUTH-004
+
+**Scope:** Allow `GoogleAuthService::verifyClaims` to validate against multiple trusted client IDs (comma-separated or array in config) to support Android, Admin, and potential Web clients concurrently.
+
+**Acceptance criteria:**
+- [ ] **a.** Support comma-separated `GOOGLE_CLIENT_IDS` in `config/services.php` alongside single client ID.
+- [ ] **b.** Assert token audience against the whitelist in `verifyClaims`.
+- [ ] **c.** Add regression unit/feature tests for multi-audience validation.
+
