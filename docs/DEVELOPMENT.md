@@ -172,7 +172,7 @@ $env:DB_DATABASE = 'eshopverse_test'; php artisan migrate:fresh
 php artisan serve        # http://127.0.0.1:8000  (health: GET /up)
 ```
 
-**Google Sign-In configuration (AUTH-004, hardened by AUTH-B01/AUTH-B03):** set `GOOGLE_CLIENT_ID` in `.env` to the Web application OAuth client ID whose `aud` claim `POST /api/v1/auth/google` accepts (the Android app's Google client ID from Google Cloud Console → APIs & Services → Credentials; the value must match exactly). It is not a secret — ID tokens are verified against Google's published keys. When empty, the endpoint fails closed with `500 INTERNAL_ERROR`, writes `Google Auth failed: GOOGLE_CLIENT_ID is not configured in .env` to `storage/logs/laravel.log`, and creates no account. Additional first-party clients (web admin panel, iOS) can be trusted by listing their client IDs comma-separated in `GOOGLE_CLIENT_IDS`; a token is accepted when its audience matches any configured ID.
+**Google Sign-In configuration (AUTH-004):** set `GOOGLE_CLIENT_ID` in `.env` to the OAuth client ID whose `aud` claim `POST /api/v1/auth/google` accepts (the Android app's Google client ID). It is not a secret — ID tokens are verified against Google's published keys. When empty, the endpoint fails closed with `500 INTERNAL_ERROR` and no account is created.
 
 **Safety rules**
 - `.env` is git-ignored and holds the only real credentials; `.env.example` contains placeholders only. Never commit a `.env`.

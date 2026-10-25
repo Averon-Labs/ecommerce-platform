@@ -10,7 +10,7 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 ## Component status
 
-**✅ All backend phases are complete (2026-10-15; Phase 4 added and completed 2026-10-25).** Phases 0–2 are `[x]` with dated verification records below; Phase 3 records the backend contributions to the cross-component QUAL tasks, whose canonical status and verification record live in [ROADMAP.md](ROADMAP.md). Phase 4 (AUTH-B01..AUTH-B03) hardens Google sign-in configuration, distinguishes deactivated accounts, and supports multiple trusted client audiences. Final clean-checkout verification (2026-10-15, re-run on this fresh copy of the merged tree): `composer install` (79 packages from `composer.lock`), `composer validate --strict` valid, `composer audit` no advisories, `php artisan migrate:fresh --seed` (15 migrations, seeded demo store), `php artisan test` = 153 tests / 2062 assertions / 0 failures, `vendor\bin\pint --test` passed. No backend task remains open; the owner-approved 2026-10-19 addition **AUTH-004 — Google Sign-In** (Phase 1 Step 4) is implemented and verified (see its entry below); the canonical QUAL-001..QUAL-005 entries are marked `[~]` (backend contributions delivered; Android and admin contributions pending).
+**✅ All backend phases are complete (2026-10-15).** Phases 0–2 are `[x]` with dated verification records below; Phase 3 records the backend contributions to the cross-component QUAL tasks, whose canonical status and verification record live in [ROADMAP.md](ROADMAP.md). Final clean-checkout verification (2026-10-15, re-run on this fresh copy of the merged tree): `composer install` (79 packages from `composer.lock`), `composer validate --strict` valid, `composer audit` no advisories, `php artisan migrate:fresh --seed` (15 migrations, seeded demo store), `php artisan test` = 153 tests / 2062 assertions / 0 failures, `vendor\bin\pint --test` passed. No backend task remains open; the owner-approved 2026-10-19 addition **AUTH-004 — Google Sign-In** (Phase 1 Step 4) is implemented and verified (see its entry below); the canonical QUAL-001..QUAL-005 entries are marked `[~]` (backend contributions delivered; Android and admin contributions pending).
 
 ## Phase steps
 
@@ -294,54 +294,40 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 ### Step 1 — AUTH-B01 — Google Auth Configuration Hardening & Diagnostics
 
-**Status:** `[x]`
+**Status:** `[ ]`
 
 **Depends on:** AUTH-004
 
 **Scope:** Enhance `GoogleAuthService` error diagnostics and configuration validation so that unconfigured `GOOGLE_CLIENT_ID` produces clear server logs rather than generic internal errors.
 
 **Acceptance criteria:**
-- [x] **a.** Log an explicit warning via `Log::error` when `GOOGLE_CLIENT_ID` is missing from environment configuration before terminating verification.
-- [x] **b.** Provide documented setup guidance in `backend/.env.example` and `docs/DEPLOYMENT.md` for Web Client ID provisioning.
-- [x] **c.** Verify clean test execution and assert that misconfigured client ID produces appropriate log telemetry.
-
-**Verification (2026-10-25):** `GoogleAuthService::verify()` now resolves all trusted audiences first and, when none are configured, writes `Google Auth failed: GOOGLE_CLIENT_ID is not configured in .env (set GOOGLE_CLIENT_ID or GOOGLE_CLIENT_IDS).` via `Log::error` before failing closed with the unchanged `500 INTERNAL_ERROR` (no token is ever accepted without a known audience). The message names both supported variables and contains no token material. `backend/.env.example` documents the Web application client ID from Google Cloud Console, the exact-match requirement, and the fail-closed/logging behavior; `docs/DEVELOPMENT.md` and `docs/DEPLOYMENT.md` gained local and hosted provisioning guidance (Console path, Web application type, authorized origin, comma-separated `GOOGLE_CLIENT_IDS`, where to find the log line). `GoogleAuthTest::test_google_sign_in_fails_closed_when_client_id_is_not_configured` now also spies on the log and asserts the explicit message, the `500` envelope, and that no account was created. Evidence: `tests/Feature/Auth` = 60 tests / 479 assertions / 0 failures; `vendor/bin/pint --test` passed; full suite = 185 tests / 2,244 assertions with 2 engine-only failures under the SQLite fallback (see the Phase 4 note below).
+- [ ] **a.** Log an explicit warning via `Log::error` when `GOOGLE_CLIENT_ID` is missing from environment configuration before terminating verification.
+- [ ] **b.** Provide documented setup guidance in `backend/.env.example` and `docs/DEPLOYMENT.md` for Web Client ID provisioning.
+- [ ] **c.** Verify clean test execution and assert that misconfigured client ID produces appropriate log telemetry.
 
 ### Step 2 — AUTH-B02 — User Status Differentiation & Inactive Account Rejection
 
-**Status:** `[x]`
+**Status:** `[ ]`
 
 **Depends on:** AUTH-001, AUTH-004
 
 **Scope:** Distinguish inactive/suspended accounts (`status !== 'active'`) from invalid credentials, returning contract-friendly 403 `ACCOUNT_DISABLED` instead of 401 `INVALID_CREDENTIALS`.
 
 **Acceptance criteria:**
-- [x] **a.** In `AuthController::login` and `GoogleAuthController::login`, check if user exists and is inactive, throwing `ApiException(403, 'ACCOUNT_DISABLED', ...)` instead of `INVALID_CREDENTIALS`.
-- [x] **b.** Update `docs/openapi.yaml` error codes and add feature tests in `LoginTest` and `GoogleAuthTest` asserting 403 response for deactivated accounts.
-- [x] **c.** Confirm error envelope matches standard contract schema `{error: {code: "ACCOUNT_DISABLED", message: "..."}}`.
-
-**Verification (2026-10-25):** Password sign-in now checks the account state only after the password has been verified, so a deactivated account with correct credentials answers `403 ACCOUNT_DISABLED` with the user-facing message "This account has been deactivated. Please contact support.", while a wrong password on the same account keeps the identical vague `401 INVALID_CREDENTIALS` (and still counts toward lockout) so account existence is never disclosed without credentials. Google sign-in answers the same `403` after Google has verified the identity. `docs/openapi.yaml` documents the `403` response on both operations through the new shared `AccountDisabled` response component, the new `ACCOUNT_DISABLED` entry in `x-error-codes`, and updated operation descriptions; `docs/API_CONTRACT.md` records the ownership-before-disclosure rule. Tests: `LoginTest::test_login_rejects_suspended_account_with_account_disabled` and `GoogleAuthTest::test_google_sign_in_rejects_suspended_account_with_account_disabled` assert the `403` envelope, and `LoginTest::test_login_does_not_disclose_suspended_account_with_wrong_password` pins the non-disclosure path. Recorded decision: admin sign-in keeps its existing non-specific `401` (AUTH-003 behavior) because admin sessions intentionally never reveal account state. Evidence: `tests/Feature/Auth` = 60 tests / 479 assertions / 0 failures; Redocly lint = 0 errors / 2 accepted server warnings; Pint passed.
+- [ ] **a.** In `AuthController::login` and `GoogleAuthController::login`, check if user exists and is inactive, throwing `ApiException(403, 'ACCOUNT_DISABLED', ...)` instead of `INVALID_CREDENTIALS`.
+- [ ] **b.** Update `docs/openapi.yaml` error codes and add feature tests in `LoginTest` and `GoogleAuthTest` asserting 403 response for deactivated accounts.
+- [ ] **c.** Confirm error envelope matches standard contract schema `{error: {code: "ACCOUNT_DISABLED", message: "..."}}`.
 
 ### Step 3 — AUTH-B03 — Multi-Audience Support for Google Identity
 
-**Status:** `[x]`
+**Status:** `[ ]`
 
 **Depends on:** AUTH-004
 
 **Scope:** Allow `GoogleAuthService::verifyClaims` to validate against multiple trusted client IDs (comma-separated or array in config) to support Android, Admin, and potential Web clients concurrently.
 
 **Acceptance criteria:**
-- [x] **a.** Support comma-separated `GOOGLE_CLIENT_IDS` in `config/services.php` alongside single client ID.
-- [x] **b.** Assert token audience against the whitelist in `verifyClaims`.
-- [x] **c.** Add regression unit/feature tests for multi-audience validation.
-
-**Verification (2026-10-25):** `config/services.php` adds `google.client_ids` from `GOOGLE_CLIENT_IDS` while keeping `google.client_id`; `GoogleAuthService::configuredAudiences()` accepts either setting as a string or an array, splits comma-separated values, trims blanks, and de-duplicates, so no extra configuration format is required. `verifyClaims()` accepts a token whose `aud` claim (string or array) matches any trusted ID using `hash_equals`, and rejects every audience outside the whitelist with `401 INVALID_CREDENTIALS`. Four new GoogleAuthTest cases cover a comma-separated additional audience, an array-valued `client_id`, an array `aud` claim containing a trusted ID, and an untrusted audience that creates no account. `docs/openapi.yaml` and `docs/API_CONTRACT.md` document the multi-audience behavior, and `backend/.env.example`, `docs/DEVELOPMENT.md`, and `docs/DEPLOYMENT.md` document `GOOGLE_CLIENT_IDS`. Evidence: `tests/Feature/Auth` = 60 tests / 479 assertions / 0 failures; Pint passed; Redocly lint 0 errors / 2 accepted warnings.
-
-**Phase 4 test-environment note:** the repository's test configuration targets MySQL (`eshopverse_test`). No MySQL server is installed in the 2026-10-25 verification environment, so the suite was run against SQLite (`DB_CONNECTION=sqlite DB_DATABASE=:memory:` with a temporary `.env` for `APP_KEY`/session cookie names). Result: 185 tests / 2,244 assertions, with only two engine-specific failures — `AdminCategoryTest::test_admin_category_create_validates_shapes_and_rejects_duplicate_names` (MySQL's case-insensitive collation vs SQLite) and `DatabaseWorkflowTest::test_test_database_is_the_isolated_test_database` (deliberately asserts the `mysql` driver). Every auth/customer/admin test relevant to these tasks passed.
-
-**Phase 4 CI verification (2026-10-25):** the repository's own `.github/workflows/ci.yml` **Backend Build & Test** job ran on the pushed Phase 4 head with its MySQL 8.4 service (`eshopverse_test`) and completed **successfully**: `composer install`, `composer validate --strict`, `composer audit`, `vendor/bin/pint --test`, and the full `php artisan test` (run [40216437407](https://github.com/Averon-Labs/eshop-verse/actions/runs/40216437407)). That closes the MySQL item above — the two engine-specific SQLite failures do not occur on the real test database. Delivered through [PR #62](https://github.com/Averon-Labs/eshop-verse/pull/62) (`feature/backend-phase-4` → `develop`).
-
-**Phase 4 live smoke (2026-10-25):** the API was also exercised over real HTTP (`php -S 127.0.0.1:8765` with a throwaway SQLite database, removed afterwards). Registration returned `201` with a working Sanctum token and sign-in returned `200`. Suspending that customer and signing in with the correct password returned `403 ACCOUNT_DISABLED` with the documented message, while a wrong password still returned the identical vague `401 INVALID_CREDENTIALS`; no token was issued on the disabled path. `POST /auth/google` with no client ID returned `500 INTERNAL_ERROR`, wrote `Google Auth failed: GOOGLE_CLIENT_ID is not configured in .env...` to `storage/logs/laravel.log`, and created no account. With client IDs configured, malformed, wrong-audience, and forged-signature tokens all returned `401 INVALID_CREDENTIALS` and created no account; forged tokens carrying either the primary or the additional trusted audience reached the real Google JWKS endpoint and were rejected there (the local PHP build needed an explicit CA bundle for outbound TLS). A success-path Google token cannot be minted locally, so the successful signup/sign-in journey is proven by the hermetic `GoogleAuthTest` cases, which fake only Google's JWKS response and run the real route, controller, service, database, and Sanctum token issuance.
-
-**Real client-ID check (2026-10-25):** the owner supplied a Google OAuth client from the `eshop-verse` project. It was configured in the git-ignored `backend/.env`; `config('services.google.client_id')` reported it and the live endpoint then answered `401 INVALID_CREDENTIALS` (not the unconfigured `500`) for malformed, wrong-audience, and forged-signature tokens, still creating no account. A genuine Google-issued token could not be obtained non-interactively: the first download was an installed/Android client (no client secret or redirect URIs), while ID-token verification requires the **Web application** client ID used by the app as its server client ID, and Google blocks the OAuth loopback flow for local testing. The owner then supplied a **Web application** client for the same project. It was configured locally; `config('services.google.client_id')` reports it, a forged token carrying that audience reached Google's real JWKS endpoint and the key response was cached, an Android-client audience was rejected, and no account was created by any failed attempt. The client secret was not stored or used: ID-token verification needs only the public client ID. Remaining real-account test: the Android app still carries the placeholder Web client ID, so an end-to-end Google sign-in needs the app pointed at the supplied Web client and run on a device/emulator (Android component); no backend code defect blocks it.
+- [ ] **a.** Support comma-separated `GOOGLE_CLIENT_IDS` in `config/services.php` alongside single client ID.
+- [ ] **b.** Assert token audience against the whitelist in `verifyClaims`.
+- [ ] **c.** Add regression unit/feature tests for multi-audience validation.
 

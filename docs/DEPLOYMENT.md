@@ -79,41 +79,8 @@ These values live only in `htdocs/eshopverse_app/.env` on the host (git-ignored 
 | `SESSION_DOMAIN` | `null` for this single-host layout |
 | `SANCTUM_STATEFUL_DOMAINS` | `eshopverse.byethost8.com` (add the port only for local development) |
 | `CORS_ALLOWED_ORIGINS` | `https://eshopverse.byethost8.com` |
-| `GOOGLE_CLIENT_ID` | Google **Web application** OAuth client ID (Google Cloud Console → APIs & Services → Credentials). Required for `POST /auth/google`; not a secret. Empty makes the endpoint fail closed with `500` plus an explicit log entry |
-| `GOOGLE_CLIENT_IDS` | Optional comma-separated additional trusted Google client IDs (for example the admin web panel or an iOS build) |
 | `DEMO_ADMIN_PASSWORD` | Private demo value used when seeding; never commit it or place it in docs |
 | `APP_KEY` | Generated once on the host with `php artisan key:generate` when the app was prepared; keep the same key or sessions/cookies invalidate |
-
-### Google Sign-In client ID
-
-`POST /api/v1/auth/google` is disabled until a Google OAuth client ID is configured. The API is the
-only verifier: it checks the ID token locally against Google's published keys, so no client secret is
-stored in the backend.
-
-1. Open Google Cloud Console, select the project that owns the demo, and go to
-   **APIs & Services → Credentials**.
-2. Choose **Create credentials → OAuth client ID**, application type **Web application**. The Android
-   app uses this Web client ID as its server client ID and ID-token audience; an Android-type or
-   installed-app client ID is not accepted here (Google issues the ID token for the Web client, so its
-   `aud` would not match).
-3. For the web admin sign-in, add the deployed origin (for example
-   `https://eshopverse.byethost8.com`) under **Authorized JavaScript origins**.
-4. Copy the **Client ID** (it ends with `.apps.googleusercontent.com`) exactly, without spaces, into
-   `htdocs/eshopverse_app/.env` as `GOOGLE_CLIENT_ID=...`.
-5. If other first-party clients (admin web panel, iOS) also request ID tokens, list their client IDs
-   comma-separated in `GOOGLE_CLIENT_IDS=...`. A token is accepted when its `aud` claim matches any
-   configured client ID.
-6. Save `.env` through the file manager. If the deployment caches configuration, rebuild that cache.
-
-The Android OAuth client created for the app (package `com.averonlabs.eshopverse`, plus the debug and
-release SHA-1 fingerprints registered in Google Cloud Console) is still required so Google Play services
-can authenticate the app. It is **not** the token audience: keep both clients in the same project and use
-the Web application client ID here and as the app's server client ID.
-
-When `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_IDS` are both empty, the endpoint answers
-`500 INTERNAL_ERROR`, writes `Google Auth failed: GOOGLE_CLIENT_ID is not configured in .env` to
-`storage/logs/laravel.log`, and creates no account. That log line is the signal to fix this setting; it
-never contains a token or credential.
 
 The admin production build uses `admin/.env.production`:
 
