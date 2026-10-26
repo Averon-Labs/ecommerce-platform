@@ -20,7 +20,11 @@ import com.averonlabs.eshopverse.core.net.ApiRoutes;
 import com.averonlabs.eshopverse.core.storage.TokenStore;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -387,10 +391,10 @@ public class AuthRepository {
     }
 
     public static String calculateDefaultExpiresAt() {
-        return java.time.Instant.now()
-                .plus(30, java.time.temporal.ChronoUnit.DAYS)
-                .truncatedTo(java.time.temporal.ChronoUnit.SECONDS)
-                .toString();
+        long expiryMillis = System.currentTimeMillis() + 30L * 24L * 60L * 60L * 1000L;
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
+        formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return formatter.format(new Date(expiryMillis));
     }
 
     private void persistSessionSafely(@NonNull AuthSession session) {
