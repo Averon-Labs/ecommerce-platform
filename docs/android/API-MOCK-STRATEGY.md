@@ -95,12 +95,17 @@ The base URL is a build-time field, not a constant in code:
 
 | Build | Base URL | Source |
 |-------|----------|--------|
-| `debug` (default) | `http://10.0.2.2:8081/api/v1` | mock server |
-| `debug` (overridden) | any value from `-PapiBaseUrl=` or `gradle.properties` | developer machine or a Laravel server on the host |
-| `release` | `https://<api-host>/api/v1` | open decision OPEN-1 in `docs/openapi.yaml` |
+| `debug` (default) | `https://eshopverse.wasmer.app/api/v1` | hosted demo backend |
+| `debug` (local mock) | `http://10.0.2.2:8081/api/v1` via `-PapiBaseUrl=` | mock server |
+| `debug` (local Laravel) | `http://10.0.2.2:8000/api/v1` via `-PapiBaseUrl=` | developer machine |
+| `release` | `https://eshopverse.wasmer.app/api/v1` | hosted demo backend |
 
-Switching is a base-URL change plus a `POST /__mock/reset`. No production code changes, because
-nothing in the app knows whether the server is the mock or Laravel.
+Switching is a base-URL change plus a `POST /__mock/reset` when the local mock is used. No production
+code changes, because nothing in the app knows whether the server is the mock or Laravel.
+
+The in-app `OfflineMockInterceptor`, when enabled for catalog/cart/order demos, never answers
+`/auth/*`. Registration, sign-in, Google sign-in, profile reads, and password reset always go to the
+real API, so an unreachable backend surfaces as a network error instead of a fabricated demo account.
 
 When the real backend exists, the same Android test suite runs against it by overriding the base URL
 and skipping the mock control calls. That is the integration check that closes the contract loop; it

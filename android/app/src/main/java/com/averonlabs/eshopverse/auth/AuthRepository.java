@@ -34,12 +34,16 @@ public class AuthRepository {
 
     private final ApiRoutes apiRoutes;
     private final TokenStore tokenStore;
-    private final boolean isDebugMode;
 
     public AuthRepository(@NonNull ApiRoutes apiRoutes, @NonNull TokenStore tokenStore) {
         this(apiRoutes, tokenStore, BuildConfig.DEBUG);
     }
 
+    /**
+     * @param isDebugMode retained for source compatibility with existing tests.
+     *                    Legacy offline mock tokens are rejected in every build now
+     *                    that authentication always goes to the real API.
+     */
     public AuthRepository(
             @NonNull ApiRoutes apiRoutes,
             @NonNull TokenStore tokenStore,
@@ -47,14 +51,18 @@ public class AuthRepository {
     ) {
         this.apiRoutes = Objects.requireNonNull(apiRoutes, "apiRoutes cannot be null");
         this.tokenStore = Objects.requireNonNull(tokenStore, "tokenStore cannot be null");
-        this.isDebugMode = isDebugMode;
     }
 
     /**
      * Checks if the user has an active, non-expired session token.
+     *
+     * <p>The old offline mock bearer token is always rejected and purged, even
+     * in debug builds. It is not valid against the live API and would otherwise
+     * keep a stale demo session (previously "Alex Morgan") alive after an
+     * upgrade.</p>
      */
     public boolean isSignedIn() {
-        if (!isDebugMode && "demo-jwt-offline-token-sample".equals(tokenStore.getToken())) {
+        if ("demo-jwt-offline-token-sample".equals(tokenStore.getToken())) {
             tokenStore.clear();
             return false;
         }

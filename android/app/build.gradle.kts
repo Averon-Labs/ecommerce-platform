@@ -5,6 +5,10 @@ plugins {
 val apiBaseUrlOverride = providers.gradleProperty("apiBaseUrl")
 val googleWebClientIdOverride = providers.gradleProperty("googleWebClientId")
 
+// Hosted demo backend (Laravel API + admin SPA on the same origin).
+// Local servers can still be used with -PapiBaseUrl="http://10.0.2.2:8000/api/v1".
+val defaultApiBaseUrl = "https://eshopverse.wasmer.app/api/v1"
+
 android {
     namespace = "com.averonlabs.eshopverse"
     compileSdk {
@@ -33,7 +37,7 @@ android {
             buildConfigField(
                 "String",
                 "API_BASE_URL",
-                "\"${apiBaseUrlOverride.orElse("http://10.0.2.2:8081/api/v1").get()}\""
+                "\"${apiBaseUrlOverride.orElse(defaultApiBaseUrl).get()}\""
             )
             buildConfigField(
                 "String",
@@ -47,7 +51,7 @@ android {
             buildConfigField(
                 "String",
                 "API_BASE_URL",
-                "\"${apiBaseUrlOverride.orElse("https://api.eshopverse.example.com/api/v1").get()}\""
+                "\"${apiBaseUrlOverride.orElse(defaultApiBaseUrl).get()}\""
             )
             buildConfigField(
                 "String",

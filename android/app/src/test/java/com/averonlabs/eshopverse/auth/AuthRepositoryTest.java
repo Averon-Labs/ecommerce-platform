@@ -570,12 +570,12 @@ public class AuthRepositoryTest {
     }
 
     @Test
-    public void testIsSignedInAllowsMockTokenInDebugMode() {
+    public void testIsSignedInPurgesLegacyMockTokenInDebugMode() {
         AuthRepository debugRepo = new AuthRepository(apiRoutes, tokenStore, true);
         tokenStore.save("demo-jwt-offline-token-sample", "2030-01-01T00:00:00Z");
 
-        assertTrue(debugRepo.isSignedIn());
-        assertEquals("demo-jwt-offline-token-sample", tokenStore.getToken());
+        assertFalse(debugRepo.isSignedIn());
+        assertNull(tokenStore.getToken());
     }
 
     @Test
