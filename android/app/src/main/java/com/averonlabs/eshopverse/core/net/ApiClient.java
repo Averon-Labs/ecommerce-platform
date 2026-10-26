@@ -60,7 +60,6 @@ public final class ApiClient {
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC);
             loggingInterceptor.redactHeader("Authorization");
             clientBuilder.addInterceptor(loggingInterceptor);
-            clientBuilder.addInterceptor(new OfflineMockInterceptor());
         }
 
         this.okHttpClient = clientBuilder.build();
