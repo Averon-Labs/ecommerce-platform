@@ -3,6 +3,7 @@ package com.averonlabs.eshopverse.core.net;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.averonlabs.eshopverse.core.model.Cart;
@@ -261,5 +262,26 @@ public class OfflineMockInterceptorTest {
                 .build();
 
         client.newCall(request).execute();
+    }
+
+    @Test
+    public void testAuthEndpointsHaveNoOfflineMockResponse() {
+        OfflineMockInterceptor interceptor = new OfflineMockInterceptor();
+        RequestBody body = RequestBody.create(
+                MediaType.parse("application/json"),
+                "{\"email\":\"new@example.com\",\"password\":\"Password123\",\"firstName\":\"New\",\"lastName\":\"User\"}"
+        );
+
+        for (String endpoint : new String[]{"login", "register", "google"}) {
+            Request request = new Request.Builder()
+                    .url("http://127.0.0.1:54321/api/v1/auth/" + endpoint)
+                    .post(body)
+                    .build();
+
+            assertNull(
+                    "Offline auth must not fabricate a session for /auth/" + endpoint,
+                    interceptor.getMockResponseFor(request)
+            );
+        }
     }
 }

@@ -128,12 +128,18 @@ Set-Location android
 .\gradlew.bat installDebug
 ```
 
-#### 2. Running with the embedded offline mock mode (standalone)
+#### 2. Running against the hosted demo API (default)
 
-By default, the debug build contains an `OfflineMockInterceptor` that serves mock responses for catalog, cart, checkout, and orders automatically without needing any external server. You can immediately launch and test the app offline on any emulator or device:
+The debug and release builds default to the hosted demo backend at
+`https://eshopverse.wasmer.app/api/v1`. Build and install without extra flags:
 ```powershell
 .\gradlew.bat installDebug
 ```
+
+Sign-up, sign-in, profile, cart, and orders all go to the real Laravel API.
+`OfflineMockInterceptor` is not part of the production network chain, and it never
+returns a mock session for `/auth/*`; an unreachable API surfaces as a network
+error instead of a fake "Alex Morgan" account.
 
 #### 3. Running against the Python mock server
 
@@ -147,7 +153,7 @@ Set-Location android
 .\gradlew.bat installDebug -PapiBaseUrl="http://10.0.2.2:8081/api/v1"
 ```
 
-#### 4. Running against the live Laravel backend
+#### 4. Running against a local Laravel backend
 
 To test end-to-end integration against the real seeded database:
 ```powershell
@@ -168,7 +174,7 @@ For testing authenticated features (Cart, Checkout, Order History, Profile):
 
 | Role | Email | Password | Notes |
 |---|---|---|---|
-| Customer | `demo@example.com` | `Password123` | Pre-seeded customer account in local database and mock responses |
+| Customer | `demo@example.com` | `Password123` | Pre-seeded customer account in the local database and the hosted demo backend |
 
 ---
 

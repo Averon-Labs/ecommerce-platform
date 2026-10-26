@@ -22,8 +22,12 @@ import okhttp3.ResponseBody;
 import okio.Buffer;
 
 /**
- * Provides comprehensive offline fallback dummy data when the backend or local mock server is not reachable.
- * Active in debug builds to guarantee a rich, interactive, realistic demo out-of-the-box.
+ * Provides offline fallback dummy data for catalog, cart, checkout, and orders
+ * when an explicitly wired mock network is unreachable.
+ *
+ * <p>This interceptor is not added to the production {@code ApiClient} chain.
+ * It must never answer authentication endpoints: sign-up, sign-in, Google
+ * sign-in, profile, and password reset always go to the real API.</p>
  */
 public class OfflineMockInterceptor implements Interceptor {
 
@@ -252,7 +256,7 @@ public class OfflineMockInterceptor implements Interceptor {
                     + "\"inStock\":true,\"availableQuantity\":15,\"priceChanged\":false,\"unavailable\":false"
                     + "}],"
                     + "\"subtotal\":\"89.99\",\"shipping\":\"5.00\",\"total\":\"94.99\",\"currency\":\"USD\","
-                    + "\"shippingAddress\":{\"recipientName\":\"Alex Morgan\",\"line1\":\"123 Main St\",\"city\":\"New York\",\"region\":\"NY\",\"postalCode\":\"10001\",\"country\":\"US\"},"
+                    + "\"shippingAddress\":{\"recipientName\":\"Demo Customer\",\"line1\":\"123 Main St\",\"city\":\"New York\",\"region\":\"NY\",\"postalCode\":\"10001\",\"country\":\"US\"},"
                     + "\"shippingAddressId\":\"addr-demo-001\"}}";
         }
 
@@ -268,7 +272,7 @@ public class OfflineMockInterceptor implements Interceptor {
                         + "\"id\":1,\"reference\":\"ORD-2026-0001\",\"status\":\"confirmed\",\"paymentStatus\":\"completed\","
                         + "\"subtotal\":\"89.99\",\"shipping\":\"5.00\",\"total\":\"94.99\",\"currency\":\"USD\","
                         + "\"createdAt\":\"2026-10-12T18:00:00Z\",\"updatedAt\":\"2026-10-12T18:05:00Z\",\"notes\":\"Express Delivery\","
-                        + "\"shippingAddress\":{\"recipientName\":\"Alex Morgan\",\"line1\":\"123 Main St\",\"city\":\"New York\",\"region\":\"NY\",\"postalCode\":\"10001\",\"country\":\"US\"},"
+                        + "\"shippingAddress\":{\"recipientName\":\"Demo Customer\",\"line1\":\"123 Main St\",\"city\":\"New York\",\"region\":\"NY\",\"postalCode\":\"10001\",\"country\":\"US\"},"
                         + "\"items\":[{\"productId\":101,\"productName\":\"Classic Leather Sneaker\",\"quantity\":1,\"unitPrice\":\"89.99\",\"lineTotal\":\"89.99\"}],"
                         + "\"timeline\":[{\"status\":\"confirmed\",\"at\":\"2026-10-12T18:00:00Z\"}]}}";
             }
@@ -283,15 +287,15 @@ public class OfflineMockInterceptor implements Interceptor {
                     + "\"id\":1,\"reference\":\"ORD-2026-0001\",\"status\":\"confirmed\",\"paymentStatus\":\"completed\","
                     + "\"subtotal\":\"89.99\",\"shipping\":\"5.00\",\"total\":\"94.99\",\"currency\":\"USD\","
                     + "\"createdAt\":\"2026-10-12T18:00:00Z\",\"updatedAt\":\"2026-10-12T18:05:00Z\",\"notes\":\"Express Delivery\","
-                    + "\"shippingAddress\":{\"recipientName\":\"Alex Morgan\",\"line1\":\"123 Main St\",\"city\":\"New York\",\"region\":\"NY\",\"postalCode\":\"10001\",\"country\":\"US\"},"
+                    + "\"shippingAddress\":{\"recipientName\":\"Demo Customer\",\"line1\":\"123 Main St\",\"city\":\"New York\",\"region\":\"NY\",\"postalCode\":\"10001\",\"country\":\"US\"},"
                     + "\"items\":[{\"productId\":101,\"productName\":\"Classic Leather Sneaker\",\"quantity\":1,\"unitPrice\":\"89.99\",\"lineTotal\":\"89.99\"}],"
                     + "\"timeline\":[{\"status\":\"confirmed\",\"at\":\"2026-10-12T18:00:00Z\"}]}}";
         }
 
-        if (path.endsWith("/auth/login") || path.endsWith("/auth/register") || path.endsWith("/auth/google")) {
-            return "{\"data\":{\"token\":\"demo-jwt-offline-token-sample\",\"expiresAt\":\"2030-01-01T00:00:00Z\",\"user\":{\"id\":1,\"email\":\"alex.morgan@eshopverse.com\",\"firstName\":\"Alex\",\"lastName\":\"Morgan\",\"role\":\"customer\",\"status\":\"active\",\"createdAt\":\"2026-01-15T10:00:00Z\"}}}";
-        }
-
+        // Authentication is deliberately never mocked. Returning a fake 200
+        // here would silently sign the user in as demo data (previously
+        // "Alex Morgan") whenever the real API was unreachable. Auth failures
+        // must surface as a real network error so the user can retry.
         return null;
     }
 
