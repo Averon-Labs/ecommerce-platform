@@ -38,6 +38,7 @@ public class AccountFragment extends Fragment {
     private FragmentAccountBinding binding;
     private AuthViewModel authViewModel;
     private SessionViewModel sessionViewModel;
+    private GoogleAuthManager googleAuthManager;
 
     @Nullable
     @Override
@@ -57,6 +58,7 @@ public class AccountFragment extends Fragment {
         AuthViewModelFactory factory = new AuthViewModelFactory(requireContext());
         authViewModel = new ViewModelProvider(this, factory).get(AuthViewModel.class);
         sessionViewModel = new ViewModelProvider(requireActivity(), factory).get(SessionViewModel.class);
+        googleAuthManager = new GoogleAuthManager(requireContext());
 
         binding.stateContainer.setContentView(binding.scrollContent);
 
@@ -125,7 +127,23 @@ public class AccountFragment extends Fragment {
         });
 
         binding.btnGuestGoogleSignIn.setOnClickListener(v -> {
-            authViewModel.loginWithGoogle("mock_google_id_token_demo");
+            if (getActivity() == null) return;
+            googleAuthManager.startSignIn(requireActivity(), new GoogleAuthManager.GoogleAuthCallback() {
+                @Override
+                public void onSuccess(@NonNull String idToken) {
+                    authViewModel.loginWithGoogle(idToken);
+                }
+
+                @Override
+                public void onCancelled() {
+                    // User dismissed credential picker
+                }
+
+                @Override
+                public void onError(@NonNull String errorMessage) {
+                    showAnchoredSnackbar(errorMessage);
+                }
+            });
         });
 
         binding.btnGuestForgotPassword.setOnClickListener(v -> {
