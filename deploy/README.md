@@ -6,11 +6,15 @@ checklist: [`docs/DEPLOYMENT.md`](../docs/DEPLOYMENT.md).
 ## Admin update archive
 
 ```text
-deploy/eshopverse-admin-dist.zip   # ~1.07 MB; contents extract directly into htdocs/
+output/eshopverse-admin.zip   # ~1.08 MB; contents extract directly into htdocs/
 ├── index.html
 ├── assets/
 └── fonts/
 ```
+
+The current packages (admin bundle **and** the Laravel application archive) are generated under
+`output/`; see [`docs/DEPLOYMENT.md`](../DEPLOYMENT.md#upload-packages-2026-10-28). The earlier
+`deploy/eshopverse-admin-dist.zip` name described the same admin layout and is no longer kept in the tree.
 
 Upload the archive to `htdocs`, extract it over the existing `index.html`, `assets/`, and `fonts/`, delete any
 old `_worker.js`, then hard-refresh. The backend and database are unchanged by the theme update.

@@ -82,3 +82,11 @@ admin/.env
 *.zip
 *.tar.gz
 *.rar
+
+# =====================
+# Generated deployment packages
+# =====================
+# output/backend, output/admin and their archives are built locally from
+# backend/ and admin/dist for a host upload; the source of truth is the repo
+# and the instructions live in docs/DEPLOYMENT.md.
+output/
