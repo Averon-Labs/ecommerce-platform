@@ -16,12 +16,37 @@ repository.
 | API | `GET https://eshopverse.byethost8.com/api/v1/products` returns the seeded active products |
 | Admin | React SPA served from the same domain; `POST /api/v1/admin/auth/login` returns `200` with the demo administrator |
 | Admin sign-in | SPA at `/login`; accounts are provisioned by the backend seed, with no self-registration |
-| Theme | Light/dark toggle implemented in the admin SPA, persisted in `localStorage`; new build is ready in `deploy/eshopverse-admin-dist.zip`. As of 2026-10-19 the live host still serves the previous admin bundle (`index-BR1LMIVW.js`) until the upload step below is run. |
-| Backend redeploy | Not required for the theme update — the API and database are unchanged |
+| Theme | Light/dark toggle implemented in the admin SPA, persisted in `localStorage`. The current production build is `assets/index-DwFFOLMM.js` with `assets/index-C8Rh47uc.css`; as of 2026-10-28 the live host still serves the previous admin bundle (`index-BR1LMIVW.js`) until the upload below is run. |
+| Backend redeploy | **Required** for the product-image work (backend Phase 5, `CAT-B01`/`CAT-B02`): the API stores uploaded files on the `product-images` disk (`storage/app/product-images`) and serves them through `GET /api/v1/media/product-images/{productId}/{filename}`. No new environment variable and no schema migration; `storage/app/product-images` must exist and be writable. |
 
 The deployment is a **demo**, not a production commerce service. Payment remains simulated, data is fictional,
 and the security limitations in [`SECURITY.md`](SECURITY.md) and [`SECURITY_REVIEW.md`](SECURITY_REVIEW.md)
 still apply.
+
+## Upload packages (2026-10-28)
+
+The current build is packaged locally under `output/` (generated, `.gitignore`d; the source of truth is
+the repository plus `npm run build`). Upload steps and per-package notes: `output/README.md`.
+
+| Package | Size | Goes to |
+|---------|------|---------|
+| `output/eshopverse_app.zip` (root folder `eshopverse_app/`) | 16.95 MB | `htdocs/` — extracts into the existing application directory |
+| `output/eshopverse-admin.zip` (`index.html`, `assets/`, `fonts/` at the root) | 1.08 MB | `htdocs/` — overwrites the SPA files |
+
+Backend upload rules: never overwrite `htdocs/eshopverse_app/.env` (it is not in the archive), keep the
+host's `storage/` content — in particular `storage/app/product-images/` — and keep `storage/` and
+`bootstrap/cache/` writable. The archive ships `vendor/` because `backend/composer.lock` changed on
+2026-10-23 (`config.platform.php` pinned to 8.3.36) and the host cannot run Composer.
+
+### Verification record (2026-10-28)
+
+| Check | Result |
+|-------|--------|
+| Backend `php artisan test` | 196 tests / 2,362 assertions — 194 pass. The 2 failures exist only off MySQL: `DatabaseWorkflowTest` asserts the `mysql` driver and `AdminCategoryTest`'s duplicate-name case relies on the MySQL column collation. Both pass in the repository's Backend Build & Test job on MySQL 8.4. `vendor/bin/pint --test` passes. |
+| Host PHP compatibility | `composer.json` pins `config.platform.php` to 8.3.36, `vendor/composer/platform_check.php` requires PHP ≥ 8.3.0, and no PHP 8.4-only syntax is used — the build runs on the host's PHP 8.3. |
+| Admin panel | `npm run typecheck`, `npm run lint`, `npm test` (11 files / 89 tests), `npm run check:contrast` (34/34) and `npm run build` all pass; the build reproduces `index-DwFFOLMM.js` exactly. |
+| Live API smoke, host layout | 88/88 checks against a local mirror of this document's `htdocs/` layout (front controller + SPA + `eshopverse_app/`): `/up`, catalog reads and 404s, registration/login/profile, cart → quote → order (`Idempotency-Key` enforced) → simulated payment, admin session + CSRF (including token rotation), category/product/inventory/order administration, order status chain `confirmed → processing → shipped → delivered` with `409 INVALID_TRANSITION` afterwards, image upload → public read → delete, Google `500` fail-closed with the explicit log line, and every SPA route. |
+| Admin browser walkthrough | Sign-in with the seeded administrator, products/categories/inventory/orders rendering live API data, theme toggle switching and persisting across reload; no console or network errors beyond the expected guest `401` on `/api/v1/admin/auth/session`. |
 
 ## Why the admin and API share one origin
 
@@ -153,11 +178,12 @@ npm test
 npm run build
 ```
 
-`npm run build` writes `admin/dist/`. The prepared upload archive is created from the **contents** of
-`admin/dist` so it extracts directly into `htdocs`:
+`npm run build` writes `admin/dist/`. The upload archive is created from the **contents** of `admin/dist`
+so it extracts directly into `htdocs`. The current package is `output/eshopverse-admin.zip`; the earlier
+`deploy/eshopverse-admin-dist.zip` name referred to the same layout and is no longer kept in the tree:
 
 ```text
-deploy/eshopverse-admin-dist.zip
+output/eshopverse-admin.zip
 ├── index.html
 ├── assets/
 └── fonts/
