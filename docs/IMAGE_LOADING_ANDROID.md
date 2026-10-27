@@ -1,47 +1,46 @@
-# برنامه اجرایی لود تصویر — بخش اندروید
-# (Image Loading Execution Plan — Android Customer Application)
+# Image Loading Execution Plan — Android Customer Application
 
-این سند اختصاصاً شامل چک‌لیست و گام‌های اجرایی لود بهینه تصاویر و تقدم رندر متن در **اپلیکیشن اندروید (Java / XML / Material 3)** است.
+This document defines the actionable checklist and implementation steps for optimized image loading and text-first rendering priority in the **Android Customer Application (Java / XML / Material 3)**.
 
-> **سندهای مرتبط:**
-> - اصل معماری: [`docs/ARCHITECTURE.md`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/docs/ARCHITECTURE.md#L112-L142)
-> - قوانین اختصاصی اندروید: [`android/AGENTS.md`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/AGENTS.md#L121-L135)
-> - برنامه اجرایی بخش ادمین و بک‌اند: [`docs/IMAGE_LOADING_ADMIN_BACKEND.md`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/docs/IMAGE_LOADING_ADMIN_BACKEND.md)
-> - اسکیل اختصاصی: [`.agents/skills/text-first-async-image-loading/SKILL.md`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/.agents/skills/text-first-async-image-loading/SKILL.md)
-
----
-
-## فاز ۱: زیرساخت و ابزار مرکزی اندروید (Android Core Tooling)
-
-### گام ۱: ارتقا و پاکسازی خودکار منابع در `ImageLoaderHelper`
-* **فایل هدف:** [`android/app/src/main/java/com/averonlabs/eshopverse/core/ui/ImageLoaderHelper.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/core/ui/ImageLoaderHelper.java)
-* **چک‌لیست اجرایی:**
-  - [x] متد `clear(@Nullable ImageView imageView)` فراخوانی شده و تمامی ریکوئست‌های در حال اجرای Glide برای ویوهای بازیافت‌شده را متوقف کند.
-  - [x] استراتژی کش روی دیسک به صورت صریح روی `DiskCacheStrategy.ALL` تنظیم باشد تا تمام سایزهای دیکودشده و باینری اصلی ذخیره شوند.
-  - [x] کش حافظه رم فعال باشد (`skipMemoryCache(false)`) تا در اسکرول‌های سریع بالا و پایین، زمان بازخوانی تصویر ۰ میلی‌ثانیه باشد.
-  - [x] ترنزیشن انیمیشن تصویر روی `DrawableTransitionOptions.withCrossFade(250)` ثابت و نرم تنظیم باشد.
-  - [x] اندازه دیکود به صورت سخت‌افزاری بر اساس ابعاد فیزیکی `ImageView` تنظیم شود تا از خطای OutOfMemory جلوگیری شود.
-
-### گام ۲: تست‌های واحد و یکپارچه زیرساخت لودر
-* **فایل هدف:** [`android/app/src/test/java/com/averonlabs/eshopverse/core/ui/ImageLoaderHelperTest.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/test/java/com/averonlabs/eshopverse/core/ui/ImageLoaderHelperTest.java)
-* **چک‌لیست اجرایی:**
-  - [x] تست نال‌سیفتی برای URLهای خالی یا `null` پاس شود و تصویر خطای پیش‌فرض لود گردد.
-  - [x] تست پیش‌بارگذاری گروهی (`preloadBatch`) با لیست‌های ترکیبی از آیتم‌های معتبر، خالی و نال اعتبارسنجی شود.
-  - [x] تست ثابت زمانی انیمیشن CrossFade روی دقیقاً `250ms` تثبیت و پاس شود.
-  - [x] اجرای فرمان `./gradlew testDebugUnitTest --tests ImageLoaderHelperTest` بدون هیچ‌گونه خطا پایان یابد.
+> **Related Documents:**
+> - Architecture Law: [`docs/ARCHITECTURE.md`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/docs/ARCHITECTURE.md#L112-L142)
+> - Android Rules: [`android/AGENTS.md`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/AGENTS.md#L121-L135)
+> - Admin & Backend Execution Plan: [`docs/IMAGE_LOADING_ADMIN_BACKEND.md`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/docs/IMAGE_LOADING_ADMIN_BACKEND.md)
+> - Agent Skill: [`.agents/skills/text-first-async-image-loading/SKILL.md`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/.agents/skills/text-first-async-image-loading/SKILL.md)
 
 ---
 
-## فاز ۲: آداپتورها و ویوپورت‌های کاتالوگ و خرید (Android Adapters & Layouts)
+## Phase 1: Android Core Tooling
 
-### گام ۳: کاتالوگ و گرید محصولات
-* **فایل‌های هدف:**
+### Step 1: Resource cleanup and helper upgrade in `ImageLoaderHelper`
+* **Target File:** [`android/app/src/main/java/com/averonlabs/eshopverse/core/ui/ImageLoaderHelper.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/core/ui/ImageLoaderHelper.java)
+* **Execution Checklist:**
+  - [x] Implement `clear(@Nullable ImageView imageView)` to cancel in-flight Glide requests for recycled views.
+  - [x] Configure disk cache strategy explicitly to `DiskCacheStrategy.ALL` to store decoded and original binary data.
+  - [x] Enable memory caching (`skipMemoryCache(false)`) to achieve 0ms retrieval during fast scrolling.
+  - [x] Configure cross-fade transition smoothly at `DrawableTransitionOptions.withCrossFade(250)`.
+  - [x] Enforce hardware decode sizing according to physical `ImageView` dimensions to prevent OutOfMemory errors.
+
+### Step 2: Unit and integration tests for loader infrastructure
+* **Target File:** [`android/app/src/test/java/com/averonlabs/eshopverse/core/ui/ImageLoaderHelperTest.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/test/java/com/averonlabs/eshopverse/core/ui/ImageLoaderHelperTest.java)
+* **Execution Checklist:**
+  - [x] Null safety tests pass for empty or `null` URLs and default error image is loaded.
+  - [x] Batch preloading (`preloadBatch`) verified with mixed lists of valid, empty, and null items.
+  - [x] Fixed time constant for CrossFade animation asserted at exactly `250ms`.
+  - [x] Command `./gradlew testDebugUnitTest --tests ImageLoaderHelperTest` finishes without errors.
+
+---
+
+## Phase 2: Android Adapters & Layouts
+
+### Step 3: Catalog & Product Grid
+* **Target Files:**
   - [`android/app/src/main/java/com/averonlabs/eshopverse/catalog/ProductGridAdapter.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/catalog/ProductGridAdapter.java)
   - [`android/app/src/main/res/layout/item_product_card.xml`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/res/layout/item_product_card.xml)
   - [`android/app/src/main/res/layout/item_product_linear_card.xml`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/res/layout/item_product_linear_card.xml)
-* **چک‌لیست اجرایی:**
-  - [x] در متد `bind()`، نام محصول، قیمت فرمت‌شده با پول رسمی، بج موجودی و تگ دسترس‌پذیری در خطوط اول و به شکل همگام (Synchronous) ست شوند.
-  - [x] متد `onViewRecycled` در `ProductGridAdapter` اورراید شود و متد `ImageLoaderHelper.clear(holder.binding.ivProductImage)` برای لغو دانلود عکس‌های خارج از کادر فراخوانی گردد:
+* **Execution Checklist:**
+  - [x] In `bind()`, product name, formatted price, stock badge, and accessibility content description are bound synchronously on the first lines.
+  - [x] `onViewRecycled` in `ProductGridAdapter` is overridden and calls `ImageLoaderHelper.clear(holder.binding.ivProductImage)` to cancel out-of-viewport downloads:
     ```java
     @Override
     public void onViewRecycled(@NonNull ProductViewHolder holder) {
@@ -49,68 +48,68 @@
         ImageLoaderHelper.clear(holder.binding.ivProductImage);
     }
     ```
-  - [x] در فایل‌های XML، ویژگی `app:layout_constraintDimensionRatio="1:1"` روی ویوپورت تصویر قرار گیرد تا تحت هیچ شرایطی پرش چیدمان (Layout Shift) رخ ندهد.
-  - [x] از هرگونه `wrap_content` برای عرض یا ارتفاع کانتینر تصویر اکیداً پرهیز شود.
+  - [x] In XML layouts, `app:layout_constraintDimensionRatio="1:1"` is set on image viewports to prevent Layout Shift.
+  - [x] Strictly avoid `wrap_content` on image container width or height.
 
-### گام ۴: لیست علاقه‌مندی‌ها (Favorites / Wishlist)
-* **فایل‌های هدف:**
+### Step 4: Favorites List (Wishlist)
+* **Target Files:**
   - [`android/app/src/main/java/com/averonlabs/eshopverse/catalog/FavoritesAdapter.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/catalog/FavoritesAdapter.java)
   - [`android/app/src/main/res/layout/fragment_favorites.xml`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/res/layout/fragment_favorites.xml)
-* **چک‌لیست اجرایی:**
-  - [x] متد `onViewRecycled` در `FavoritesAdapter` پیاده‌سازی شده و تسک‌های در صف برای کارت‌های بازیافت‌شده لغو گردند.
-  - [x] متن‌ها و قیمت‌های کالاهای ذخیره‌شده فوراً از دیتابیس محلی/کش رسم شوند و منتظر دانلود عکس‌های ریموت نمانند.
-  - [x] تصویر موقت Shimmer به محض بایند شدن کارت نمایان باشد.
+* **Execution Checklist:**
+  - [x] `onViewRecycled` implemented in `FavoritesAdapter` to cancel queued tasks for recycled cards.
+  - [x] Titles and prices of saved items rendered immediately from local database/cache without waiting for remote images.
+  - [x] Shimmer placeholder visible immediately upon card binding.
 
-### گام ۵: سبد خرید (Cart Screen)
-* **فایل‌های هدف:**
+### Step 5: Cart Screen
+* **Target Files:**
   - [`android/app/src/main/java/com/averonlabs/eshopverse/cart/CartAdapter.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/cart/CartAdapter.java)
   - [`android/app/src/main/res/layout/item_cart_line.xml`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/res/layout/item_cart_line.xml)
-* **چک‌لیست اجرایی:**
-  - [x] ابعاد تامبنیل تصویر در XML روی اندازه ثابت (مانند `80dp x 80dp`) با پس‌زمینه Shimmer قفل شود تا باز شدن صفحه هیچ پرشی نداشته باشد.
-  - [x] قیمت واحد، قیمت کل سطر، هشدارهای تغییر قیمت و نام کالا در بالاترین اولویت متد `bind()` قرار گیرند.
-  - [x] متد `onViewRecycled` برای لغو دانلود تصویر خطوط سبد خرید در هنگام اسکرول یا حذف پیاده‌سازی شود.
+* **Execution Checklist:**
+  - [x] Fixed thumbnail dimensions in XML (e.g., `80dp x 80dp`) with shimmer background to eliminate layout shift.
+  - [x] Unit price, line total, price change notices, and item title prioritized at the top of `bind()`.
+  - [x] `onViewRecycled` implemented to cancel cart item image downloads during scrolling or removal.
 
-### گام ۶: بازبینی تسویه‌حساب و ثبت نهایی سفارش
-* **فایل‌های هدف:**
+### Step 6: Checkout Review & Order Confirmation
+* **Target Files:**
   - [`android/app/src/main/java/com/averonlabs/eshopverse/checkout/ReviewItemsAdapter.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/checkout/ReviewItemsAdapter.java)
   - [`android/app/src/main/res/layout/item_review_line.xml`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/res/layout/item_review_line.xml)
-* **چک‌لیست اجرایی:**
-  - [x] رندر جزئیات فاکتور و لیست اقلام سفارش بدون هیچ مکث یا وابستگی به شبکه برای عکس‌ها انجام شود (<50ms).
-  - [x] متد `onViewRecycled` برای تامبنیل‌های آیتم‌های سفارش ثبت گردد.
-  - [x] در صورت خطای لود یا عدم اتصال اینترنت، فاکتور بدون مشکل نمایش داده شود و آیکون لوکس پیش‌فرض خطا جایگزین گردد.
+* **Execution Checklist:**
+  - [x] Render invoice breakdown and order item summaries without delay or network dependencies (<50ms).
+  - [x] Implement `onViewRecycled` for order item thumbnails.
+  - [x] In case of network error or offline state, invoice renders reliably with default error placeholder.
 
-### گام ۷: اسلایدر و گالری جزئیات محصول
-* **فایل‌های هدف:**
+### Step 7: Product Detail Image Carousel
+* **Target Files:**
   - [`android/app/src/main/java/com/averonlabs/eshopverse/catalog/ImageCarouselAdapter.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/catalog/ImageCarouselAdapter.java)
   - [`android/app/src/main/res/layout/item_product_image.xml`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/res/layout/item_product_image.xml)
   - [`android/app/src/main/res/layout/fragment_product_detail.xml`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/res/layout/fragment_product_detail.xml)
-* **چک‌لیست اجرایی:**
-  - [ ] تمامی مشخصات متنی (نام کالا، مشخصات فنی، برند، قیمت، وضعیت انبار) فوراً از پارامترهای ناوبری یا کش رسم شوند.
-  - [ ] ویوپورت گالری در بالا دارای نسبت ثابت `4:5` یا `1:1` با پس‌زمینه Shimmer باشد.
-  - [ ] متد `onViewRecycled` برای لغو عکس‌های بزرگ هنگام سوایپ سریع اسلایدر پیاده‌سازی شود.
+* **Execution Checklist:**
+  - [ ] All text specifications (product name, technical specs, brand, price, stock status) rendered immediately from navigation arguments or cache.
+  - [ ] Carousel viewport at top has fixed `4:5` or `1:1` aspect ratio with shimmer placeholder.
+  - [ ] `onViewRecycled` implemented to cancel large image requests during rapid swiping.
 
 ---
 
-## فاز ۳: بهینه‌سازی اسکرول و پیش‌بارگذاری اندروید (Android Prefetching)
+## Phase 3: Android Prefetching & Scroll Optimization
 
-### گام ۸: پیش‌واکشی فعال بر اساس جهت اسکرول
-* **فایل‌های هدف:**
+### Step 8: Active prefetching based on scroll direction
+* **Target Files:**
   - [`android/app/src/main/java/com/averonlabs/eshopverse/catalog/fragment/ExploreFragment.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/catalog/fragment/ExploreFragment.java)
   - [`android/app/src/main/java/com/averonlabs/eshopverse/shell/HomeFragment.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/shell/HomeFragment.java)
-* **چک‌لیست اجرایی:**
-  - [ ] اسکرول لیسنر کاتالوگ جهت اسکرول کاربر را تشخیص دهد.
-  - [ ] در اسکرول به سمت پایین، آدرس ۴ تا ۶ تصویر آینده از طریق `ImageLoaderHelper.preloadBatch()` در حافظه کش قرار گیرد.
-  - [ ] عملیات پیش‌بارگذاری با اولویت پایین (Low Priority) انجام شود تا پهنای باند آیتم‌های جاری داخل صفحه مصرف نشود.
+* **Execution Checklist:**
+  - [ ] Catalog scroll listener detects scroll direction.
+  - [ ] On downward scroll, prefetch 4 to 6 upcoming product images into cache via `ImageLoaderHelper.preloadBatch()`.
+  - [ ] Prefetch tasks run at Low Priority to ensure on-screen bandwidth is not degraded.
 
 ---
 
-## جدول پیگیری وضعیت اندروید
+## Android Progress Tracking
 
-- [x] **گام ۱:** ارتقای متد پاکسازی منابع در `ImageLoaderHelper.java`
-- [x] **گام ۲:** اعتبارسنجی تست‌های واحد در `ImageLoaderHelperTest.java`
-- [x] **گام ۳:** پیاده‌سازی در `ProductGridAdapter.java` و لایه‌های گرید
-- [x] **گام ۴:** پیاده‌سازی در `FavoritesAdapter.java`
-- [x] **گام ۵:** پیاده‌سازی در `CartAdapter.java` و لایه سطر سبد خرید
-- [ ] **گام ۶:** پیاده‌سازی در `ReviewItemsAdapter.java`
-- [ ] **گام ۷:** پیاده‌سازی در `ImageCarouselAdapter.java` و لایه جزئیات
-- [ ] **گام ۸:** پیاده‌سازی پیش‌بارگذاری فعال در فرگمنت‌ها
+- [x] **Step 1:** Resource cleanup method in `ImageLoaderHelper.java`
+- [x] **Step 2:** Unit test validation in `ImageLoaderHelperTest.java`
+- [x] **Step 3:** Implementation in `ProductGridAdapter.java` and grid layouts
+- [x] **Step 4:** Implementation in `FavoritesAdapter.java`
+- [x] **Step 5:** Implementation in `CartAdapter.java` and cart line layout
+- [ ] **Step 6:** Implementation in `ReviewItemsAdapter.java`
+- [ ] **Step 7:** Implementation in `ImageCarouselAdapter.java` and detail layout
+- [ ] **Step 8:** Active prefetching implementation in fragments

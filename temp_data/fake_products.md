@@ -1,6 +1,6 @@
 
-📋 فهرست کتگوری‌ها و محصولات
-کتگوری‌ها
+📋 Categories and Products List
+Categories
 Shirts & Tops
 Pants & Jeans
 Dresses
@@ -11,8 +11,8 @@ Shoes
 Accessories
 Leather & Suede
 Bags & Backpacks
-تمام محصولات
-ID	نام محصول	قیمت	کتگوری	نام عکس
+All Products
+ID	Product Name	Price	Category	Image Name
 shirt_001	Classic White Oxford Shirt	$45.99	Shirts & Tops	shirt_001.webp
 shirt_002	Silk Navy Blouse	$68.50	Shirts & Tops	shirt_002.webp
 shirt_003	Striped Casual Shirt	$39.99	Shirts & Tops	shirt_003.webp

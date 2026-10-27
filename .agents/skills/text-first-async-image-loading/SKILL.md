@@ -13,9 +13,9 @@ This skill defines the non-negotiable architectural standard for loading list da
 
 ---
 
-## 1. Core Principles (قواعد بنیادین)
+## 1. Core Principles
 
-### 1.1 Strict Payload Separation (جداسازی داده متنی از باینری)
+### 1.1 Strict Payload Separation
 - **API Payloads:** Network endpoints (REST/JSON) must only transmit text, numerical metadata, and image URLs (`String`). Never bundle raw binary or base64 image data within list payloads.
 - **Immediate Text Binding:** All textual components (Title, Price, Stock Status, Discounts, Badges) must be bound and rendered synchronously to the UI thread (<100ms) the moment data arrives from memory or network.
 
@@ -27,7 +27,7 @@ This skill defines the non-negotiable architectural standard for loading list da
   - Cart & Order Line Thumbnails: Fixed dimensions (e.g. `80dp x 80dp`).
 - **Never use `wrap_content` for width or height** on network image containers.
 
-### 1.3 Independent Asynchronous Streaming (لود کاملاً مستقل در پس‌زمینه)
+### 1.3 Independent Asynchronous Streaming
 - Each image is treated as a separate, independent network job dispatched to a background thread pool (managed via `ImageLoaderHelper` / Glide).
 - If one image fails, times out, or has high latency, it must **never** delay, stall, or prevent adjacent text or other images from displaying.
 
@@ -141,7 +141,7 @@ For the Admin Dashboard and web components:
 
 ---
 
-## 4. Anti-Patterns to Strictly Avoid (آنچه هرگز نباید انجام داد)
+## 4. Anti-Patterns to Strictly Avoid
 
 - ❌ **NEVER block the UI thread** or await image downloads in Repositories, ViewModels, or Adapters.
 - ❌ **NEVER use `wrap_content`** on network image views (causes jarring layout reflows when images arrive).

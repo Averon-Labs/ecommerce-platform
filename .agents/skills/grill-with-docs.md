@@ -7,27 +7,24 @@ adapted_for: eshop-verse (see AGENTS.md, docs/decisions/README.md)
 
 # Grill With Docs — Project-Adapted Version
 
-این فایل موتور مصاحبه (`grilling`) و انضباط مدل‌سازی دامنه (`domain-modeling`)
-را با فرمت ADR و گردش‌کار Task-ID این پروژه (طبق AGENTS.md) ترکیب می‌کند.
+This file combines the interview engine (`grilling`) and domain-modeling discipline with this project's ADR format and Task-ID workflow (per AGENTS.md).
 
-## ⚠️ جایگاه این Skill در گردش‌کار پروژه
+## ⚠️ Role of this Skill in the Project Workflow
 
-این Skill **جایگزین** سیستم Builder → Tester → Debugger یا روش Task-ID محور
-توضیح داده‌شده در AGENTS.md نیست. این فقط یک **مرحله‌ی صفر** است، پیش از
-ساخت یک Task Entry رسمی:
-۱. ابهام یا تصمیم نامشخصی هست؟
+This Skill does **NOT replace** the Builder → Tester → Debugger workflow or the Task-ID driven approach defined in AGENTS.md. It is strictly a **Step 0**, preceding the creation of a formal Task Entry:
+1. Is there ambiguity or an unsettled architectural decision?
    ↓
-۲. این Skill را اجرا کن (مصاحبه + GLOSSARY.md + در صورت لزوم ADR)
+2. Run this Skill (Interview + GLOSSARY.md + ADR if necessary)
    ↓
-۳. حالا یک Task Entry رسمی در roadmap مربوطه بساز
+3. Create an official Task Entry in the relevant roadmap
    ↓
-۴. گردش‌کار استاندارد AGENTS.md (Builder/Tester/Debugger) شروع می‌شود
+4. Standard AGENTS.md workflow (Builder/Tester/Debugger) begins
 
-وقتی به ایجنت این فایل داده می‌شود، بگویید:
+When delegating to an agent with this file:
 "Follow the Grill With Docs instructions in this file. Start the interview about <topic>."
 
-> **مهم:** در حین اجرای یک تسکِ مشخص‌شده، هرگز جلسه‌ی مصاحبه‌ی طولانی (Grilling) راه نیندازید.
-> طبق AGENTS.md فقط یک سوال مشخص و متمرکز با پیشنهاد پیش‌فرض بپرسید.
+> **Important:** While executing an already-assigned task, never start a full extended grilling session.
+> Per AGENTS.md, ask only a single focused question with a recommended default.
 
 ---
 
