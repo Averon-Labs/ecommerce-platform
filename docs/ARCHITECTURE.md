@@ -105,7 +105,7 @@ docs/       → Shared documentation
 | Logging | Server-side structured logs; never include credentials or payment data | DECIDED |
 | Monitoring | Out of scope for the portfolio demo; define before public production use | DEFERRED |
 | Caching | HTTP/client caching only where useful; no distributed cache in the first release | DECIDED |
-| File Storage | Seeded image URLs or local development storage; production storage is out of scope | DECIDED |
+| File Storage | Admin-uploaded product images stored on the API host and served through the public media endpoint; seeded/external URLs remain valid | DECIDED |
 
 ---
 

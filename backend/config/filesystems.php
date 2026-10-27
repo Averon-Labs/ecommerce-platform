@@ -47,6 +47,18 @@ return [
             'report' => false,
         ],
 
+        // CAT-003: admin-uploaded product images. Kept outside the web root
+        // and served through GET /api/v1/media/product-images/{filename},
+        // so uploads work whether the host publishes Laravel's public
+        // directory or only routes /api/* through the front controller.
+        'product-images' => [
+            'driver' => 'local',
+            'root' => storage_path('app/product-images'),
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

@@ -22,6 +22,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\ProductController;
@@ -36,6 +37,16 @@ Route::get('products', [ProductController::class, 'index'])
 Route::get('products/{productId}', [ProductController::class, 'show'])
     ->whereNumber('productId')
     ->middleware('throttle:public-read');
+
+// ------------------------------------------------- Stored product images (CAT-003)
+
+// Files uploaded through POST /admin/products/{productId}/images. Served by
+// the API (not by the web server) so the path works on every host layout.
+// Files are organised per product in product-id subdirectories.
+Route::get('media/product-images/{productId}/{filename}', [MediaController::class, 'productImage'])
+    ->whereNumber('productId')
+    ->where('filename', '[A-Za-z0-9][A-Za-z0-9._-]{0,120}')
+    ->name('media.product-images');
 
 // ------------------------------------------------------------- Customer auth
 
@@ -110,7 +121,17 @@ Route::prefix('admin')->group(function (): void {
             Route::put('products/{productId}', [AdminProductController::class, 'update'])
                 ->whereNumber('productId')
                 ->middleware('throttle:admin-write');
+            Route::post('products/{productId}/images', [AdminProductController::class, 'storeImage'])
+                ->whereNumber('productId')
+                ->middleware('throttle:admin-write');
+            Route::delete('products/{productId}/images/{imageId}', [AdminProductController::class, 'deleteImage'])
+                ->whereNumber('productId')
+                ->whereNumber('imageId')
+                ->middleware('throttle:admin-write');
             Route::post('products/{productId}/archive', [AdminProductController::class, 'archive'])
+                ->whereNumber('productId')
+                ->middleware('throttle:admin-write');
+            Route::delete('products/{productId}', [AdminProductController::class, 'destroy'])
                 ->whereNumber('productId')
                 ->middleware('throttle:admin-write');
 

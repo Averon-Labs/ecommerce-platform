@@ -345,3 +345,37 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Real client-ID check (2026-10-25):** the owner supplied a Google OAuth client from the `eshop-verse` project. It was configured in the git-ignored `backend/.env`; `config('services.google.client_id')` reported it and the live endpoint then answered `401 INVALID_CREDENTIALS` (not the unconfigured `500`) for malformed, wrong-audience, and forged-signature tokens, still creating no account. A genuine Google-issued token could not be obtained non-interactively: the first download was an installed/Android client (no client secret or redirect URIs), while ID-token verification requires the **Web application** client ID used by the app as its server client ID, and Google blocks the OAuth loopback flow for local testing. The owner then supplied a **Web application** client for the same project. It was configured locally; `config('services.google.client_id')` reports it, a forged token carrying that audience reached Google's real JWKS endpoint and the key response was cached, an Android-client audience was rejected, and no account was created by any failed attempt. The client secret was not stored or used: ID-token verification needs only the public client ID. Remaining real-account test: the Android app still carries the placeholder Web client ID, so an end-to-end Google sign-in needs the app pointed at the supplied Web client and run on a device/emulator (Android component); no backend code defect blocks it.
 
+## Phase 5 — Product Media & Catalog Lifecycle
+
+**Project phase gate:** this phase has no entry in the project roadmap; it is backend-owned catalog work requested directly by the owner on 2026-10-27 (image upload/delete in the admin dashboard, and product deletion removing its files).
+
+### Step 1 — CAT-B01 — Product image upload, deletion, and storage
+
+**Status:** `[~]`
+
+**Depends on:** CAT-003
+
+**Scope:** Move product imagery from URL strings to server-held files: a multipart upload operation, per-image deletion that also removes the file, a public read path for stored files, and the matching contract documentation.
+
+**Acceptance criteria:**
+- [x] **a.** `POST /admin/products/{productId}/images` accepts one JPEG/PNG/WebP/GIF of at most 5 MB (validated on detected content type, stored under a generated name), stores it on the `product-images` disk, appends the row, and answers `201` with the `ProductImage` payload; exceeding eight images answers `409 PRODUCT_IMAGE_LIMIT`.
+- [x] **b.** `DELETE /admin/products/{productId}/images/{imageId}` removes the row and the stored file for URLs this API produced, while seeded/external URLs only lose their row; unknown product or image ids answer `404`.
+- [x] **c.** Stored files are served publicly by `GET /media/product-images/{filename}` with a filename constraint that blocks path traversal, and `docs/openapi.yaml` documents all three operations, `ProductImage.id`, the new error codes, and the rate-limit classes.
+
+**Verification (2026-10-27, builder):** `ProductImageStorage` writes to the new `product-images` disk (outside the web root) and builds URLs from the named media route, so uploads work whether the host publishes `public/` or only routes `/api/*` to the front controller; the controller never uses a client-supplied file name. New `tests/Feature/Admin/AdminProductImageTest.php` covers upload (201, file on disk, DB row, public `200 image/png` read), a renamed script rejected with `422`, the 5 MB ceiling, the eight-image cap (`409`), image deletion (row + file + subsequent `404`), external URLs left untouched on disk, guest `401` and customer `401 UNAUTHENTICATED` on the admin route, and traversal/unknown-name `404`. Evidence: `AdminProductImageTest` = 11 tests / 118 assertions / 0 failures on the SQLite fallback. Pending: independent tester stage and the owner's Git/PR step (backend agents run no Git).
+
+### Step 2 — CAT-B02 — Product deletion with stored-file cleanup
+
+**Status:** `[~]`
+
+**Depends on:** CAT-B01
+
+**Scope:** Give the admin dashboard a real delete for products that removes the product together with its image rows, stored files, inventory row, and cart lines, while protecting order snapshots.
+
+**Acceptance criteria:**
+- [x] **a.** `DELETE /admin/products/{productId}` deletes the product, its image rows, its inventory row, and any cart lines in one transaction, then removes the stored image files from the server, answering `204`.
+- [x] **b.** A product referenced by any order answers `409 PRODUCT_HAS_ORDERS` with guidance to archive instead, and nothing — row, image row, or file — is removed.
+- [x] **c.** Replacing `imageUrls` on `PUT /admin/products/{productId}` deletes the stored files that left the list, keeps external URLs untouched, and both new codes are documented in `docs/openapi.yaml`.
+
+**Verification (2026-10-27, builder):** `AdminProductController::destroy()` checks `order_items` first (the schema keeps a RESTRICT foreign key there), performs explicit per-table deletes inside a transaction instead of relying on engine-specific cascades, and only then deletes files through `ProductImageStorage::deleteByUrl()`, which ignores external URLs. `replaceImages()` now deletes rows by `product_id` (the `images` relation carries an `ORDER BY`, which a `DELETE` statement does not accept on every database) and drops files that no longer appear in the payload. Test cases in `AdminProductImageTest` cover deletion with an inventory row and a cart line (all rows and the file gone), the order guard (`409 PRODUCT_HAS_ORDERS`, everything intact), and the `PUT` cleanup. Evidence: same run as CAT-B01 — 11 tests / 118 assertions / 0 failures; `AdminProductTest` (12 tests) still passes. Pending: independent tester stage and the owner's Git/PR step.
+
