@@ -41,20 +41,28 @@ function StockValue({ product }: { product: AdminProduct }) {
 }
 
 function ProductThumb({ product }: { product: AdminProduct }) {
+  const [loaded, setLoaded] = useState(false);
+
   if (product.imageUrl) {
     return (
-      <img
-        src={product.imageUrl}
-        alt=""
-        className="h-10 w-10 shrink-0 rounded-lg border border-border object-cover"
-      />
+      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
+        {!loaded && <div className="absolute inset-0 animate-pulse bg-muted-foreground/10" />}
+        <img
+          src={product.imageUrl}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          onLoad={() => setLoaded(true)}
+          className={`h-full w-full object-cover transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+        />
+      </div>
     );
   }
 
   return (
     <span
       aria-hidden="true"
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-border text-[10px] text-muted-foreground"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-border bg-muted/40 text-[10px] text-muted-foreground"
     >
       No image
     </span>

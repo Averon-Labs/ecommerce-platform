@@ -53,6 +53,28 @@ describe('ProductsPage (A-02)', () => {
     ).toBeInTheDocument();
   });
 
+  it('products_list_renders_thumbnail_with_lazy_loading_and_async_decoding', async () => {
+    mockApi([
+      sessionRoute(),
+      categoryListRoute(),
+      productsRoute(() =>
+        jsonResponse(200, {
+          data: [product({ imageUrl: 'https://example.com/lamp.jpg' })],
+          pagination: pagination(1, 20, 1, 1),
+        }),
+      ),
+    ]);
+
+    render(<App />);
+
+    const table = await findProductsTable();
+    const thumb = table.querySelector('img');
+    expect(thumb).not.toBeNull();
+    expect(thumb).toHaveAttribute('loading', 'lazy');
+    expect(thumb).toHaveAttribute('decoding', 'async');
+    expect(thumb).toHaveAttribute('src', 'https://example.com/lamp.jpg');
+  });
+
   it('products_empty_catalog_offers_add_product', async () => {
     mockApi([
       sessionRoute(),

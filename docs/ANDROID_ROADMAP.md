@@ -715,18 +715,18 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 4 — IMG-005 — Admin Dashboard Zero-CLS & Web Lazy Loading Standards
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** UI-003, FND-003
 
 **Scope:** Apply `loading="lazy"`, `decoding="async"`, and skeleton shimmer utilities across product thumbnail images in the Admin React web dashboard (`ProductsPage.tsx` and `ProductFormPage.tsx`).
 
 **Acceptance criteria:**
-- [ ] **a.** Thumbnail images in `admin/src/pages/products/ProductsPage.tsx` have `loading="lazy"` and `decoding="async"`.
-- [ ] **b.** Thumbnail containers in admin table enforce fixed aspect ratios (`w-10 h-10` or `aspect-square`) with a skeleton shimmer pulse background during network loading.
-- [ ] **c.** Product preview in `admin/src/pages/products/ProductFormPage.tsx` applies `decoding="async"` and smooth transition opacity.
+- [x] **a.** Thumbnail images in `admin/src/pages/products/ProductsPage.tsx` have `loading="lazy"` and `decoding="async"`.
+- [x] **b.** Thumbnail containers in admin table enforce fixed aspect ratios (`w-10 h-10` or `aspect-square`) with a skeleton shimmer pulse background during network loading.
+- [x] **c.** Product preview in `admin/src/pages/products/ProductFormPage.tsx` applies `decoding="async"` and smooth transition opacity.
 
-**Verification:** TypeScript type check (`npm run build` or `npm test` in `admin/`) succeeds with zero errors.
+**Verification:** TypeScript type check and production build (`npm run build` in `admin/` producing bundle with 0 errors) and Vitest suite (`npm test` in `admin/` passing 86 of 86 unit tests). Phase 11 complete!
 
 ## External dependencies owned by other components
 
