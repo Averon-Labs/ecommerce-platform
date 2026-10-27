@@ -25,6 +25,39 @@ public class ImageLoaderHelperTest {
         assertEquals(250, ImageLoaderHelper.DEFAULT_CROSS_FADE_DURATION_MS);
         assertEquals(R.drawable.bg_placeholder_shimmer, ImageLoaderHelper.DEFAULT_PLACEHOLDER_RES);
         assertEquals(R.drawable.bg_placeholder_error, ImageLoaderHelper.DEFAULT_ERROR_RES);
+        assertEquals(com.bumptech.glide.Priority.LOW, ImageLoaderHelper.PREFETCH_PRIORITY);
+    }
+
+    @Test
+    public void testPreloadOnDestroyedOrFinishingActivitySafelyHandled() {
+        Activity mockDestroyedActivity = mock(Activity.class);
+        when(mockDestroyedActivity.isDestroyed()).thenReturn(true);
+        when(mockDestroyedActivity.isFinishing()).thenReturn(false);
+
+        ImageLoaderHelper.preload(mockDestroyedActivity, "https://example.com/item.jpg");
+
+        Activity mockFinishingActivity = mock(Activity.class);
+        when(mockFinishingActivity.isDestroyed()).thenReturn(false);
+        when(mockFinishingActivity.isFinishing()).thenReturn(true);
+
+        ImageLoaderHelper.preload(mockFinishingActivity, "https://example.com/item.jpg");
+    }
+
+    @Test
+    public void testPreloadBatchOnDestroyedOrFinishingActivitySafelyHandled() {
+        List<String> urls = Collections.singletonList("https://example.com/item.jpg");
+
+        Activity mockDestroyedActivity = mock(Activity.class);
+        when(mockDestroyedActivity.isDestroyed()).thenReturn(true);
+        when(mockDestroyedActivity.isFinishing()).thenReturn(false);
+
+        ImageLoaderHelper.preloadBatch(mockDestroyedActivity, urls);
+
+        Activity mockFinishingActivity = mock(Activity.class);
+        when(mockFinishingActivity.isDestroyed()).thenReturn(false);
+        when(mockFinishingActivity.isFinishing()).thenReturn(true);
+
+        ImageLoaderHelper.preloadBatch(mockFinishingActivity, urls);
     }
 
     @Test

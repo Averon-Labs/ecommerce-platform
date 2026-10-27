@@ -97,9 +97,9 @@ This document defines the actionable checklist and implementation steps for opti
   - [`android/app/src/main/java/com/averonlabs/eshopverse/catalog/fragment/ExploreFragment.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/catalog/fragment/ExploreFragment.java)
   - [`android/app/src/main/java/com/averonlabs/eshopverse/shell/HomeFragment.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/shell/HomeFragment.java)
 * **Execution Checklist:**
-  - [ ] Catalog scroll listener detects scroll direction.
-  - [ ] On downward scroll, prefetch 4 to 6 upcoming product images into cache via `ImageLoaderHelper.preloadBatch()`.
-  - [ ] Prefetch tasks run at Low Priority to ensure on-screen bandwidth is not degraded.
+  - [x] Catalog scroll listener detects scroll direction.
+  - [x] On downward scroll, prefetch 4 to 6 upcoming product images into cache via `ImageLoaderHelper.preloadBatch()`.
+  - [x] Prefetch tasks run at Low Priority to ensure on-screen bandwidth is not degraded.
 
 ---
 
@@ -113,4 +113,4 @@ All remaining Android implementation items are tracked canonically in **[Android
 - [x] **Step 5:** Implementation in `CartAdapter.java` and cart line layout
 - [x] **Step 6:** Implementation in `ReviewItemsAdapter.java` (token polish in **IMG-004**)
 - [x] **Step 7 (IMG-002):** Optimistic text-first transition in `ProductDetailFragment.java` & arguments
-- [ ] **Step 8 (IMG-003):** Lookahead prefetching in fragments (low-priority tuning in **IMG-003**)
+- [x] **Step 8 (IMG-003):** Lookahead prefetching in fragments (low-priority tuning in **IMG-003**)

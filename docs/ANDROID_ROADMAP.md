@@ -685,16 +685,16 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 2 — IMG-003 — Prefetch Bandwidth Guard & Low-Priority Glide Optimization
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** IMG-001
 
 **Scope:** Configure `ImageLoaderHelper.preload()` and `ImageLoaderHelper.preloadBatch()` to execute with `Priority.LOW` so background scroll lookahead downloads do not contend for HTTP/2 connection pools or bandwidth with active on-screen viewports on weak mobile connections.
 
 **Acceptance criteria:**
-- [ ] **a.** `ImageLoaderHelper.preload()` explicitly applies `.priority(Priority.LOW)` to speculative Glide requests.
-- [ ] **b.** `ImageLoaderHelper.preloadBatch()` preserves `Priority.LOW` across batch iterations and checks activity/context lifecycle before queuing.
-- [ ] **c.** Unit test in `ImageLoaderHelperTest` asserts `Priority.LOW` configuration and null-safe execution.
+- [x] **a.** `ImageLoaderHelper.preload()` explicitly applies `.priority(Priority.LOW)` to speculative Glide requests.
+- [x] **b.** `ImageLoaderHelper.preloadBatch()` preserves `Priority.LOW` across batch iterations and checks activity/context lifecycle before queuing.
+- [x] **c.** Unit test in `ImageLoaderHelperTest` asserts `Priority.LOW` configuration and null-safe execution.
 
 **Verification:** unit tests in `ImageLoaderHelperTest` pass cleanly with JVM mock verification; `./gradlew testDebugUnitTest --tests ImageLoaderHelperTest` passes.
 

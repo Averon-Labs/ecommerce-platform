@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.averonlabs.eshopverse.R;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
@@ -23,10 +24,13 @@ import java.util.List;
  * 4. Muted editorial error fallback vectors.
  * 5. Smooth 250ms hardware cross-fade transition.
  * 6. Multi-tier intelligent caching (RAM LRU + Disk Cache AUTOMATIC).
+ * 7. Low-priority speculative prefetching (IMG-003) to prevent socket starvation.
  */
 public final class ImageLoaderHelper {
 
     public static final int DEFAULT_CROSS_FADE_DURATION_MS = 250;
+
+    public static final Priority PREFETCH_PRIORITY = Priority.LOW;
 
     @DrawableRes
     public static final int DEFAULT_PLACEHOLDER_RES = R.drawable.bg_placeholder_shimmer;
@@ -125,18 +129,26 @@ public final class ImageLoaderHelper {
     }
 
     /**
-     * Proactively preloads an image URL into Glide's disk and memory cache.
-     * Used by scroll prefetchers to guarantee 0ms pop-in when scrolled into view.
+     * Proactively preloads an image URL into Glide's disk and memory cache with Priority.LOW (IMG-003).
+     * Used by scroll prefetchers so lookahead requests do not compete with visible viewport requests.
      */
     public static void preload(@Nullable Context context, @Nullable String url) {
         if (context == null || url == null || url.trim().isEmpty()) {
             return;
         }
 
+        if (context instanceof android.app.Activity) {
+            android.app.Activity activity = (android.app.Activity) context;
+            if (activity.isDestroyed() || activity.isFinishing()) {
+                return;
+            }
+        }
+
         try {
             Context appContext = context.getApplicationContext();
             Glide.with(appContext)
                     .load(url.trim())
+                    .priority(PREFETCH_PRIORITY)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .skipMemoryCache(false)
                     .preload();
@@ -146,11 +158,18 @@ public final class ImageLoaderHelper {
     }
 
     /**
-     * Proactively preloads a batch of image URLs into cache.
+     * Proactively preloads a batch of image URLs into cache with Priority.LOW (IMG-003).
      */
     public static void preloadBatch(@Nullable Context context, @Nullable List<String> urls) {
         if (context == null || urls == null || urls.isEmpty()) {
             return;
+        }
+
+        if (context instanceof android.app.Activity) {
+            android.app.Activity activity = (android.app.Activity) context;
+            if (activity.isDestroyed() || activity.isFinishing()) {
+                return;
+            }
         }
 
         Context appContext = context.getApplicationContext();

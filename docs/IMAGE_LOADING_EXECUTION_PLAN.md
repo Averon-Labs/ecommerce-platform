@@ -121,9 +121,9 @@ This part covers all implementation steps for image loading infrastructure, adap
   - [`android/app/src/main/java/com/averonlabs/eshopverse/catalog/fragment/ExploreFragment.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/catalog/fragment/ExploreFragment.java)
   - [`android/app/src/main/java/com/averonlabs/eshopverse/shell/HomeFragment.java`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/java/com/averonlabs/eshopverse/shell/HomeFragment.java)
 * **Execution Checklist:**
-  - [ ] Catalog scroll listener detects scroll direction.
-  - [ ] On downward scroll, prefetch 4 to 6 upcoming product images into cache via `ImageLoaderHelper.preloadBatch()`.
-  - [ ] Prefetch tasks run at Low Priority to ensure on-screen bandwidth is not degraded.
+  - [x] Catalog scroll listener detects scroll direction.
+  - [x] On downward scroll, prefetch 4 to 6 upcoming product images into cache via `ImageLoaderHelper.preloadBatch()`.
+  - [x] Prefetch tasks run at Low Priority to ensure on-screen bandwidth is not degraded.
 
 ---
 
