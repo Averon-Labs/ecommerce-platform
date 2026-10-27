@@ -700,18 +700,18 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 3 — IMG-004 — Layout Token & Active Shimmer Alignment across Order Review Views
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** ORD-002, UI-002
 
 **Scope:** Reconcile `item_review_line.xml` to include active shimmer placeholder backgrounds (`@drawable/bg_placeholder_shimmer`) and enforce fixed dimensions so checkout review lines never display blank voids before image arrival.
 
 **Acceptance criteria:**
-- [ ] **a.** `item_review_line.xml` adds `android:background="@drawable/bg_placeholder_shimmer"` to `iv_review_item_image` with fixed `48dp x 48dp` bounds.
-- [ ] **b.** Confirm all item thumbnails in review, order confirmation, and order history have immutable dimensions with zero `wrap_content` containers.
-- [ ] **c.** Layout verification confirms zero layout shift (CLS = 0) on order review screens.
+- [x] **a.** `item_review_line.xml` adds `android:background="@drawable/bg_placeholder_shimmer"` to `iv_review_item_image` with fixed `48dp x 48dp` bounds.
+- [x] **b.** Confirm all item thumbnails in review, order confirmation, and order history have immutable dimensions with zero `wrap_content` containers.
+- [x] **c.** Layout verification confirms zero layout shift (CLS = 0) on order review screens.
 
-**Verification:** layout inspection and unit/rendering verification in `testDebugUnitTest`.
+**Verification:** layout inspection and unit/rendering verification in `testDebugUnitTest` passing cleanly.
 
 ### Step 4 — IMG-005 — Admin Dashboard Zero-CLS & Web Lazy Loading Standards
 
