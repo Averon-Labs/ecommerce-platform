@@ -247,3 +247,22 @@ A local preview smoke test at 1200px confirmed: the OS-dark default rendered dar
 light, `localStorage["eshop-admin-theme"]` became `light`, and a reload kept the light theme. The prepared
 upload archive is `deploy/eshopverse-admin-dist.zip`; live upload is the owner's remaining deployment step
 (see [`DEPLOYMENT.md`](DEPLOYMENT.md)). No independent tester was assigned to this post-phase enhancement.
+
+## Phase 4 — Product Images and Deletion
+
+**Project phase gate:** this phase has no entry in the project roadmap; it is admin-owned work requested directly by the owner on 2026-10-27, delivered together with the backend CAT-B01/CAT-B02 steps.
+
+### Step 1 — CAT-005 — Image upload/remove controls and product deletion
+
+**Status:** `[~]`
+
+**Depends on:** CAT-B01, CAT-B02 (backend)
+
+**Scope:** Replace the URL fields of A-03 with upload and remove controls backed by the new backend operations, and give A-02 a confirmed Delete action.
+
+**Acceptance criteria:**
+- [x] **a.** The product form sends image files as multipart to `POST /admin/products/{id}/images`, shows each stored image with its preview and a **Remove** control that calls `DELETE /admin/products/{id}/images/{imageId}`, and keeps up/down ordering in the `imageUrls` payload on save; URL entry is gone.
+- [x] **b.** A new product disables its file picker until it has been saved once, the eight-image limit and the server's `422`/`409` messages are surfaced as an accessible alert, and image operations are immediate so they never count as unsaved edits.
+- [x] **c.** The product list offers a confirmed **Delete** that calls `DELETE /admin/products/{id}`, reports the server's message (including `409 PRODUCT_HAS_ORDERS`) and the success feedback, and refreshes the list.
+
+**Verification (2026-10-27, builder):** `admin/src/api/http.ts` gained a `formData` path that deliberately omits `Content-Type` so the browser sets the multipart boundary (the CSRF header and retry behavior are unchanged); `catalog.ts` adds `uploadAdminProductImage`, `deleteAdminProductImage`, and `deleteAdminProduct`; `ProductImage` in `types.ts` now carries `id`. `ProductFormPage` tracks the image list separately from the saved baseline, so an upload or removal updates both and the unsaved-change guard still catches edits to the other fields (asserted by a test that navigates away without a dialog after an upload and a removal). `ProductsPage` adds the confirmed delete row/card action. Evidence: `npm run typecheck`, `npm run lint`, `npm run check:contrast` (34/34), `npm test` (11 files, 89 tests — 4 new: multipart upload with no hand-written content type, immediate delete, upload-failure alert, delete confirm/conflict), and `npm run build` all pass. Pending: independent tester stage and the owner's Git/PR step.

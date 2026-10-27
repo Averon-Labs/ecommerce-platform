@@ -9,6 +9,7 @@ import type {
   InventoryQuery,
   InventoryRow,
   Paged,
+  ProductImage,
 } from './types';
 
 /**
@@ -16,6 +17,8 @@ import type {
  *
  * Stock is owned by `PATCH /admin/inventory/{productId}` and is never part of
  * the product payload; archiving uses dedicated endpoints and is not a delete.
+ * Image files are uploaded and deleted through their own operations — the
+ * product payload only carries their order.
  */
 
 /* ------------------------------------------------------------------ products */
@@ -70,6 +73,33 @@ export async function archiveAdminProduct(productId: number): Promise<AdminProdu
     { method: 'POST' },
   );
   return payload.data;
+}
+
+/**
+ * Hard-delete a product, its image rows, and the files stored for them.
+ * Answers 409 `PRODUCT_HAS_ORDERS` when an order references the product.
+ */
+export async function deleteAdminProduct(productId: number): Promise<void> {
+  await apiRequest<void>(`/admin/products/${productId}`, { method: 'DELETE' });
+}
+
+/** POST /admin/products/{id}/images — multipart upload of one image file. */
+export async function uploadAdminProductImage(productId: number, file: File): Promise<ProductImage> {
+  const data = new FormData();
+  data.append('image', file);
+
+  const payload = await apiRequest<{ data: ProductImage }>(`/admin/products/${productId}/images`, {
+    method: 'POST',
+    formData: data,
+  });
+  return payload.data;
+}
+
+/** DELETE /admin/products/{id}/images/{imageId} — also removes the file. */
+export async function deleteAdminProductImage(productId: number, imageId: number): Promise<void> {
+  await apiRequest<void>(`/admin/products/${productId}/images/${imageId}`, {
+    method: 'DELETE',
+  });
 }
 
 /* ---------------------------------------------------------------- categories */

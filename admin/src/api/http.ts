@@ -66,6 +66,8 @@ export function readCookie(name: string): string | null {
 interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   body?: unknown;
+  /** multipart payload (file upload); the browser sets the boundary. */
+  formData?: FormData;
   signal?: AbortSignal;
 }
 
@@ -102,7 +104,9 @@ async function send<T>(
   const method = options.method ?? 'GET';
   const headers: Record<string, string> = { Accept: 'application/json' };
 
-  if (options.body !== undefined) {
+  if (options.formData === undefined && options.body !== undefined) {
+    // A FormData body must keep the browser-generated multipart boundary,
+    // so Content-Type is set only for the JSON path.
     headers['Content-Type'] = 'application/json';
   }
 
@@ -117,7 +121,9 @@ async function send<T>(
     method,
     headers,
     credentials: 'include',
-    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+    body:
+      options.formData ??
+      (options.body === undefined ? undefined : JSON.stringify(options.body)),
     signal: options.signal,
   });
 

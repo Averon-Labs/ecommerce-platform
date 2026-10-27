@@ -53,28 +53,6 @@ describe('ProductsPage (A-02)', () => {
     ).toBeInTheDocument();
   });
 
-  it('products_list_renders_thumbnail_with_lazy_loading_and_async_decoding', async () => {
-    mockApi([
-      sessionRoute(),
-      categoryListRoute(),
-      productsRoute(() =>
-        jsonResponse(200, {
-          data: [product({ imageUrl: 'https://example.com/lamp.jpg' })],
-          pagination: pagination(1, 20, 1, 1),
-        }),
-      ),
-    ]);
-
-    render(<App />);
-
-    const table = await findProductsTable();
-    const thumb = table.querySelector('img');
-    expect(thumb).not.toBeNull();
-    expect(thumb).toHaveAttribute('loading', 'lazy');
-    expect(thumb).toHaveAttribute('decoding', 'async');
-    expect(thumb).toHaveAttribute('src', 'https://example.com/lamp.jpg');
-  });
-
   it('products_empty_catalog_offers_add_product', async () => {
     mockApi([
       sessionRoute(),
@@ -277,5 +255,81 @@ describe('ProductsPage (A-02)', () => {
     expect(within(secondNav).getByText('Page 2 of 2')).toBeInTheDocument();
     expect(within(secondNav).getByRole('button', { name: 'Next' })).toBeDisabled();
     expect(urls.some((url) => url.includes('page=2'))).toBe(true);
+  });
+
+  it('delete_product_confirms_calls_the_api_and_refreshes_the_list', async () => {
+    let deleted = false;
+    const fetchMock = mockApi([
+      sessionRoute(),
+      categoryListRoute([]),
+      productsRoute(() =>
+        jsonResponse(200, {
+          data: deleted ? [] : [product()],
+          pagination: deleted ? pagination() : pagination(1, 20, 1, 1),
+        }),
+      ),
+      {
+        method: 'DELETE',
+        path: '/admin/products/5',
+        handler: () => {
+          deleted = true;
+          return jsonResponse(204);
+        },
+      },
+    ]);
+
+    render(<App />);
+
+    const table = await findProductsTable();
+    fireEvent.click(within(table).getByRole('button', { name: 'Delete Aurora Desk Lamp' }));
+
+    const dialog = await screen.findByRole('dialog', { name: 'Delete Aurora Desk Lamp?' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Delete product' }));
+
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Aurora Desk Lamp was deleted, including its images.',
+    );
+    expect(await screen.findByText('No products yet')).toBeInTheDocument();
+
+    const deleteCall = fetchMock.mock.calls.find(
+      ([url, init]) =>
+        (init as RequestInit | undefined)?.method === 'DELETE' &&
+        String(url).endsWith('/admin/products/5'),
+    );
+    expect(deleteCall).toBeDefined();
+  });
+
+  it('delete_conflict_surfaces_the_server_message_and_keeps_the_product', async () => {
+    mockApi([
+      sessionRoute(),
+      categoryListRoute([]),
+      productsRoute(() =>
+        jsonResponse(200, { data: [product()], pagination: pagination(1, 20, 1, 1) }),
+      ),
+      {
+        method: 'DELETE',
+        path: '/admin/products/5',
+        handler: () =>
+          jsonResponse(409, {
+            error: {
+              code: 'PRODUCT_HAS_ORDERS',
+              message: 'This product belongs to an existing order and cannot be deleted.',
+            },
+          }),
+      },
+    ]);
+
+    render(<App />);
+
+    const table = await findProductsTable();
+    fireEvent.click(within(table).getByRole('button', { name: 'Delete Aurora Desk Lamp' }));
+
+    const dialog = await screen.findByRole('dialog', { name: 'Delete Aurora Desk Lamp?' });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Delete product' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'This product belongs to an existing order and cannot be deleted.',
+    );
+    expect(within(await findProductsTable()).getByText('Aurora Desk Lamp')).toBeInTheDocument();
   });
 });

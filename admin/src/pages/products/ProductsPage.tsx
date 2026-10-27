@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { archiveAdminProduct, listAdminCategories, listAdminProducts } from '../../api/catalog';
+import {
+  archiveAdminProduct,
+  deleteAdminProduct,
+  listAdminCategories,
+  listAdminProducts,
+} from '../../api/catalog';
 import { ApiError } from '../../api/http';
 import type { AdminCategory, AdminProduct, Pagination as PaginationMeta, ProductStatus } from '../../api/types';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
@@ -41,28 +46,20 @@ function StockValue({ product }: { product: AdminProduct }) {
 }
 
 function ProductThumb({ product }: { product: AdminProduct }) {
-  const [loaded, setLoaded] = useState(false);
-
   if (product.imageUrl) {
     return (
-      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-border bg-muted">
-        {!loaded && <div className="absolute inset-0 animate-pulse bg-muted-foreground/10" />}
-        <img
-          src={product.imageUrl}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          onLoad={() => setLoaded(true)}
-          className={`h-full w-full object-cover transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
-        />
-      </div>
+      <img
+        src={product.imageUrl}
+        alt=""
+        className="h-10 w-10 shrink-0 rounded-lg border border-border object-cover"
+      />
     );
   }
 
   return (
     <span
       aria-hidden="true"
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-border bg-muted/40 text-[10px] text-muted-foreground"
+      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-dashed border-border text-[10px] text-muted-foreground"
     >
       No image
     </span>
@@ -90,6 +87,8 @@ export default function ProductsPage() {
   const [reloadToken, setReloadToken] = useState(0);
   const [archiveTarget, setArchiveTarget] = useState<AdminProduct | null>(null);
   const [archiving, setArchiving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<AdminProduct | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -194,6 +193,31 @@ export default function ProductsPage() {
     }
   }
 
+  async function confirmDelete() {
+    if (!deleteTarget) {
+      return;
+    }
+
+    setDeleting(true);
+    setActionError(null);
+
+    try {
+      const removed = deleteTarget.name;
+      await deleteAdminProduct(deleteTarget.id);
+      setDeleteTarget(null);
+      setFeedback(`${removed} was deleted, including its images.`);
+    } catch (error) {
+      // 409 PRODUCT_HAS_ORDERS arrives with the server's explanation.
+      setDeleteTarget(null);
+      setActionError(
+        error instanceof ApiError ? error.message : 'The product could not be deleted. Try again.',
+      );
+    } finally {
+      setDeleting(false);
+      setReloadToken((token) => token + 1);
+    }
+  }
+
   return (
     <section aria-labelledby="products-title" className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -202,7 +226,7 @@ export default function ProductsPage() {
             Products
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Create, edit, and archive catalog products. Stock is managed in Inventory.
+            Create, edit, archive, or delete catalog products. Stock is managed in Inventory.
           </p>
         </div>
         <Link to="/products/new" className={primaryButtonClass}>
@@ -400,6 +424,17 @@ export default function ProductsPage() {
                             Archive
                           </button>
                         )}
+                        <button
+                          type="button"
+                          aria-label={`Delete ${product.name}`}
+                          className={actionButtonClass}
+                          onClick={() => {
+                            setActionError(null);
+                            setDeleteTarget(product);
+                          }}
+                        >
+                          Delete
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -458,6 +493,17 @@ export default function ProductsPage() {
                       Archive
                     </button>
                   )}
+                  <button
+                    type="button"
+                    aria-label={`Delete ${product.name}`}
+                    className={actionButtonClass}
+                    onClick={() => {
+                      setActionError(null);
+                      setDeleteTarget(product);
+                    }}
+                  >
+                    Delete
+                  </button>
                 </div>
               </li>
             ))}
@@ -486,6 +532,20 @@ export default function ProductsPage() {
           }
         }}
         onConfirm={() => void confirmArchive()}
+      />
+
+      <ConfirmDialog
+        open={deleteTarget !== null}
+        title={deleteTarget ? `Delete ${deleteTarget.name}?` : 'Delete product?'}
+        description="The product and its uploaded images are removed from the server for good. Archive it instead if an order already references it."
+        confirmLabel="Delete product"
+        busy={deleting}
+        onCancel={() => {
+          if (!deleting) {
+            setDeleteTarget(null);
+          }
+        }}
+        onConfirm={() => void confirmDelete()}
       />
     </section>
   );

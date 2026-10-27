@@ -74,10 +74,9 @@ describe('ProductFormPage (A-03)', () => {
     fireEvent.change(screen.getByLabelText('Price (USD)'), { target: { value: '19.99' } });
     fireEvent.change(screen.getByLabelText(/^SKU/), { target: { value: 'NEW-1' } });
     fireEvent.change(screen.getByLabelText('Category'), { target: { value: '1' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Add image URL' }));
-    fireEvent.change(screen.getByLabelText('Image URL 1'), {
-      target: { value: 'https://cdn.example.test/a.jpg' },
-    });
+    // Images cannot be uploaded before the product exists.
+    expect(screen.getByLabelText('Add images')).toBeDisabled();
+    expect(screen.getByText('Save the product first, then add its images.')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     expect(
@@ -96,7 +95,7 @@ describe('ProductFormPage (A-03)', () => {
       sku: 'NEW-1',
       categoryId: 1,
       status: 'active',
-      imageUrls: ['https://cdn.example.test/a.jpg'],
+      imageUrls: [],
     });
   });
 
@@ -112,7 +111,7 @@ describe('ProductFormPage (A-03)', () => {
             data: product({
               id: 7,
               status: 'inactive',
-              images: [{ url: 'https://cdn.example.test/a.jpg', sortOrder: 0 }],
+              images: [{ id: 11, url: 'https://cdn.example.test/a.jpg', sortOrder: 0 }],
             }),
           }),
       },
@@ -135,7 +134,8 @@ describe('ProductFormPage (A-03)', () => {
     await screen.findByRole('heading', { level: 1, name: 'Edit product' });
     await waitFor(() => expect(screen.getByLabelText('Name')).toHaveValue('Aurora Desk Lamp'));
     expect(screen.getByLabelText(/^SKU/)).toHaveValue('AUR-1');
-    expect(screen.getByLabelText('Image URL 1')).toHaveValue('https://cdn.example.test/a.jpg');
+    expect(screen.getByText('https://cdn.example.test/a.jpg')).toBeInTheDocument();
+    expect(screen.getByLabelText('Add images')).toBeEnabled();
 
     fireEvent.change(screen.getByLabelText(/^SKU/), { target: { value: 'DUP-1' } });
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
@@ -250,4 +250,130 @@ describe('ProductFormPage (A-03)', () => {
     // The failure is recoverable: entered values are preserved for the retry.
     expect(screen.getByLabelText('Name')).toHaveValue('Renamed Lamp');
   });
+
+  it('edit_form_uploads_and_removes_image_files_and_stays_clean_for_the_rest', async () => {
+    const fetchMock = mockApi([
+      sessionRoute(),
+      categoryListRoute(),
+      {
+        method: 'GET',
+        path: '/admin/products/7',
+        handler: () =>
+          jsonResponse(200, {
+            data: product({
+              id: 7,
+              images: [{ id: 11, url: 'https://cdn.example.test/a.jpg', sortOrder: 0 }],
+            }),
+          }),
+      },
+      {
+        method: 'POST',
+        path: '/admin/products/7/images',
+        handler: () =>
+          jsonResponse(201, {
+            data: {
+              id: 12,
+              url: '/api/v1/media/product-images/b.png',
+              sortOrder: 1,
+            },
+          }),
+      },
+      {
+        method: 'DELETE',
+        path: '/admin/products/7/images/11',
+        handler: () => jsonResponse(204),
+      },
+    ]);
+    window.history.pushState({}, '', '/products/7/edit');
+
+    render(<App />);
+
+    await screen.findByRole('heading', { level: 1, name: 'Edit product' });
+    await waitFor(() => expect(screen.getByText('https://cdn.example.test/a.jpg')).toBeInTheDocument());
+
+    // Upload: multipart body, no hand-written content type.
+    selectImageFile(
+      screen.getByLabelText('Add images') as HTMLInputElement,
+      new File(['png'], 'b.png', { type: 'image/png' }),
+    );
+
+    expect(
+      await screen.findByText('/api/v1/media/product-images/b.png'),
+    ).toBeInTheDocument();
+
+    const uploadCall = fetchMock.mock.calls.find(
+      ([, init]) => (init as RequestInit | undefined)?.method === 'POST',
+    );
+    expect(uploadCall).toBeDefined();
+    const uploadInit = uploadCall?.[1] as RequestInit;
+    expect(uploadInit.body).toBeInstanceOf(FormData);
+    expect((uploadInit.headers as Record<string, string>)['Content-Type']).toBeUndefined();
+
+    // Delete: the row is removed on the server right away.
+    fireEvent.click(screen.getByRole('button', { name: 'Remove image 1' }));
+
+    await waitFor(() =>
+      expect(screen.queryByText('https://cdn.example.test/a.jpg')).not.toBeInTheDocument(),
+    );
+
+    const deleteCall = fetchMock.mock.calls.find(
+      ([url, init]) =>
+        (init as RequestInit | undefined)?.method === 'DELETE' &&
+        String(url).endsWith('/admin/products/7/images/11'),
+    );
+    expect(deleteCall).toBeDefined();
+
+    // Uploads and deletions are already persisted, so the form is not dirty:
+    // leaving through the sidebar asks for no confirmation.
+    fireEvent.click(screen.getByRole('link', { name: 'Categories' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await screen.findByRole('heading', { level: 1, name: 'Categories' });
+  });
+
+  it('edit_form_reports_an_image_upload_failure_without_losing_the_form', async () => {
+    mockApi([
+      sessionRoute(),
+      categoryListRoute(),
+      {
+        method: 'GET',
+        path: '/admin/products/7',
+        handler: () => jsonResponse(200, { data: product({ id: 7 }) }),
+      },
+      {
+        method: 'POST',
+        path: '/admin/products/7/images',
+        handler: () =>
+          jsonResponse(422, {
+            error: {
+              code: 'VALIDATION_ERROR',
+              message: 'One or more request fields are invalid.',
+              details: [{ field: 'image', message: 'The image failed to upload.' }],
+            },
+          }),
+      },
+    ]);
+    window.history.pushState({}, '', '/products/7/edit');
+
+    render(<App />);
+
+    await screen.findByRole('heading', { level: 1, name: 'Edit product' });
+    await waitFor(() => expect(screen.getByLabelText('Add images')).toBeEnabled());
+
+    selectImageFile(
+      screen.getByLabelText('Add images') as HTMLInputElement,
+      new File(['png'], 'broken.png', { type: 'image/png' }),
+    );
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('The image failed to upload.');
+    expect(screen.getByText('No images yet.')).toBeInTheDocument();
+    expect(screen.getByLabelText('Name')).toHaveValue('Aurora Desk Lamp');
+  });
 });
+
+/**
+ * Attach one file to the native file input the way a browser selection does.
+ */
+function selectImageFile(input: HTMLInputElement, file: File) {
+  Object.defineProperty(input, 'files', { configurable: true, value: [file] });
+  fireEvent.change(input);
+}
