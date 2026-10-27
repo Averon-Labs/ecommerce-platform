@@ -11,6 +11,7 @@
         android:id="@+id/iv_review_item_image"
         android:layout_width="48dp"
         android:layout_height="48dp"
+        android:background="@drawable/bg_placeholder_shimmer"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_image_placeholder" />

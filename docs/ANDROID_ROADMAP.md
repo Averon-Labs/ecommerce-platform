@@ -700,33 +700,33 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 3 — IMG-004 — Layout Token & Active Shimmer Alignment across Order Review Views
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** ORD-002, UI-002
 
 **Scope:** Reconcile `item_review_line.xml` to include active shimmer placeholder backgrounds (`@drawable/bg_placeholder_shimmer`) and enforce fixed dimensions so checkout review lines never display blank voids before image arrival.
 
 **Acceptance criteria:**
-- [ ] **a.** `item_review_line.xml` adds `android:background="@drawable/bg_placeholder_shimmer"` to `iv_review_item_image` with fixed `48dp x 48dp` bounds.
-- [ ] **b.** Confirm all item thumbnails in review, order confirmation, and order history have immutable dimensions with zero `wrap_content` containers.
-- [ ] **c.** Layout verification confirms zero layout shift (CLS = 0) on order review screens.
+- [x] **a.** `item_review_line.xml` adds `android:background="@drawable/bg_placeholder_shimmer"` to `iv_review_item_image` with fixed `48dp x 48dp` bounds.
+- [x] **b.** Confirm all item thumbnails in review, order confirmation, and order history have immutable dimensions with zero `wrap_content` containers.
+- [x] **c.** Layout verification confirms zero layout shift (CLS = 0) on order review screens.
 
-**Verification:** layout inspection and unit/rendering verification in `testDebugUnitTest`.
+**Verification:** layout inspection and unit/rendering verification in `testDebugUnitTest` passing cleanly.
 
 ### Step 4 — IMG-005 — Admin Dashboard Zero-CLS & Web Lazy Loading Standards
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** UI-003, FND-003
 
 **Scope:** Apply `loading="lazy"`, `decoding="async"`, and skeleton shimmer utilities across product thumbnail images in the Admin React web dashboard (`ProductsPage.tsx` and `ProductFormPage.tsx`).
 
 **Acceptance criteria:**
-- [ ] **a.** Thumbnail images in `admin/src/pages/products/ProductsPage.tsx` have `loading="lazy"` and `decoding="async"`.
-- [ ] **b.** Thumbnail containers in admin table enforce fixed aspect ratios (`w-10 h-10` or `aspect-square`) with a skeleton shimmer pulse background during network loading.
-- [ ] **c.** Product preview in `admin/src/pages/products/ProductFormPage.tsx` applies `decoding="async"` and smooth transition opacity.
+- [x] **a.** Thumbnail images in `admin/src/pages/products/ProductsPage.tsx` have `loading="lazy"` and `decoding="async"`.
+- [x] **b.** Thumbnail containers in admin table enforce fixed aspect ratios (`w-10 h-10` or `aspect-square`) with a skeleton shimmer pulse background during network loading.
+- [x] **c.** Product preview in `admin/src/pages/products/ProductFormPage.tsx` applies `decoding="async"` and smooth transition opacity.
 
-**Verification:** TypeScript type check (`npm run build` or `npm test` in `admin/`) succeeds with zero errors.
+**Verification:** TypeScript type check and production build (`npm run build` in `admin/` producing bundle with 0 errors) and Vitest suite (`npm test` in `admin/` passing 86 of 86 unit tests). Phase 11 complete!
 
 ## External dependencies owned by other components
 

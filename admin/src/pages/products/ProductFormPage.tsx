@@ -49,17 +49,19 @@ const EMPTY_FORM: FormState = {
 /** Small demo-URL preview; a broken URL shows a placeholder instead. */
 function ImagePreview({ url }: { url: string }) {
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const trimmed = url.trim();
 
   useEffect(() => {
     setFailed(false);
+    setLoaded(false);
   }, [url]);
 
   if (!trimmed || failed) {
     return (
       <span
         aria-hidden="true"
-        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-dashed border-border text-[10px] text-muted-foreground"
+        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-dashed border-border bg-muted/40 text-[10px] text-muted-foreground"
       >
         {trimmed ? 'No preview' : 'Preview'}
       </span>
@@ -67,12 +69,17 @@ function ImagePreview({ url }: { url: string }) {
   }
 
   return (
-    <img
-      src={trimmed}
-      alt=""
-      onError={() => setFailed(true)}
-      className="h-16 w-16 shrink-0 rounded-xl border border-border object-cover"
-    />
+    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
+      {!loaded && <div className="absolute inset-0 animate-pulse bg-muted-foreground/10" />}
+      <img
+        src={trimmed}
+        alt=""
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        onError={() => setFailed(true)}
+        className={`h-full w-full object-cover transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+      />
+    </div>
   );
 }
 
