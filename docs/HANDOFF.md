@@ -266,8 +266,8 @@ npm run build            # type-check + production build (dist/)
 | ID | Screen | How to reach it | Key behaviors |
 |----|--------|-----------------|---------------|
 | **A-01** | **Admin sign in** | Open `http://localhost:5173` | Email + password with inline validation; throttle messages carry the retry hint; non-admin or expired sessions show a notice; the light/dark toggle is at the top-right and its choice persists. |
-| **A-02** | **Products** | Sidebar: **Products** | Search plus category/status filters, API pagination, row actions **Edit**/**Archive** (confirmation), responsive table-to-card layout on narrow screens. |
-| **A-03** | **Create/edit product** | **Add product** / row **Edit** | Grouped form (name, description, USD price, optional SKU, category, status, ordered demo image URLs with preview); unsaved-change guard; stock is managed in A-05, not here. |
+| **A-02** | **Products** | Sidebar: **Products** | Search plus category/status filters, API pagination, row actions **Edit**/**Archive**/**Delete** (both confirmed; a product already referenced by an order answers `409 PRODUCT_HAS_ORDERS`), responsive table-to-card layout on narrow screens. |
+| **A-03** | **Create/edit product** | **Add product** / row **Edit** | Grouped form (name, description, USD price, optional SKU, category, status, image upload/remove with previews); images are stored on the server as soon as they are added or removed; unsaved-change guard; stock is managed in A-05, not here. |
 | **A-04** | **Categories** | Sidebar: **Categories** | Create/edit, archive/restore; archiving is refused with the server's conflict message while active products remain assigned. |
 | **A-05** | **Inventory** | Sidebar: **Inventory** | Product/SKU/quantity/availability table; **Adjust stock** dialog validates a nonnegative integer; quantity zero reads **Out of stock** in catalog views. |
 | **A-06** | **Orders** | Sidebar: **Orders** | Search by reference or customer, status/date filters, API pagination, payment badge, responsive rows. |
@@ -282,7 +282,7 @@ npm run build            # type-check + production build (dist/)
 
 ### Known limitations (Admin)
 
-- **Demo image URLs only** — no binary upload; product images are ordered URL strings with previews.
+- **Images are uploaded, not linked** — the product form sends files to the API and removes them on the server; a new product must be saved once before its images can be added.
 - **Stock lives in Inventory (A-05)** and is never edited on the product form.
 - Desktop widths are the primary target; narrow screens fall back to the documented labelled card lists.
 - The light/dark preference is the only value stored in `localStorage` (`eshop-admin-theme`) and is non-sensitive; auth tokens and session state remain in Sanctum cookies. Deferred by product scope: analytics/overview, customer administration, CMS, and wishlist.

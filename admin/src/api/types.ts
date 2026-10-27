@@ -41,6 +41,8 @@ export type PaymentStatus = 'pending' | 'completed' | 'failed';
 export type PaymentMethod = 'demo';
 
 export interface ProductImage {
+  /** Row id; addressed by `DELETE /admin/products/{id}/images/{imageId}`. */
+  id: number;
   url: string;
   sortOrder: number;
 }

@@ -3,12 +3,14 @@ import type { FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   createAdminProduct,
+  deleteAdminProductImage,
   getAdminProduct,
   listAdminCategories,
   updateAdminProduct,
+  uploadAdminProductImage,
 } from '../../api/catalog';
 import { ApiError } from '../../api/http';
-import type { AdminCategory, AdminProductInput } from '../../api/types';
+import type { AdminCategory, AdminProductInput, ProductImage } from '../../api/types';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { useNavigationGuard } from '../../components/NavigationGuard';
 import { ErrorPanel } from '../../components/StatePanels';
@@ -33,7 +35,7 @@ interface FormState {
   sku: string;
   categoryId: string;
   status: 'active' | 'inactive';
-  imageUrls: string[];
+  images: ProductImage[];
 }
 
 const EMPTY_FORM: FormState = {
@@ -43,25 +45,26 @@ const EMPTY_FORM: FormState = {
   sku: '',
   categoryId: '',
   status: 'active',
-  imageUrls: [],
+  images: [],
 };
+
+/** Accepted upload types, mirroring the API's `mimes:` rule. */
+const IMAGE_ACCEPT = 'image/jpeg,image/png,image/webp,image/gif';
 
 /** Small demo-URL preview; a broken URL shows a placeholder instead. */
 function ImagePreview({ url }: { url: string }) {
   const [failed, setFailed] = useState(false);
-  const [loaded, setLoaded] = useState(false);
   const trimmed = url.trim();
 
   useEffect(() => {
     setFailed(false);
-    setLoaded(false);
   }, [url]);
 
   if (!trimmed || failed) {
     return (
       <span
         aria-hidden="true"
-        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-dashed border-border bg-muted/40 text-[10px] text-muted-foreground"
+        className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-dashed border-border text-[10px] text-muted-foreground"
       >
         {trimmed ? 'No preview' : 'Preview'}
       </span>
@@ -69,24 +72,20 @@ function ImagePreview({ url }: { url: string }) {
   }
 
   return (
-    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-border bg-muted">
-      {!loaded && <div className="absolute inset-0 animate-pulse bg-muted-foreground/10" />}
-      <img
-        src={trimmed}
-        alt=""
-        decoding="async"
-        onLoad={() => setLoaded(true)}
-        onError={() => setFailed(true)}
-        className={`h-full w-full object-cover transition-opacity duration-200 ${loaded ? 'opacity-100' : 'opacity-0'}`}
-      />
-    </div>
+    <img
+      src={trimmed}
+      alt=""
+      onError={() => setFailed(true)}
+      className="h-16 w-16 shrink-0 rounded-xl border border-border object-cover"
+    />
   );
 }
 
 /**
  * A-03 — Create/edit product. Grouped two-column form on wide screens and one
- * column on narrow screens; stock is managed in A-05, images are demo URLs
- * only, and canceling with unsaved edits asks for confirmation.
+ * column on narrow screens; stock is managed in A-05, images are uploaded and
+ * removed here (the server stores the files), and canceling with unsaved edits
+ * asks for confirmation.
  */
 export default function ProductFormPage() {
   const { productId: productIdParam } = useParams();
@@ -96,7 +95,7 @@ export default function ProductFormPage() {
   const invalidId = productId !== null && (!Number.isInteger(productId) || productId <= 0);
 
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
-  const [initialSnapshot, setInitialSnapshot] = useState(() => JSON.stringify(EMPTY_FORM));
+  const [initialForm, setInitialForm] = useState<FormState>(EMPTY_FORM);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -109,6 +108,8 @@ export default function ProductFormPage() {
   const [loadedArchived, setLoadedArchived] = useState(false);
   const [reloadToken, setReloadToken] = useState(0);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const [imageBusy, setImageBusy] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -150,11 +151,11 @@ export default function ProductFormPage() {
           sku: product.sku ?? '',
           categoryId: product.categoryId === null ? '' : String(product.categoryId),
           status: product.status === 'inactive' ? 'inactive' : 'active',
-          imageUrls: product.images.map((image) => image.url),
+          images: product.images,
         };
 
         setForm(next);
-        setInitialSnapshot(JSON.stringify(next));
+        setInitialForm(next);
         setLoadedCategoryName(product.categoryName);
         setLoadedArchived(product.status === 'archived');
       })
@@ -184,7 +185,8 @@ export default function ProductFormPage() {
     return () => controller.abort();
   }, [productId, invalidId, reloadToken]);
 
-  const isDirty = !invalidId && !notFound && JSON.stringify(form) !== initialSnapshot;
+  const isDirty =
+    !invalidId && !notFound && JSON.stringify(form) !== JSON.stringify(initialForm);
 
   useEffect(() => {
     setBlocked(isDirty);
@@ -219,15 +221,8 @@ export default function ProductFormPage() {
     };
     const firstKey = Object.keys(errors)[0];
 
-    if (!firstKey) {
-      return;
-    }
-
-    const imageMatch = /^imageUrls\.(\d+)$/.exec(firstKey);
-    const targetId = directTargets[firstKey] ?? (imageMatch ? `product-image-${imageMatch[1]}` : undefined);
-
-    if (targetId) {
-      document.getElementById(targetId)?.focus();
+    if (firstKey && directTargets[firstKey]) {
+      document.getElementById(directTargets[firstKey])?.focus();
     }
   }
 
@@ -261,12 +256,6 @@ export default function ProductFormPage() {
       errors.categoryId = 'Choose an active category or “No category”.';
     }
 
-    form.imageUrls.forEach((url, index) => {
-      if (url.trim().length > 2048) {
-        errors[`imageUrls.${index}`] = 'Keep the URL to 2048 characters or fewer.';
-      }
-    });
-
     setFieldErrors(errors);
     focusFirstError(errors);
     return Object.keys(errors).length === 0;
@@ -288,13 +277,13 @@ export default function ProductFormPage() {
       sku: form.sku.trim() === '' ? null : form.sku.trim(),
       categoryId: form.categoryId === '' ? null : Number(form.categoryId),
       status: form.status,
-      imageUrls: form.imageUrls.map((url) => url.trim()).filter((url) => url !== ''),
+      imageUrls: form.images.map((image) => image.url),
     };
 
     try {
       if (productId !== null) {
         const saved = await updateAdminProduct(productId, payload);
-        setInitialSnapshot(JSON.stringify(form));
+        setInitialForm(form);
         navigate('/products', { replace: true, state: { feedback: `${saved.name} was saved.` } });
       } else {
         const created = await createAdminProduct(payload);
@@ -305,15 +294,13 @@ export default function ProductFormPage() {
       }
     } catch (error) {
       if (error instanceof ApiError) {
-        const mapped: Record<string, string> = {};
-
-        if (error.code === 'SKU_TAKEN') {
-          mapped.sku = error.message;
-        } else if (error.status === 422) {
-          for (const detail of error.details) {
-            if (detail.field === 'imageUrls') {
-              continue; // Array-level message: shown as the form alert below.
-            }
+        const mapped: Record<string, string> = {};          if (error.code === 'SKU_TAKEN') {
+            mapped.sku = error.message;
+          } else if (error.status === 422) {
+            for (const detail of error.details) {
+              if (detail.field === 'imageUrls' || detail.field === 'image') {
+                continue; // Array/file-level message: shown as the form alert below.
+              }
             if (detail.field) {
               mapped[detail.field] = detail.message;
             }
@@ -351,23 +338,80 @@ export default function ProductFormPage() {
     navigate('/products');
   }
 
-  function updateImageUrl(index: number, value: string) {
-    setForm((current) => ({
-      ...current,
-      imageUrls: current.imageUrls.map((url, position) => (position === index ? value : url)),
-    }));
+  /**
+   * Persist an image change on the server and mirror it in both the form and
+   * its baseline: uploads and deletions are immediate, so they never count as
+   * unsaved edits to the rest of the form.
+   */
+  function applyImages(images: ProductImage[]) {
+    setForm((current) => ({ ...current, images }));
+    setInitialForm((current) => ({ ...current, images }));
   }
 
-  function removeImage(index: number) {
-    setForm((current) => ({
-      ...current,
-      imageUrls: current.imageUrls.filter((_, position) => position !== index),
-    }));
+  async function handleImageFiles(files: FileList | null) {
+    if (productId === null || !files || files.length === 0 || imageBusy) {
+      return;
+    }
+
+    if (form.images.length + files.length > MAX_IMAGES) {
+      setImageError(`A product can hold at most ${MAX_IMAGES} images. Remove one first.`);
+      return;
+    }
+
+    setImageBusy(true);
+    setImageError(null);
+
+    let uploaded = [...form.images];
+
+    try {
+      for (const file of Array.from(files)) {
+        uploaded = [...uploaded, await uploadAdminProductImage(productId, file)];
+      }
+      applyImages(uploaded);
+    } catch (error) {
+      // Files that were stored before the failure stay attached to the product.
+      applyImages(uploaded);
+      setImageError(
+        error instanceof ApiError
+          ? (error.fieldError('image') ?? error.message)
+          : 'The image could not be uploaded. Check your connection and try again.',
+      );
+    } finally {
+      setImageBusy(false);
+    }
+  }
+
+  async function removeImage(index: number) {
+    if (productId === null || imageBusy) {
+      return;
+    }
+
+    const image = form.images[index];
+
+    if (!image) {
+      return;
+    }
+
+    setImageBusy(true);
+    setImageError(null);
+
+    try {
+      await deleteAdminProductImage(productId, image.id);
+      applyImages(form.images.filter((_, position) => position !== index));
+    } catch (error) {
+      setImageError(
+        error instanceof ApiError
+          ? error.message
+          : 'The image could not be removed. Check your connection and try again.',
+      );
+    } finally {
+      setImageBusy(false);
+    }
   }
 
   function moveImage(index: number, direction: -1 | 1) {
     setForm((current) => {
-      const next = [...current.imageUrls];
+      const next = [...current.images];
       const target = index + direction;
 
       if (target < 0 || target >= next.length) {
@@ -375,7 +419,7 @@ export default function ProductFormPage() {
       }
 
       [next[index], next[target]] = [next[target], next[index]];
-      return { ...current, imageUrls: next };
+      return { ...current, images: next };
     });
   }
 
@@ -398,7 +442,8 @@ export default function ProductFormPage() {
           {productId !== null ? 'Edit product' : 'Create product'}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Stock is managed in Inventory, not here. Images are demo URLs — there is no upload.
+          Stock is managed in Inventory, not here. Images are uploaded to the server and can be
+          removed at any time.
         </p>
       </div>
 
@@ -609,43 +654,34 @@ export default function ProductFormPage() {
           </div>
 
           <fieldset>
-            <legend className={labelClass}>Demo image URLs</legend>
+            <legend className={labelClass}>Images</legend>
             <p className={helperTextClass}>
-              Ordered; the first image is the catalog thumbnail. Up to {MAX_IMAGES} URLs, no upload.
+              Ordered; the first image is the catalog thumbnail. Up to {MAX_IMAGES} images.
+              Uploads and removals are applied on the server immediately.
             </p>
+
             <div className="mt-3 space-y-3">
-              {form.imageUrls.map((url, index) => (
-                <div key={index} className="flex flex-wrap items-start gap-3">
-                  <ImagePreview url={url} />
-                  <div className="min-w-[12rem] flex-1">
-                    <label htmlFor={`product-image-${index}`} className="sr-only">
-                      {`Image URL ${index + 1}`}
-                    </label>
-                    <input
-                      id={`product-image-${index}`}
-                      type="url"
-                      placeholder="https://…"
-                      className={inputClass}
-                      value={url}
-                      onChange={(event) => updateImageUrl(index, event.target.value)}
-                      aria-describedby={
-                        fieldErrors[`imageUrls.${index}`]
-                          ? `product-image-${index}-error`
-                          : undefined
-                      }
-                    />
-                    {fieldErrors[`imageUrls.${index}`] && (
-                      <p id={`product-image-${index}-error`} className={fieldErrorClass}>
-                        {fieldErrors[`imageUrls.${index}`]}
-                      </p>
-                    )}
-                  </div>
+              {form.images.length === 0 && (
+                <p className="rounded-xl border border-dashed border-border px-3 py-4 text-sm text-muted-foreground">
+                  No images yet.
+                </p>
+              )}
+
+              {form.images.map((image, index) => (
+                <div key={image.id} className="flex flex-wrap items-center gap-3">
+                  <ImagePreview url={image.url} />
+                  <span
+                    className="min-w-[10rem] flex-1 truncate text-sm text-muted-foreground"
+                    title={image.url}
+                  >
+                    {image.url}
+                  </span>
                   <div className="flex gap-1">
                     <button
                       type="button"
                       className={actionButtonClass}
                       onClick={() => moveImage(index, -1)}
-                      disabled={index === 0}
+                      disabled={imageBusy || index === 0}
                       aria-label={`Move image ${index + 1} up`}
                     >
                       ↑
@@ -654,7 +690,7 @@ export default function ProductFormPage() {
                       type="button"
                       className={actionButtonClass}
                       onClick={() => moveImage(index, 1)}
-                      disabled={index === form.imageUrls.length - 1}
+                      disabled={imageBusy || index === form.images.length - 1}
                       aria-label={`Move image ${index + 1} down`}
                     >
                       ↓
@@ -662,7 +698,9 @@ export default function ProductFormPage() {
                     <button
                       type="button"
                       className={actionButtonClass}
-                      onClick={() => removeImage(index)}
+                      onClick={() => void removeImage(index)}
+                      disabled={imageBusy}
+                      aria-busy={imageBusy}
                       aria-label={`Remove image ${index + 1}`}
                     >
                       Remove
@@ -671,16 +709,37 @@ export default function ProductFormPage() {
                 </div>
               ))}
             </div>
-            <button
-              type="button"
-              className={`${secondaryButtonClass} mt-3`}
-              onClick={() =>
-                setForm((current) => ({ ...current, imageUrls: [...current.imageUrls, ''] }))
-              }
-              disabled={form.imageUrls.length >= MAX_IMAGES}
-            >
-              Add image URL
-            </button>
+
+            <div className="mt-4">
+              <label htmlFor="product-image-file" className={labelClass}>
+                Add images
+              </label>
+              <input
+                id="product-image-file"
+                type="file"
+                accept={IMAGE_ACCEPT}
+                multiple
+                className={`${inputClass} mt-1 file:mr-3 file:rounded-lg file:border-0 file:bg-muted file:px-3 file:py-1 file:text-sm file:font-semibold file:text-foreground`}
+                onChange={(event) => {
+                  void handleImageFiles(event.target.files);
+                  event.target.value = '';
+                }}
+                disabled={productId === null || imageBusy || form.images.length >= MAX_IMAGES}
+                aria-busy={imageBusy}
+                aria-describedby="product-image-help"
+              />
+              <p id="product-image-help" className={helperTextClass}>
+                {productId === null
+                  ? 'Save the product first, then add its images.'
+                  : 'JPEG, PNG, WebP, or GIF, up to 5 MB each.'}
+              </p>
+            </div>
+
+            {imageError && (
+              <p role="alert" className={fieldErrorClass}>
+                {imageError}
+              </p>
+            )}
           </fieldset>
 
           <div className="flex flex-wrap items-center gap-3">
