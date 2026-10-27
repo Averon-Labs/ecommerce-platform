@@ -8,6 +8,7 @@ val googleWebClientIdOverride = providers.gradleProperty("googleWebClientId")
 // Hosted demo backend (Laravel API + admin SPA on the same origin).
 // Local servers can still be used with -PapiBaseUrl="http://10.0.2.2:8000/api/v1".
 val defaultApiBaseUrl = "https://eshopverse.wasmer.app/api/v1"
+val defaultGoogleWebClientId = "702430048689-e9iqrle5v5i8uoj85d1jj7hoad83277t.apps.googleusercontent.com"
 
 android {
     namespace = "com.averonlabs.eshopverse"
@@ -42,7 +43,7 @@ android {
             buildConfigField(
                 "String",
                 "GOOGLE_WEB_CLIENT_ID",
-                "\"${googleWebClientIdOverride.orElse("828340620853-examplewebclient.apps.googleusercontent.com").get()}\""
+                "\"${googleWebClientIdOverride.orElse(defaultGoogleWebClientId).get()}\""
             )
         }
 
@@ -56,7 +57,7 @@ android {
             buildConfigField(
                 "String",
                 "GOOGLE_WEB_CLIENT_ID",
-                "\"${googleWebClientIdOverride.orElse("828340620853-examplewebclient.apps.googleusercontent.com").get()}\""
+                "\"${googleWebClientIdOverride.orElse(defaultGoogleWebClientId).get()}\""
             )
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
