@@ -47,10 +47,10 @@ All first-release prices are USD, so a per-row currency column is unnecessary. M
 |-------|------|-------|
 | id | Primary Key | |
 | product_id | Foreign Key | References Products |
-| url | String | Seeded/demo image URL |
+| url | String | Absolute URL of the stored image file, or a seeded/external URL |
 | sort_order | Integer | Orders images for product display |
 
-Product images are separate rows so each product can have an ordered image set. Uploading images is deferred; seeded URLs are sufficient for the demo.
+Product images are separate rows so each product can have an ordered image set. Admins upload files through `POST /admin/products/{productId}/images`; the file is stored on the API host (the `product-images` disk) and served by `GET /api/v1/media/product-images/{filename}`, while the row keeps its URL. Deleting an image row, dropping an image from a `PUT` payload, or deleting the product removes the stored file as well. Seeded or third-party URLs are kept as-is and never treated as local files.
 
 ### Categories
 
@@ -166,7 +166,7 @@ Reviews, notifications, coupons, saved addresses, and wishlists are outside the 
 
 - Production soft-delete and audit-history requirements.
 - Coupon, refund, tax, and real payment-provider models.
-- Production image storage and retention.
+- Cloud object storage and a CDN for product images (the first release stores uploaded files on the API host).
 - Production deployment, backup, and recovery requirements.
 
 Use `utf8mb4`, indexes for foreign keys and frequently queried fields, and migrations for every schema change. Review final indexes and constraints against actual query patterns.

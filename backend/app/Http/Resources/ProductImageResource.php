@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * docs/openapi.yaml ProductImage: url + sortOrder.
+ * docs/openapi.yaml ProductImage: id + url + sortOrder. The id addresses
+ * the row through DELETE /admin/products/{productId}/images/{imageId}.
  */
 class ProductImageResource extends JsonResource
 {
@@ -16,6 +17,7 @@ class ProductImageResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'url' => $this->url,
             'sortOrder' => $this->sort_order,
         ];

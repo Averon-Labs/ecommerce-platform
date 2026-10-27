@@ -1361,6 +1361,137 @@ paths:
               schema: { $ref: '#/components/schemas/Error' }
         '422': { $ref: '#/components/responses/ValidationError' }
         '429': { $ref: '#/components/responses/RateLimited' }
+    delete:
+      tags: [Admin catalog]
+      operationId: adminDeleteProduct
+      summary: Delete a product and its stored images
+      description: |
+        Removes the product together with its image rows, the files stored by
+        `adminUploadProductImage`, its inventory row, and any cart lines. A product that
+        appears in any order cannot be deleted — its snapshot must stay referentially
+        intact — and answers `409 PRODUCT_HAS_ORDERS`; archive such a product instead.
+      security:
+        - adminSession: []
+      parameters:
+        - $ref: '#/components/parameters/ProductId'
+        - $ref: '#/components/parameters/CsrfToken'
+      responses:
+        '204':
+          description: Product, image rows, and stored image files removed.
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/CsrfRejected' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: '`PRODUCT_HAS_ORDERS` — the product belongs to an existing order.'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /admin/products/{productId}/images:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+    post:
+      tags: [Admin catalog]
+      operationId: adminUploadProductImage
+      summary: Upload a product image
+      description: |
+        Stores one image file on the server and appends it to the product's ordered image
+        set. The file is validated on its detected content type (JPEG, PNG, WebP, GIF) and
+        a 5 MB ceiling, and its stored name is generated, so the client-supplied name never
+        reaches the path. The returned `url` is absolute and is served by `getProductImage`.
+      security:
+        - adminSession: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [image]
+              additionalProperties: false
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: JPEG, PNG, WebP, or GIF, at most 5 MB.
+      responses:
+        '201':
+          description: Image stored and appended to the ordered set.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/ProductImage' }
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/CsrfRejected' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409':
+          description: '`PRODUCT_IMAGE_LIMIT` — the product already holds 8 images.'
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /admin/products/{productId}/images/{imageId}:
+    parameters:
+      - $ref: '#/components/parameters/ProductId'
+      - name: imageId
+        in: path
+        required: true
+        description: Image row id from `ProductImage.id`.
+        schema: { type: integer, minimum: 1 }
+    delete:
+      tags: [Admin catalog]
+      operationId: adminDeleteProductImage
+      summary: Delete a product image
+      description: |
+        Removes the image row and, when the URL points into this API's stored-image path,
+        the file itself from the server. Seeded or third-party URLs have no local file and
+        only lose their row.
+      security:
+        - adminSession: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfToken'
+      responses:
+        '204':
+          description: Image row (and stored file, when local) removed.
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '403': { $ref: '#/components/responses/CsrfRejected' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
+  /media/product-images/{filename}:
+    get:
+      tags: [Catalog]
+      operationId: getProductImage
+      summary: Serve a stored product image
+      description: |
+        Public read of a file stored by `adminUploadProductImage`. Files live outside the
+        web root, so this operation is the only way they are served; the name is generated
+        and constrained to a plain file name, so a path cannot be traversed. Governed by
+        the document-level `global` rate-limit class.
+      security: []
+      parameters:
+        - name: filename
+          in: path
+          required: true
+          schema: { type: string, pattern: '^[A-Za-z0-9][A-Za-z0-9._-]{0,120}$' }
+      responses:
+        '200':
+          description: The image bytes with their content type.
+          content:
+            image/jpeg: { schema: { type: string, format: binary } }
+            image/png: { schema: { type: string, format: binary } }
+            image/webp: { schema: { type: string, format: binary } }
+            image/gif: { schema: { type: string, format: binary } }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '429': { $ref: '#/components/responses/RateLimited' }
 
   /admin/products/{productId}/archive:
     post:
@@ -1369,8 +1500,9 @@ paths:
       summary: Archive a product
       description: |
         Archiving sets `status` to `archived`, which removes the product from public listings
-        and makes it unavailable for new cart lines. Products are never hard-deleted: existing
-        orders keep their snapshots. Re-archiving returns `409 INVALID_PRODUCT_STATE`.
+        and makes it unavailable for new cart lines. A product that belongs to an order must be
+        archived rather than deleted (`adminDeleteProduct` answers `409 PRODUCT_HAS_ORDERS`), so
+        existing orders keep their snapshots. Re-archiving returns `409 INVALID_PRODUCT_STATE`.
       security:
         - adminSession: []
       parameters:
@@ -2174,6 +2306,12 @@ components:
       type: object
       required: [url, sortOrder]
       properties:
+        id:
+          type: integer
+          minimum: 1
+          description: |
+            Image row id, always present on responses; addresses the row through
+            `adminDeleteProductImage`.
         url: { type: string, format: uri-reference }
         sortOrder: { type: integer, minimum: 0 }
 
@@ -2240,7 +2378,10 @@ components:
         imageUrls:
           type: array
           maxItems: 8
-          description: Ordered seeded image URLs. Binary upload is out of scope.
+          description: |
+            Ordered image list. Uploading and deleting files goes through
+            `adminUploadProductImage` and `adminDeleteProductImage`; this key carries the
+            resulting order, and omitting an image that is stored locally removes its file.
           items: { type: string, format: uri-reference, maxLength: 2048 }
 
     InventoryRow:
@@ -2483,16 +2624,18 @@ x-error-codes:
   CATEGORY_NOT_EMPTY: { status: 409, meaning: Category still holds non-archived products. }
   CATEGORY_NAME_TAKEN: { status: 409, meaning: Category name is already used. }
   SKU_TAKEN: { status: 409, meaning: Product SKU is already used. }
+  PRODUCT_IMAGE_LIMIT: { status: 409, meaning: Product already holds the maximum of 8 images. }
+  PRODUCT_HAS_ORDERS: { status: 409, meaning: Product belongs to an order and must be archived, not deleted. }
   CATEGORY_NOT_FOUND: { status: 422, meaning: Filter references an unknown or archived category. }
   RATE_LIMITED: { status: 429, meaning: Request class limit exceeded. }
   INTERNAL_ERROR: { status: 500, meaning: Unexpected failure; no internal detail is returned. }
 
 x-rate-limit-classes:
   # `global` applies to every operation. Each class below narrows the limit for the
-  # operationIds it lists and is applied in addition to `global`. Operations governed
-  # by `global` only: getCustomerProfile, getCart, listOrders, getOrder,
-  # getAdminCsrfCookie, getAdminSession, adminListProducts, adminGetProduct,
-  # adminListCategories, adminListInventory, adminListOrders, adminGetOrder.
+  # operationIds it lists and is applied in addition to `global`. Operations governed  # by `global` only: getCustomerProfile, getCart, listOrders, getOrder,
+    # getAdminCsrfCookie, getAdminSession, adminListProducts, adminGetProduct,
+    # adminListCategories, adminListInventory, adminListOrders, adminGetOrder,
+    # getProductImage.
   # Every operation documents `429` via the shared RateLimited response.
   global: { limit: 300, window: 1m, key: ip }
   public-read: { limit: 120, window: 1m, key: ip, applies-to: [listCategories, listProducts, getProduct] }
@@ -2502,7 +2645,7 @@ x-rate-limit-classes:
   password-reset: { limit: 3, window: 1h, key: email, secondary: { limit: 10, window: 1h, key: ip }, applies-to: [requestPasswordReset, confirmPasswordReset] }
   admin-login: { limit: 10, window: 1m, key: ip, applies-to: [loginAdmin] }
   customer-write: { limit: 60, window: 1m, key: token, applies-to: [logoutCustomer, updateCustomerProfile, addCartItem, clearCart, updateCartItem, removeCartItem, createCheckoutQuote, createOrder, submitSimulatedPayment] }
-  admin-write: { limit: 120, window: 1m, key: session, applies-to: [logoutAdmin, adminCreateProduct, adminUpdateProduct, adminArchiveProduct, adminCreateCategory, adminUpdateCategory, adminArchiveCategory, adminRestoreCategory, adminUpdateInventory, adminUpdateOrderStatus] }
+  admin-write: { limit: 120, window: 1m, key: session, applies-to: [logoutAdmin, adminCreateProduct, adminUpdateProduct, adminArchiveProduct, adminDeleteProduct, adminUploadProductImage, adminDeleteProductImage, adminCreateCategory, adminUpdateCategory, adminArchiveCategory, adminRestoreCategory, adminUpdateInventory, adminUpdateOrderStatus] }
 
 x-order-state-machine:
   initial: pending_payment

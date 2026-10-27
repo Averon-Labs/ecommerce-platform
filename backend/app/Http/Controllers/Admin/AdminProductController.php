@@ -4,24 +4,39 @@ namespace App\Http\Controllers\Admin;
 
 use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\AdminProductImageRequest;
 use App\Http\Requests\AdminProductInputRequest;
 use App\Http\Requests\AdminProductQueryRequest;
 use App\Http\Resources\AdminProductResource;
+use App\Http\Resources\ProductImageResource;
+use App\Models\CartItem;
 use App\Models\Category;
+use App\Models\Inventory;
+use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Services\ProductImageStorage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 /**
  * docs/openapi.yaml Admin catalog product operations (CAT-003): list
- * every status, create, read, full-replace update, and archive. Stock is
- * deliberately absent — it is owned by PATCH /admin/inventory/{productId}.
- * Products are never hard-deleted, so order snapshots stay intact.
+ * every status, create, read, full-replace update, archive, delete, and
+ * the upload/delete of its image files. Stock is deliberately absent — it
+ * is owned by PATCH /admin/inventory/{productId}. Products are hard-deleted
+ * only while no order references them; otherwise the answer is
+ * 409 PRODUCT_HAS_ORDERS and archiving keeps the order snapshots intact.
  */
 class AdminProductController extends Controller
 {
+    /** Maximum images per product (contract: AdminProductInput maxItems). */
+    public const MAX_IMAGES = 8;
+
+    public function __construct(private readonly ProductImageStorage $imageStorage) {}
+
     /**
      * Paged admin product rows across all statuses.
      */
@@ -171,6 +186,102 @@ class AdminProductController extends Controller
         ]);
     }
 
+    /**
+     * Upload one image file for a product and append it to the ordered set.
+     * The file is stored on the server; the returned URL is what the catalog
+     * and the customer app load.
+     */
+    public function storeImage(AdminProductImageRequest $request, int $productId): JsonResponse
+    {
+        $product = $this->findProduct($productId);
+        $sortOrder = ProductImage::query()->where('product_id', $product->id)->count();
+
+        if ($sortOrder >= self::MAX_IMAGES) {
+            throw new ApiException(
+                409,
+                'PRODUCT_IMAGE_LIMIT',
+                'A product can hold at most '.self::MAX_IMAGES.' images. Remove one before adding another.',
+            );
+        }
+
+        $url = $this->imageStorage->store($request->file('image'), $product->id);
+
+        if ($url === null) {
+            throw new ApiException(500, 'INTERNAL_ERROR', 'The image could not be stored.');
+        }
+
+        $image = ProductImage::query()->create([
+            'product_id' => $product->id,
+            'url' => $url,
+            'sort_order' => $sortOrder,
+        ]);
+
+        return response()->json(['data' => new ProductImageResource($image)], 201);
+    }
+
+    /**
+     * Remove one image row and its stored file from the server.
+     */
+    public function deleteImage(int $productId, int $imageId): Response
+    {
+        $product = $this->findProduct($productId);
+
+        $image = ProductImage::query()
+            ->where('product_id', $product->id)
+            ->whereKey($imageId)
+            ->first();
+
+        if ($image === null) {
+            throw new ApiException(404, 'NOT_FOUND', 'The requested image was not found.');
+        }
+
+        $url = $image->url;
+        $image->delete();
+        $this->imageStorage->deleteByUrl($url);
+
+        return response()->noContent();
+    }
+
+    /**
+     * Delete a product together with its image files, inventory row, and
+     * cart lines. Orders own immutable snapshots referencing the product,
+     * so a product that appears in any order cannot be deleted (409) and
+     * must be archived instead.
+     */
+    public function destroy(int $productId): Response
+    {
+        $product = $this->findProduct($productId);
+
+        $hasOrders = OrderItem::query()->where('product_id', $product->id)->exists();
+
+        if ($hasOrders) {
+            throw new ApiException(
+                409,
+                'PRODUCT_HAS_ORDERS',
+                'This product belongs to an existing order and cannot be deleted. Archive it instead.',
+            );
+        }
+
+        $urls = ProductImage::query()->where('product_id', $product->id)->pluck('url')->all();
+
+        // Explicit deletes keep the behaviour identical on every supported
+        // database instead of relying on per-engine foreign-key cascades.
+        DB::transaction(function () use ($product): void {
+            ProductImage::query()->where('product_id', $product->id)->delete();
+            Inventory::query()->where('product_id', $product->id)->delete();
+            CartItem::query()->where('product_id', $product->id)->delete();
+            $product->delete();
+        });
+
+        // Only files stored by this server are removed; seeded/external URLs
+        // resolve to no local file and are skipped.
+        foreach ($urls as $url) {
+            $this->imageStorage->deleteByUrl($url);
+        }
+
+        return response()->noContent();
+    }
+
     private function findProduct(int $productId): Product
     {
         $product = Product::query()
@@ -231,17 +342,36 @@ class AdminProductController extends Controller
 
     /**
      * Replace the ordered image set (sort_order = position in imageUrls).
+     * Rows are deleted by product_id — the images relation carries an
+     * ORDER BY, which a DELETE statement does not accept on every database.
+     * Files that no longer appear in the new list are removed from the
+     * server; external URLs are left alone.
      */
     private function replaceImages(Product $product, array $urls): void
     {
-        $product->images()->delete();
+        $previousUrls = ProductImage::query()
+            ->where('product_id', $product->id)
+            ->pluck('url')
+            ->all();
+
+        ProductImage::query()->where('product_id', $product->id)->delete();
+
+        $kept = [];
 
         foreach (array_values($urls) as $index => $url) {
+            $kept[] = $url;
+
             ProductImage::query()->create([
                 'product_id' => $product->id,
                 'url' => $url,
                 'sort_order' => $index,
             ]);
+        }
+
+        foreach ($previousUrls as $previousUrl) {
+            if (! in_array($previousUrl, $kept, true)) {
+                $this->imageStorage->deleteByUrl($previousUrl);
+            }
         }
     }
 }
