@@ -84,9 +84,9 @@ This document defines the actionable checklist and implementation steps for opti
   - [`android/app/src/main/res/layout/item_product_image.xml`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/res/layout/item_product_image.xml)
   - [`android/app/src/main/res/layout/fragment_product_detail.xml`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/res/layout/fragment_product_detail.xml)
 * **Execution Checklist:**
-  - [ ] All text specifications (product name, technical specs, brand, price, stock status) rendered immediately from navigation arguments or cache.
-  - [ ] Carousel viewport at top has fixed `4:5` or `1:1` aspect ratio with shimmer placeholder.
-  - [ ] `onViewRecycled` implemented to cancel large image requests during rapid swiping.
+  - [x] All text specifications (product name, technical specs, brand, price, stock status) rendered immediately from navigation arguments or cache.
+  - [x] Carousel viewport at top has fixed `4:5` or `1:1` aspect ratio with shimmer placeholder.
+  - [x] `onViewRecycled` implemented to cancel large image requests during rapid swiping.
 
 ---
 
@@ -103,13 +103,14 @@ This document defines the actionable checklist and implementation steps for opti
 
 ---
 
-## Android Progress Tracking
+## Android Progress Tracking & Phase 11 Mapping
 
+All remaining Android implementation items are tracked canonically in **[Android Roadmap Phase 11](ANDROID_ROADMAP.md)**:
 - [x] **Step 1:** Resource cleanup method in `ImageLoaderHelper.java`
 - [x] **Step 2:** Unit test validation in `ImageLoaderHelperTest.java`
 - [x] **Step 3:** Implementation in `ProductGridAdapter.java` and grid layouts
 - [x] **Step 4:** Implementation in `FavoritesAdapter.java`
 - [x] **Step 5:** Implementation in `CartAdapter.java` and cart line layout
-- [ ] **Step 6:** Implementation in `ReviewItemsAdapter.java`
-- [ ] **Step 7:** Implementation in `ImageCarouselAdapter.java` and detail layout
-- [ ] **Step 8:** Active prefetching implementation in fragments
+- [x] **Step 6:** Implementation in `ReviewItemsAdapter.java` (token polish in **IMG-004**)
+- [x] **Step 7 (IMG-002):** Optimistic text-first transition in `ProductDetailFragment.java` & arguments
+- [ ] **Step 8 (IMG-003):** Lookahead prefetching in fragments (low-priority tuning in **IMG-003**)

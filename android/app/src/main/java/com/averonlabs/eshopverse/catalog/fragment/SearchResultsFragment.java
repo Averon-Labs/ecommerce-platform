@@ -248,8 +248,7 @@ public class SearchResultsFragment extends Fragment {
         if (!isAdded()) {
             return;
         }
-        Bundle args = new Bundle();
-        args.putLong("productId", product.getId());
+        Bundle args = ProductDetailFragment.createArgs(product);
         try {
             Navigation.findNavController(requireView()).navigate(
                     R.id.action_searchResultsFragment_to_productDetailFragment,

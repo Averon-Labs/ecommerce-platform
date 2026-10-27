@@ -38,15 +38,62 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.averonlabs.eshopverse.core.model.Currency;
+import com.averonlabs.eshopverse.core.model.ProductSummary;
+import com.averonlabs.eshopverse.core.money.Money;
+
 /**
  * M-05 Product detail screen per docs/android/PHASE-1-SPEC.md §E.4.
+ * Implements Text-First Immediate Rendering (Phase 11 — IMG-002).
  */
 public class ProductDetailFragment extends Fragment {
+
+    public static final String ARG_PRODUCT_ID = "productId";
+    public static final String ARG_PRODUCT_NAME = "productName";
+    public static final String ARG_PRODUCT_PRICE = "productPrice";
+    public static final String ARG_PRODUCT_CURRENCY = "productCurrency";
+    public static final String ARG_PRODUCT_CATEGORY = "productCategory";
+    public static final String ARG_PRODUCT_IMAGE_URL = "productImageUrl";
+    public static final String ARG_PRODUCT_IN_STOCK = "productInStock";
+    public static final String ARG_PRODUCT_SUMMARY = "productSummary";
+
+    @NonNull
+    public static Bundle createArgs(@NonNull ProductSummary product) {
+        return populateArgs(new Bundle(), product);
+    }
+
+    @NonNull
+    public static Bundle populateArgs(@NonNull Bundle args, @NonNull ProductSummary product) {
+        args.putLong(ARG_PRODUCT_ID, product.getId());
+        args.putString(ARG_PRODUCT_NAME, product.getName());
+        args.putString(ARG_PRODUCT_PRICE, product.getPrice());
+        if (product.getCurrency() != null) {
+            args.putString(ARG_PRODUCT_CURRENCY, product.getCurrency().name());
+        }
+        args.putString(ARG_PRODUCT_CATEGORY, product.getCategoryName());
+        args.putString(ARG_PRODUCT_IMAGE_URL, product.getImageUrl());
+        args.putBoolean(ARG_PRODUCT_IN_STOCK, product.isInStock());
+        args.putSerializable(ARG_PRODUCT_SUMMARY, product);
+        return args;
+    }
+
+    @NonNull
+    public static Bundle createArgs(long productId) {
+        return populateArgs(new Bundle(), productId);
+    }
+
+    @NonNull
+    public static Bundle populateArgs(@NonNull Bundle args, long productId) {
+        args.putLong(ARG_PRODUCT_ID, productId);
+        return args;
+    }
 
     private FragmentProductDetailBinding binding;
     private ProductDetailViewModel viewModel;
     private ImageCarouselAdapter imageAdapter;
     private long productId = -1;
+    private boolean hasOptimisticSummary = false;
+    private ProductSummary currentProduct = null;
 
     @Override
     public View onCreateView(
@@ -65,8 +112,39 @@ public class ProductDetailFragment extends Fragment {
         CatalogViewModelFactory factory = new CatalogViewModelFactory(requireContext());
         viewModel = new ViewModelProvider(this, factory).get(ProductDetailViewModel.class);
 
+        ProductSummary summary = null;
         if (getArguments() != null) {
-            productId = getArguments().getLong("productId", -1);
+            productId = getArguments().getLong(ARG_PRODUCT_ID, -1);
+            if (getArguments().containsKey(ARG_PRODUCT_SUMMARY)) {
+                try {
+                    summary = (ProductSummary) getArguments().getSerializable(ARG_PRODUCT_SUMMARY);
+                } catch (Exception ignored) {
+                }
+            }
+            if (summary == null && getArguments().containsKey(ARG_PRODUCT_NAME)) {
+                String name = getArguments().getString(ARG_PRODUCT_NAME);
+                String price = getArguments().getString(ARG_PRODUCT_PRICE);
+                String currencyStr = getArguments().getString(ARG_PRODUCT_CURRENCY);
+                Currency currency = Currency.USD;
+                if (currencyStr != null) {
+                    try {
+                        currency = Currency.valueOf(currencyStr);
+                    } catch (Exception ignored) {
+                    }
+                }
+                String category = getArguments().getString(ARG_PRODUCT_CATEGORY);
+                String imageUrl = getArguments().getString(ARG_PRODUCT_IMAGE_URL);
+                boolean inStock = getArguments().getBoolean(ARG_PRODUCT_IN_STOCK, true);
+                if (name != null && price != null) {
+                    summary = new ProductSummary((int) productId, name, price, currency, null, category, imageUrl, inStock, null);
+                }
+            }
+        }
+
+        if (summary != null) {
+            viewModel.setOptimisticSummary(summary);
+        } else if (viewModel.getOptimisticSummary().getValue() != null) {
+            summary = viewModel.getOptimisticSummary().getValue();
         }
 
         setupBackButton();
@@ -75,9 +153,15 @@ public class ProductDetailFragment extends Fragment {
         setupAddToCartAction();
         observeViewModel();
 
-        binding.skeletonProductDetail.getRoot().setVisibility(View.VISIBLE);
-        binding.scrollProductContent.setVisibility(View.GONE);
-        binding.cardBottomActions.setVisibility(View.GONE);
+        if (summary != null) {
+            hasOptimisticSummary = true;
+            bindOptimisticSummary(summary);
+        } else {
+            hasOptimisticSummary = false;
+            binding.skeletonProductDetail.getRoot().setVisibility(View.VISIBLE);
+            binding.scrollProductContent.setVisibility(View.GONE);
+            binding.cardBottomActions.setVisibility(View.GONE);
+        }
 
         if (productId > 0) {
             viewModel.loadProduct(productId);
@@ -194,13 +278,23 @@ public class ProductDetailFragment extends Fragment {
 
         switch (state.getStatus()) {
             case LOADING:
-                binding.skeletonProductDetail.getRoot().setVisibility(View.VISIBLE);
-                binding.scrollProductContent.setVisibility(View.GONE);
-                binding.cardBottomActions.setVisibility(View.GONE);
-                binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
+                if (hasOptimisticSummary) {
+                    binding.skeletonProductDetail.getRoot().setVisibility(View.GONE);
+                    binding.scrollProductContent.setVisibility(View.VISIBLE);
+                    binding.cardBottomActions.setVisibility(View.VISIBLE);
+                    binding.skeletonDescription.setVisibility(View.VISIBLE);
+                    binding.tvProductDescription.setVisibility(View.GONE);
+                    binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
+                } else {
+                    binding.skeletonProductDetail.getRoot().setVisibility(View.VISIBLE);
+                    binding.scrollProductContent.setVisibility(View.GONE);
+                    binding.cardBottomActions.setVisibility(View.GONE);
+                    binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
+                }
                 break;
             case CONTENT:
                 binding.skeletonProductDetail.getRoot().setVisibility(View.GONE);
+                binding.skeletonDescription.setVisibility(View.GONE);
                 binding.scrollProductContent.setVisibility(View.VISIBLE);
                 binding.cardBottomActions.setVisibility(View.VISIBLE);
                 binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
@@ -211,17 +305,81 @@ public class ProductDetailFragment extends Fragment {
             case EMPTY:
             case ERROR:
                 binding.skeletonProductDetail.getRoot().setVisibility(View.GONE);
-                binding.stateContainer.setState(
-                        StateContainerView.State.ERROR,
-                        getString(state.getMessageRes() != 0 ? state.getMessageRes() : R.string.catalog_error_load_details),
-                        getString(R.string.catalog_action_retry),
-                        viewModel::retry
-                );
+                if (hasOptimisticSummary) {
+                    // Summary already rendered optimistically — don't wipe out the screen
+                    binding.skeletonDescription.setVisibility(View.GONE);
+                    Snackbar.make(
+                            binding.getRoot(),
+                            getString(state.getMessageRes() != 0 ? state.getMessageRes() : R.string.catalog_error_load_details),
+                            Snackbar.LENGTH_INDEFINITE
+                    ).setAction(R.string.catalog_action_retry, v -> viewModel.retry()).show();
+                } else {
+                    binding.stateContainer.setState(
+                            StateContainerView.State.ERROR,
+                            getString(state.getMessageRes() != 0 ? state.getMessageRes() : R.string.catalog_error_load_details),
+                            getString(R.string.catalog_action_retry),
+                            viewModel::retry
+                    );
+                }
                 break;
         }
     }
 
+    private void bindOptimisticSummary(@NonNull ProductSummary product) {
+        currentProduct = product;
+        binding.skeletonProductDetail.getRoot().setVisibility(View.GONE);
+        binding.scrollProductContent.setVisibility(View.VISIBLE);
+        binding.cardBottomActions.setVisibility(View.VISIBLE);
+        binding.stateContainer.setState(StateContainerView.State.CONTENT, null, null, null);
+
+        if (product.getCategoryName() != null && !product.getCategoryName().trim().isEmpty()) {
+            binding.tvProductCategory.setText(product.getCategoryName().toUpperCase());
+            binding.tvProductCategory.setVisibility(View.VISIBLE);
+        } else {
+            binding.tvProductCategory.setVisibility(View.GONE);
+        }
+
+        binding.tvProductName.setText(product.getName());
+        binding.tvProductPrice.setFormattedPrice(MoneyFormat.format(product.getPriceMoney()));
+        binding.tvProductPrice.setTextColor(ContextCompat.getColor(requireContext(), R.color.color_botanical_green));
+
+        // Description is still loading full detail -> show skeletonDescription, hide tvProductDescription
+        binding.tvProductDescription.setVisibility(View.GONE);
+        binding.skeletonDescription.setVisibility(View.VISIBLE);
+
+        // Availability and Stepper Bounds
+        boolean inStock = product.isInStock();
+        if (inStock) {
+            binding.badgeStock.setStatus(StatusBadgeView.Status.SUCCESS);
+            binding.badgeStock.setText(R.string.catalog_in_stock);
+            binding.stepperQuantity.setMax(99);
+            binding.layoutQuantity.setVisibility(View.VISIBLE);
+            binding.btnAddToCart.setEnabled(true);
+            binding.tvAddToCartNotice.setVisibility(View.GONE);
+        } else {
+            binding.badgeStock.setStatus(StatusBadgeView.Status.NEUTRAL);
+            binding.badgeStock.setText(R.string.catalog_out_of_stock);
+            binding.layoutQuantity.setVisibility(View.GONE);
+            binding.btnAddToCart.setEnabled(false);
+            binding.tvAddToCartNotice.setVisibility(View.VISIBLE);
+            binding.tvAddToCartNotice.setText(R.string.catalog_out_of_stock);
+        }
+
+        // Hero image in gallery
+        if (product.getImageUrl() != null && !product.getImageUrl().trim().isEmpty()) {
+            List<ProductImage> imageList = new ArrayList<>();
+            imageList.add(new ProductImage(product.getImageUrl(), 1));
+            imageAdapter.submitList(imageList);
+            binding.tvImageIndicator.setVisibility(View.GONE);
+        }
+
+        setupFavoriteButton(product);
+    }
+
     private void bindProduct(@NonNull ProductDetail product) {
+        currentProduct = product;
+        binding.skeletonDescription.setVisibility(View.GONE);
+
         if (product.getCategoryName() != null && !product.getCategoryName().trim().isEmpty()) {
             binding.tvProductCategory.setText(product.getCategoryName().toUpperCase());
             binding.tvProductCategory.setVisibility(View.VISIBLE);
@@ -289,7 +447,7 @@ public class ProductDetailFragment extends Fragment {
         setupFavoriteButton(product);
     }
 
-    private void setupFavoriteButton(@NonNull ProductDetail product) {
+    private void setupFavoriteButton(@NonNull ProductSummary product) {
         FavoritesRepository favRepo = FavoritesRepository.getInstance(requireContext());
         boolean isFav = favRepo.isFavorite(product.getId());
         updateFavoriteVisual(isFav);

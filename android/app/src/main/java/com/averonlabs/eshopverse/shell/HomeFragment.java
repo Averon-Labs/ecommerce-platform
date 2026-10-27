@@ -22,6 +22,7 @@ import com.averonlabs.eshopverse.catalog.CatalogViewModelFactory;
 import com.averonlabs.eshopverse.catalog.CategoryIconResolver;
 import com.averonlabs.eshopverse.catalog.CategoryViewModel;
 import com.averonlabs.eshopverse.catalog.ProductGridAdapter;
+import com.averonlabs.eshopverse.catalog.fragment.ProductDetailFragment;
 import com.averonlabs.eshopverse.core.model.Category;
 import com.averonlabs.eshopverse.core.model.ProductSummary;
 import com.averonlabs.eshopverse.core.state.UiState;
@@ -238,8 +239,7 @@ public class HomeFragment extends Fragment {
         if (!isAdded()) {
             return;
         }
-        Bundle args = new Bundle();
-        args.putLong("productId", product.getId());
+        Bundle args = ProductDetailFragment.createArgs(product);
         try {
             Navigation.findNavController(requireView()).navigate(
                     R.id.action_homeFragment_to_productDetailFragment,

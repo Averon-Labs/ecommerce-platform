@@ -13,6 +13,9 @@ import com.averonlabs.eshopverse.core.state.UiState;
 
 import java.util.Objects;
 
+import androidx.annotation.Nullable;
+import com.averonlabs.eshopverse.core.model.ProductSummary;
+
 /**
  * ViewModel managing product details, image carousel index, and quantity stepper state
  * per docs/android/PHASE-1-SPEC.md §E.4.
@@ -24,6 +27,7 @@ public class ProductDetailViewModel extends ViewModel {
     private final MutableLiveData<UiState<ProductDetail>> productState = new MutableLiveData<>();
     private final MutableLiveData<Integer> quantityLiveData = new MutableLiveData<>(1);
     private final MutableLiveData<Integer> selectedImageIndex = new MutableLiveData<>(0);
+    private final MutableLiveData<ProductSummary> optimisticSummary = new MutableLiveData<>(null);
 
     private long currentProductId = -1;
     private boolean inFlight = false;
@@ -45,6 +49,17 @@ public class ProductDetailViewModel extends ViewModel {
     @NonNull
     public LiveData<Integer> getSelectedImageIndex() {
         return selectedImageIndex;
+    }
+
+    @NonNull
+    public LiveData<ProductSummary> getOptimisticSummary() {
+        return optimisticSummary;
+    }
+
+    public void setOptimisticSummary(@Nullable ProductSummary summary) {
+        if (summary != null && optimisticSummary.getValue() == null) {
+            optimisticSummary.setValue(summary);
+        }
     }
 
     public void setQuantity(int quantity) {

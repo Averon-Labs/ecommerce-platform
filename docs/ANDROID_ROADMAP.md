@@ -661,6 +661,73 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 **Verification:** added `ACCOUNT_DISABLED` to `ApiErrorCodes.java`, `strings_errors.xml`, and `ErrorMessages.java`, updated `AuthViewModel.java` to map deactivated accounts to email error field, added unit tests in `ErrorMessagesTest` (26 codes verified) and `AuthViewModelTest.testLoginAccountDisabledMapsToEmailFieldAndUiState`, and verified complete test suite pass with `.\gradlew.bat testDebugUnitTest` (100% pass rate).
 
+## Phase 11 — Text-First Immediate Rendering & Full Asynchronous Image Pipeline
+
+**Cross-component release check:** verify 100% adherence to `docs/ARCHITECTURE.md` (§112–145) and `.agents/skills/text-first-async-image-loading/SKILL.md` across all Android viewports and web admin surfaces, eliminating all blocking full-screen skeleton anti-patterns and layout shift.
+
+### Step 1 — IMG-002 — Optimistic Text-First Transition for Product Detail Screen (M-05)
+
+**Status:** `[x]`
+
+**Depends on:** CAT-002, UI-002, IMG-001
+
+**Scope:** Replace the blocking full-screen skeleton anti-pattern in `ProductDetailFragment` with an instant, optimistic screen transition. When navigating from catalog, search, home, or favorites, pass essential product summary metadata (`ProductSummary` or basic fields: id, name, price, category, stock status, main image URL) via navigation arguments or shared repository cache so title, price, category, and hero image render synchronously within 50ms on entry, while secondary specifications, full description, and multi-image galleries stream asynchronously in the background.
+
+**Acceptance criteria:**
+- [x] **a.** `ProductDetailFragment` accepts either `productId` or a pre-populated bundle containing basic `ProductSummary` attributes (`name`, `price`, `currency`, `categoryName`, `inStock`, `imageUrl`).
+- [x] **b.** On `onViewCreated`, if metadata arguments exist, immediately populate `tvProductName`, `tvProductPrice`, `tvProductCategory`, `badgeStock`, and bind the hero image container with `ImageLoaderHelper.loadImage()` (<50ms, UI thread) rather than setting content to `View.GONE`.
+- [x] **c.** The full-screen skeleton (`skeletonProductDetail`) is scoped strictly to secondary sections (description body and multi-image indicators) while remote `GET /products/{id}` is in flight.
+- [x] **d.** When the authoritative `ProductDetail` network response arrives, smoothly update any changed fields (fresh stock quantity, full description, complete image carousel) without visual jank or layout shift.
+- [x] **e.** If opened with only a `productId` (e.g. from a deep link or notification), graceful fallback displays the partial skeleton until data arrives.
+- [x] **f.** Unit tests and JVM tests verify that optimistic binding renders cleanly without NPE or data race.
+
+**Verification:** unit tests in `ProductDetailViewModelTest` (7 tests verifying initial state, optimistic summary LiveData, load states, stepper bounds, and argument bundle factories), verified smooth optimistic rendering without blocking skeleton, and `testDebugUnitTest` passes cleanly with 233 passing unit tests.
+
+### Step 2 — IMG-003 — Prefetch Bandwidth Guard & Low-Priority Glide Optimization
+
+**Status:** `[ ]`
+
+**Depends on:** IMG-001
+
+**Scope:** Configure `ImageLoaderHelper.preload()` and `ImageLoaderHelper.preloadBatch()` to execute with `Priority.LOW` so background scroll lookahead downloads do not contend for HTTP/2 connection pools or bandwidth with active on-screen viewports on weak mobile connections.
+
+**Acceptance criteria:**
+- [ ] **a.** `ImageLoaderHelper.preload()` explicitly applies `.priority(Priority.LOW)` to speculative Glide requests.
+- [ ] **b.** `ImageLoaderHelper.preloadBatch()` preserves `Priority.LOW` across batch iterations and checks activity/context lifecycle before queuing.
+- [ ] **c.** Unit test in `ImageLoaderHelperTest` asserts `Priority.LOW` configuration and null-safe execution.
+
+**Verification:** unit tests in `ImageLoaderHelperTest` pass cleanly with JVM mock verification; `./gradlew testDebugUnitTest --tests ImageLoaderHelperTest` passes.
+
+### Step 3 — IMG-004 — Layout Token & Active Shimmer Alignment across Order Review Views
+
+**Status:** `[ ]`
+
+**Depends on:** ORD-002, UI-002
+
+**Scope:** Reconcile `item_review_line.xml` to include active shimmer placeholder backgrounds (`@drawable/bg_placeholder_shimmer`) and enforce fixed dimensions so checkout review lines never display blank voids before image arrival.
+
+**Acceptance criteria:**
+- [ ] **a.** `item_review_line.xml` adds `android:background="@drawable/bg_placeholder_shimmer"` to `iv_review_item_image` with fixed `48dp x 48dp` bounds.
+- [ ] **b.** Confirm all item thumbnails in review, order confirmation, and order history have immutable dimensions with zero `wrap_content` containers.
+- [ ] **c.** Layout verification confirms zero layout shift (CLS = 0) on order review screens.
+
+**Verification:** layout inspection and unit/rendering verification in `testDebugUnitTest`.
+
+### Step 4 — IMG-005 — Admin Dashboard Zero-CLS & Web Lazy Loading Standards
+
+**Status:** `[ ]`
+
+**Depends on:** UI-003, FND-003
+
+**Scope:** Apply `loading="lazy"`, `decoding="async"`, and skeleton shimmer utilities across product thumbnail images in the Admin React web dashboard (`ProductsPage.tsx` and `ProductFormPage.tsx`).
+
+**Acceptance criteria:**
+- [ ] **a.** Thumbnail images in `admin/src/pages/products/ProductsPage.tsx` have `loading="lazy"` and `decoding="async"`.
+- [ ] **b.** Thumbnail containers in admin table enforce fixed aspect ratios (`w-10 h-10` or `aspect-square`) with a skeleton shimmer pulse background during network loading.
+- [ ] **c.** Product preview in `admin/src/pages/products/ProductFormPage.tsx` applies `decoding="async"` and smooth transition opacity.
+
+**Verification:** TypeScript type check (`npm run build` or `npm test` in `admin/`) succeeds with zero errors.
+
 ## External dependencies owned by other components
 
 These are the only cross-component items the Android tasks depend on. They are listed here **once** for

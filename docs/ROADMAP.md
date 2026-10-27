@@ -396,6 +396,21 @@ Each Task ID has exactly one canonical task entry. Status, dependencies, accepta
 | CI-001 | [Project Roadmap — Phase 0 — Step 7](ROADMAP.md) | Refresh GitHub Actions runtimes and least-privilege permissions |
 | PLAN-004 | [Project Roadmap — Phase 0 — Step 8](ROADMAP.md) | Label roadmap acceptance criteria and remove Sub-step assignment rules |
 | PLAN-005 | [Project Roadmap — Phase 0 — Step 9](ROADMAP.md) | Plan the Android execution structure and phase specifications |
+| FAV-001 | [Android Roadmap — Phase 8 — Step 1](ANDROID_ROADMAP.md) | Product Favorites Wishlist & 1:1 Square Detail Layout |
+| OPT-001 | [Android Roadmap — Phase 8 — Step 2](ANDROID_ROADMAP.md) | Instantaneous Search & Optimistic Cart Updates |
+| NAV-001 | [Android Roadmap — Phase 8 — Step 3](ANDROID_ROADMAP.md) | Navigation & Floating Bar Polish |
+| AUTH-006 | [Android Roadmap — Phase 8 — Step 4](ANDROID_ROADMAP.md) | Customer Registration Hardening & Safe Back Navigation |
+| AUTH-005 | [Android Roadmap — Phase 8 — Step 5](ANDROID_ROADMAP.md) | Google Sign-In Hardening & Keystore Expiry Fix |
+| FLT-001 | [Android Roadmap — Phase 8 — Step 6](ANDROID_ROADMAP.md) | Advanced Filter Bottom Sheet |
+| IMG-001 | [Android Roadmap — Phase 8 — Step 7](ANDROID_ROADMAP.md) | Instant Image Engine & Cache Strategy |
+| AUTH-007 | [Android Roadmap — Phase 9 — Step 1](ANDROID_ROADMAP.md) | Google Credential Manager Integration |
+| AUTH-008 | [Android Roadmap — Phase 9 — Step 2](ANDROID_ROADMAP.md) | Dynamic Session Expiry & TokenStore Fallback |
+| AUTH-009 | [Android Roadmap — Phase 9 — Step 3](ANDROID_ROADMAP.md) | Offline Mock Session Lifecycle Alignment |
+| AUTH-010 | [Android Roadmap — Phase 10 — Step 1](ANDROID_ROADMAP.md) | Deactivated Account Error Alignment & Telemetry |
+| IMG-002 | [Android Roadmap — Phase 11 — Step 1](ANDROID_ROADMAP.md) | Optimistic Text-First Transition for Product Detail Screen |
+| IMG-003 | [Android Roadmap — Phase 11 — Step 2](ANDROID_ROADMAP.md) | Prefetch Bandwidth Guard & Low-Priority Glide Optimization |
+| IMG-004 | [Android Roadmap — Phase 11 — Step 3](ANDROID_ROADMAP.md) | Layout Token & Active Shimmer Alignment across Order Review Views |
+| IMG-005 | [Android Roadmap — Phase 11 — Step 4](ANDROID_ROADMAP.md) | Admin Dashboard Zero-CLS & Web Lazy Loading Standards |
 
 ## Optional follow-up — Public deployment
 

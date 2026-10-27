@@ -359,6 +359,8 @@ Per `.agents/skills/my-ui-ux-skill/`, EShop Verse bridges visual grandeur with s
 - **Editorial Brand Watermark:** Muted vector watermark (`ic_image_placeholder.xml`) provides a sense of luxury craft and brand identity during static loading states.
 - **Muted Error Fallback:** Network or decode failures render a discreet botanical watermark vector (`ic_image_placeholder_error.xml`); raw default broken image icons or jarring alert colors are prohibited.
 - **Hardware Cross-Fade:** Smooth 250ms asynchronous cross-fade on bitmap arrival prevents harsh flashing or visual popping.
+- **Optimistic Text-First Screen Transitions:** When navigating from a catalog or list screen into a detail screen (Screen M-05), the UI must not hide all content behind a full-screen blocking skeleton. Instead, basic summary metadata (title, price, category, stock status, and hero thumbnail) from the preceding card is immediately mounted synchronously (<50ms), while only secondary information (full description, technical specs, multi-image gallery) displays a skeleton shimmer until the remote payload finishes streaming. This eliminates perceived transition latency and creates seamless visual continuity.
+- **Web Admin Progressive Thumbnails:** Web images enforce `loading="lazy"` and `decoding="async"` inside fixed-ratio containers with Tailwind skeleton pulse (`animate-pulse bg-sandstone-100`) to guarantee sub-100ms table rendering and zero CLS.
 
 ---
 

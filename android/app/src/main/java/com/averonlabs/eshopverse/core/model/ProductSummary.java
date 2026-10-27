@@ -11,7 +11,9 @@ import java.util.Objects;
 /**
  * ProductSummary model derived from docs/openapi.yaml ProductSummary schema.
  */
-public class ProductSummary {
+public class ProductSummary implements java.io.Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @SerializedName("id")
     private final int id;

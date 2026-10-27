@@ -113,8 +113,7 @@ public class FavoritesFragment extends Fragment {
 
     private void onProductClick(@NonNull ProductSummary product) {
         NavController navController = NavHostFragment.findNavController(this);
-        Bundle args = new Bundle();
-        args.putLong("productId", product.getId());
+        Bundle args = ProductDetailFragment.createArgs(product);
         try {
             navController.navigate(R.id.action_favoritesFragment_to_productDetailFragment, args);
         } catch (Exception e) {

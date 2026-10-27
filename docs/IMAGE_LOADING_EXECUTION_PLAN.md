@@ -101,9 +101,9 @@ This part covers all implementation steps for image loading infrastructure, adap
   - [`android/app/src/main/res/layout/item_product_image.xml`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/res/layout/item_product_image.xml)
   - [`android/app/src/main/res/layout/fragment_product_detail.xml`](file:///d:/Ham/Code___/for_fiverr/eshop-verse/android/app/src/main/res/layout/fragment_product_detail.xml)
 * **Execution Checklist:**
-  - [ ] All text specifications (product name, technical specs, brand, price, stock status) rendered immediately from navigation arguments or cache.
-  - [ ] Carousel viewport at top has fixed `4:5` or `1:1` aspect ratio with shimmer placeholder.
-  - [ ] `onViewRecycled` implemented to cancel large image requests during rapid swiping:
+  - [x] All text specifications (product name, technical specs, brand, price, stock status) rendered immediately from navigation arguments or cache.
+  - [x] Carousel viewport at top has fixed `4:5` or `1:1` aspect ratio with shimmer placeholder.
+  - [x] `onViewRecycled` implemented to cancel large image requests during rapid swiping:
     ```java
     @Override
     public void onViewRecycled(@NonNull ImageViewHolder holder) {
@@ -171,7 +171,13 @@ This part covers all implementation and validation steps in the Admin Web Dashbo
 
 ---
 
-## Progress Summary
+## Progress Summary & Roadmap Mapping
+
+All remaining tasks are consolidated under **Android Roadmap Phase 11** (`feature/android-phase-11`):
+* **IMG-002 (Step 7):** Optimistic text-first transition for Product Detail screen.
+* **IMG-003 (Step 8 tuning):** Low-priority prefetch bandwidth optimization in `ImageLoaderHelper`.
+* **IMG-004 (Step 6 refinement):** Layout token & active shimmer alignment in `item_review_line.xml`.
+* **IMG-005 (Step 9):** Web admin zero-CLS and lazy loading standards.
 
 ### Android Customer Application
 - [x] **Step 1:** Resource cleanup method in `ImageLoaderHelper.java`
@@ -179,10 +185,10 @@ This part covers all implementation and validation steps in the Admin Web Dashbo
 - [x] **Step 3:** Implementation in `ProductGridAdapter.java` and grid layouts
 - [x] **Step 4:** Implementation in `FavoritesAdapter.java`
 - [x] **Step 5:** Implementation in `CartAdapter.java` and cart line layout
-- [ ] **Step 6:** Implementation in `ReviewItemsAdapter.java`
-- [ ] **Step 7:** Implementation in `ImageCarouselAdapter.java` and detail layout
-- [ ] **Step 8:** Active prefetching implementation in fragments
+- [x] **Step 6:** Implementation in `ReviewItemsAdapter.java` (refinement in IMG-004)
+- [ ] **Step 7 (IMG-002):** Implementation of optimistic text-first transition in `ProductDetailFragment.java`
+- [x] **Step 8 (IMG-003):** Active lookahead prefetching implemented in fragments (priority tuning in IMG-003)
 
 ### Admin & Backend
-- [ ] **Step 9:** Implementation of lazy loading and fixed container in Admin Dashboard (React)
+- [ ] **Step 9 (IMG-005):** Implementation of lazy loading and fixed container in Admin Dashboard (React)
 - [ ] **Step 10:** Validation of JSON contract and cache headers in Backend (REST API)
