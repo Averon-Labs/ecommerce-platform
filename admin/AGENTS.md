@@ -49,8 +49,9 @@ Use a supported stable toolchain selected at project initialization. The SPA and
 - Category management
 - Order management
 - Inventory management
+- Sales reports (paid-revenue KPIs, daily chart, top products, order-status mix)
 
-Customer administration and analytics are deferred; see `docs/PRODUCT.md`.
+Customer administration and advanced analytics beyond the sales report are deferred; see `docs/PRODUCT.md`.
 
 ---
 

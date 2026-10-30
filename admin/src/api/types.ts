@@ -207,3 +207,57 @@ export interface AdminOrderQuery {
   from?: string;
   to?: string;
 }
+
+/** `SalesReportRange` — the inclusive UTC bounds the server actually used. */
+export interface SalesReportRange {
+  from: string;
+  to: string;
+  timezone: string;
+}
+
+/** `SalesReportSummary` — paid revenue totals for the range. */
+export interface SalesReportSummary {
+  revenue: string;
+  totalOrders: number;
+  paidOrders: number;
+  itemsSold: number;
+  averageOrderValue: string;
+}
+
+/** `SalesReportDay` — one zero-filled UTC day of paid revenue. */
+export interface SalesReportDay {
+  date: string;
+  revenue: string;
+  orders: number;
+  itemsSold: number;
+}
+
+/** `SalesReportTopProduct` — a product ranked from immutable order snapshots. */
+export interface SalesReportTopProduct {
+  productId: number;
+  name: string;
+  quantity: number;
+  revenue: string;
+}
+
+/** `SalesReportStatusCount` — one row of the all-status order mix. */
+export interface SalesReportStatusCount {
+  status: OrderStatus;
+  orders: number;
+}
+
+/** `SalesReport` — the full RPT-001 response payload. */
+export interface SalesReport {
+  range: SalesReportRange;
+  currency: string;
+  summary: SalesReportSummary;
+  daily: SalesReportDay[];
+  topProducts: SalesReportTopProduct[];
+  ordersByStatus: SalesReportStatusCount[];
+}
+
+export interface SalesReportQuery {
+  from?: string;
+  to?: string;
+  topLimit?: number;
+}

@@ -266,3 +266,22 @@ upload archive is `deploy/eshopverse-admin-dist.zip`; live upload is the owner's
 - [x] **c.** The product list offers a confirmed **Delete** that calls `DELETE /admin/products/{id}`, reports the server's message (including `409 PRODUCT_HAS_ORDERS`) and the success feedback, and refreshes the list.
 
 **Verification (2026-10-27, builder):** `admin/src/api/http.ts` gained a `formData` path that deliberately omits `Content-Type` so the browser sets the multipart boundary (the CSRF header and retry behavior are unchanged); `catalog.ts` adds `uploadAdminProductImage`, `deleteAdminProductImage`, and `deleteAdminProduct`; `ProductImage` in `types.ts` now carries `id`. `ProductFormPage` tracks the image list separately from the saved baseline, so an upload or removal updates both and the unsaved-change guard still catches edits to the other fields (asserted by a test that navigates away without a dialog after an upload and a removal). `ProductsPage` adds the confirmed delete row/card action. Evidence: `npm run typecheck`, `npm run lint`, `npm run check:contrast` (34/34), `npm test` (11 files, 89 tests — 4 new: multipart upload with no hand-written content type, immediate delete, upload-failure alert, delete confirm/conflict), and `npm run build` all pass. Pending: independent tester stage and the owner's Git/PR step.
+
+## Phase 5 — Sales Reporting
+
+**Project phase gate:** this phase has no entry in the project roadmap; it is admin-owned reporting work requested directly by the owner on 2026-10-29, delivered together with the backend RPT-001 endpoint.
+
+### Step 1 — RPT-002 — Sales reports page and charts
+
+**Status:** `[~]`
+
+**Depends on:** RPT-001 (backend), ORD-003
+
+**Scope:** Add a Reports destination that turns the RPT-001 response into KPI cards, a daily revenue chart, a top-products ranking, and an order-status mix, with date presets and custom range inputs.
+
+**Acceptance criteria:**
+- [x] **a.** A **Reports** sidebar destination opens `/reports` and shows revenue, paid orders, items sold, and average order value from `GET /admin/reports/sales`, formatted as USD with `tabular-nums`.
+- [x] **b.** The daily revenue chart is rendered inline (no new chart dependency) with a fixed height and accessible name/summary, the top products and all-status mix show server values, and the range presets (7/30/90 days) plus custom `from`/`to` dates refetch from the server.
+- [x] **c.** Loading, empty, error/retry, and `401` states follow the shared panels; a custom range with `from` after `to` is rejected before the request, and no report data is invented client-side.
+
+**Verification (2026-10-29, builder):** `admin/src/api/reports.ts` wraps the contract endpoint, `types.ts` mirrors the `SalesReport*` schemas, and `ReportsPage` derives the KPI/chart/status-mix presentation from the server response while inline SVG bars avoid a chart dependency. `App.tsx` and `AppShell` add the route and destination. `ReportsPage.test.tsx` covers the rendered summary, chart and rankings, preset/custom range requests, the local range guard, empty and error/retry states, and the `401` redirect. Evidence: `npm run typecheck`, `npm run lint`, `npm test`, `npm run check:contrast`, and `npm run build` all pass. Pending: independent tester stage and the owner's Git/PR step.
