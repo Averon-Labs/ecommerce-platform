@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminInventoryController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminSalesReportController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
@@ -161,6 +162,10 @@ Route::prefix('admin')->group(function (): void {
             Route::patch('orders/{orderId}/status', [AdminOrderController::class, 'updateStatus'])
                 ->whereNumber('orderId')
                 ->middleware('throttle:admin-write');
+
+            // ------------------------------------------------- Admin reports (RPT-001)
+
+            Route::get('reports/sales', [AdminSalesReportController::class, 'index']);
         });
     });
 });
