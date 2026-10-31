@@ -8,6 +8,7 @@ import type {
   InventoryRow,
   OrderCustomer,
   Pagination,
+  SalesReport,
 } from '../api/types';
 
 export const ADMIN_USER = {
@@ -147,6 +148,43 @@ export function orderDetail(overrides: Partial<AdminOrder> = {}): AdminOrder {
     updatedAt: '2026-10-11T09:41:05Z',
     customer: ORDER_CUSTOMER,
     allowedTransitions: ['processing', 'cancelled'],
+    ...overrides,
+  };
+}
+
+/** One week of zero-filled daily data plus two paid days. */
+export function salesReport(overrides: Partial<SalesReport> = {}): SalesReport {
+  return {
+    range: { from: '2026-10-23', to: '2026-10-29', timezone: 'UTC' },
+    currency: 'USD',
+    summary: {
+      revenue: '95.00',
+      totalOrders: 3,
+      paidOrders: 2,
+      itemsSold: 4,
+      averageOrderValue: '47.50',
+    },
+    daily: [
+      { date: '2026-10-23', revenue: '0.00', orders: 0, itemsSold: 0 },
+      { date: '2026-10-24', revenue: '0.00', orders: 0, itemsSold: 0 },
+      { date: '2026-10-25', revenue: '0.00', orders: 0, itemsSold: 0 },
+      { date: '2026-10-26', revenue: '0.00', orders: 0, itemsSold: 0 },
+      { date: '2026-10-27', revenue: '0.00', orders: 0, itemsSold: 0 },
+      { date: '2026-10-28', revenue: '25.00', orders: 1, itemsSold: 2 },
+      { date: '2026-10-29', revenue: '70.00', orders: 1, itemsSold: 2 },
+    ],
+    topProducts: [
+      { productId: 5, name: 'Aurora Desk Lamp', quantity: 3, revenue: '65.00' },
+      { productId: 7, name: 'Summit Chair', quantity: 1, revenue: '30.00' },
+    ],
+    ordersByStatus: [
+      { status: 'pending_payment', orders: 1 },
+      { status: 'confirmed', orders: 1 },
+      { status: 'processing', orders: 0 },
+      { status: 'shipped', orders: 0 },
+      { status: 'delivered', orders: 0 },
+      { status: 'cancelled', orders: 1 },
+    ],
     ...overrides,
   };
 }

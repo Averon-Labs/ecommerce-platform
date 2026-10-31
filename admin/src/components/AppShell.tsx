@@ -79,6 +79,24 @@ function OrdersIcon() {
   );
 }
 
+function ReportsIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-5 w-5 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 20V10M10 20V4M16 20v-7" />
+      <path d="M2 20h20" />
+    </svg>
+  );
+}
+
 function MenuIcon() {
   return (
     <svg
@@ -101,6 +119,7 @@ const NAV_ITEMS = [
   { to: '/categories', label: 'Categories', icon: <CategoriesIcon /> },
   { to: '/inventory', label: 'Inventory', icon: <InventoryIcon /> },
   { to: '/orders', label: 'Orders', icon: <OrdersIcon /> },
+  { to: '/reports', label: 'Reports', icon: <ReportsIcon /> },
 ];
 
 type NavClickHandler = (event: ReactMouseEvent<HTMLAnchorElement>, to: string) => void;

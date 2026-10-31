@@ -11,6 +11,7 @@ import OrderDetailPage from './pages/orders/OrderDetailPage';
 import OrdersPage from './pages/orders/OrdersPage';
 import ProductFormPage from './pages/products/ProductFormPage';
 import ProductsPage from './pages/products/ProductsPage';
+import ReportsPage from './pages/reports/ReportsPage';
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
                 <Route path="inventory" element={<InventoryPage />} />
                 <Route path="orders" element={<OrdersPage />} />
                 <Route path="orders/:orderId" element={<OrderDetailPage />} />
+                <Route path="reports" element={<ReportsPage />} />
               </Route>
             </Route>
             <Route path="*" element={<NotFoundPage />} />
