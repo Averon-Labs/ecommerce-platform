@@ -21,6 +21,10 @@
 # the new 403 ACCOUNT_DISABLED outcome for deactivated accounts, and multiple
 # trusted Google client IDs. Canonical tasks: docs/BACKEND_ROADMAP.md —
 # Phase 4 — Steps 1–3.
+#
+# 2026-10-29 (RPT-001): added GET /admin/reports/sales, a read-only admin
+# sales report over the existing order snapshots. Canonical task:
+# docs/BACKEND_ROADMAP.md — Phase 6 — Step 1.
 
 openapi: 3.1.0
 
@@ -81,6 +85,8 @@ tags:
     description: Admin product, category, and inventory management.
   - name: Admin orders
     description: Admin order inspection and permitted status transitions.
+  - name: Admin reports
+    description: Read-only sales totals and charts over the existing order snapshots.
 
 security:
   - bearerAuth: []
@@ -1942,6 +1948,96 @@ paths:
         '500': { $ref: '#/components/responses/ServerError' }
         '429': { $ref: '#/components/responses/RateLimited' }
 
+  /admin/reports/sales:
+    get:
+      tags: [Admin reports]
+      operationId: adminSalesReport
+      summary: Read the sales report for an inclusive date range
+      description: |
+        Read-only. Revenue counts orders whose latest simulated payment is `completed` and
+        that were not cancelled afterwards. Amounts and product names come from the immutable
+        order snapshots, never from the current catalog, and include the flat sample shipping
+        amount. `totalOrders` counts every order created in the range regardless of payment,
+        while `paidOrders` and `itemsSold` count only the revenue orders. `daily` is
+        zero-filled for every UTC day in the range. With no `from`, the report covers the
+        30 days ending on `to` (or today). The maximum inclusive span is 366 days.
+      security:
+        - adminSession: []
+      parameters:
+        - name: from
+          in: query
+          description: Inclusive lower bound on `createdAt` (date, UTC).
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          description: Inclusive upper bound on `createdAt` (date, UTC). Defaults to today.
+          schema: { type: string, format: date }
+        - name: topLimit
+          in: query
+          description: Number of products in `topProducts`, ranked by revenue.
+          schema: { type: integer, minimum: 1, maximum: 10, default: 5 }
+      responses:
+        '200':
+          description: Sales report for the requested range.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data: { $ref: '#/components/schemas/SalesReport' }
+              examples:
+                two-day-report:
+                  summary: Two paid days with one top product
+                  value:
+                    data:
+                      range:
+                        from: '2026-10-28'
+                        to: '2026-10-29'
+                        timezone: UTC
+                      currency: USD
+                      summary:
+                        revenue: '60.00'
+                        totalOrders: 3
+                        paidOrders: 2
+                        itemsSold: 3
+                        averageOrderValue: '30.00'
+                      daily:
+                        - date: '2026-10-28'
+                          revenue: '25.00'
+                          orders: 1
+                          itemsSold: 2
+                        - date: '2026-10-29'
+                          revenue: '35.00'
+                          orders: 1
+                          itemsSold: 1
+                      topProducts:
+                        - productId: 8
+                          name: Summit Ergonomic Chair
+                          quantity: 1
+                          revenue: '30.00'
+                        - productId: 1
+                          name: Aurora Wireless Headphones
+                          quantity: 2
+                          revenue: '20.00'
+                      ordersByStatus:
+                        - status: pending_payment
+                          orders: 1
+                        - status: confirmed
+                          orders: 2
+                        - status: processing
+                          orders: 0
+                        - status: shipped
+                          orders: 0
+                        - status: delivered
+                          orders: 0
+                        - status: cancelled
+                          orders: 0
+        '401': { $ref: '#/components/responses/Unauthenticated' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+        '500': { $ref: '#/components/responses/ServerError' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+
 components:
 
   securitySchemes:
@@ -2596,6 +2692,95 @@ components:
                 server will reject.
               items: { $ref: '#/components/schemas/OrderStatus' }
 
+    SalesReportRange:
+      type: object
+      required: [from, to, timezone]
+      properties:
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        timezone:
+          type: string
+          const: UTC
+          description: Order timestamps are bucketed by their UTC calendar date.
+
+    SalesReportSummary:
+      type: object
+      required: [revenue, totalOrders, paidOrders, itemsSold, averageOrderValue]
+      properties:
+        revenue:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: Sum of `total` for revenue orders, including shipping.
+        totalOrders:
+          type: integer
+          minimum: 0
+          description: Every order created in the range, regardless of payment or status.
+        paidOrders:
+          type: integer
+          minimum: 0
+          description: Orders whose latest payment completed and that were not cancelled.
+        itemsSold:
+          type: integer
+          minimum: 0
+          description: Sum of item quantities across the revenue orders.
+        averageOrderValue:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: Revenue divided by `paidOrders`, rounded half-up; `0.00` when none.
+
+    SalesReportDay:
+      type: object
+      required: [date, revenue, orders, itemsSold]
+      properties:
+        date: { type: string, format: date }
+        revenue: { $ref: '#/components/schemas/Money' }
+        orders:
+          type: integer
+          minimum: 0
+          description: Revenue orders created on this UTC day.
+        itemsSold: { type: integer, minimum: 0 }
+
+    SalesReportTopProduct:
+      type: object
+      required: [productId, name, quantity, revenue]
+      properties:
+        productId: { type: integer, minimum: 1 }
+        name:
+          type: string
+          description: Product name from the most recent order snapshot.
+        quantity: { type: integer, minimum: 1 }
+        revenue:
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          description: Sum of the snapshot line totals for this product.
+
+    SalesReportStatusCount:
+      type: object
+      required: [status, orders]
+      properties:
+        status: { $ref: '#/components/schemas/OrderStatus' }
+        orders: { type: integer, minimum: 0 }
+
+    SalesReport:
+      type: object
+      required: [range, currency, summary, daily, topProducts, ordersByStatus]
+      properties:
+        range: { $ref: '#/components/schemas/SalesReportRange' }
+        currency: { $ref: '#/components/schemas/Currency' }
+        summary: { $ref: '#/components/schemas/SalesReportSummary' }
+        daily:
+          type: array
+          description: One entry per UTC day in the range, oldest first, including zero days.
+          items: { $ref: '#/components/schemas/SalesReportDay' }
+        topProducts:
+          type: array
+          description: Ranked by revenue, then quantity, then name; capped by `topLimit`.
+          items: { $ref: '#/components/schemas/SalesReportTopProduct' }
+        ordersByStatus:
+          type: array
+          description: All six statuses in lifecycle order, including zero counts.
+          items: { $ref: '#/components/schemas/SalesReportStatusCount' }
+
   # ------------------------------------------------------- contract metadata
 
 x-error-codes:
@@ -2635,7 +2820,7 @@ x-rate-limit-classes:
   # operationIds it lists and is applied in addition to `global`. Operations governed  # by `global` only: getCustomerProfile, getCart, listOrders, getOrder,
     # getAdminCsrfCookie, getAdminSession, adminListProducts, adminGetProduct,
     # adminListCategories, adminListInventory, adminListOrders, adminGetOrder,
-    # getProductImage.
+    # adminSalesReport, getProductImage.
   # Every operation documents `429` via the shared RateLimited response.
   global: { limit: 300, window: 1m, key: ip }
   public-read: { limit: 120, window: 1m, key: ip, applies-to: [listCategories, listProducts, getProduct] }

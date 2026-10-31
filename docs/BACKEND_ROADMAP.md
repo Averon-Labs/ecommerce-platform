@@ -379,3 +379,22 @@ A roadmap assignment uses this roadmap name, phase, and step, for example: Backe
 
 **Verification (2026-10-27, builder):** `AdminProductController::destroy()` checks `order_items` first (the schema keeps a RESTRICT foreign key there), performs explicit per-table deletes inside a transaction instead of relying on engine-specific cascades, and only then deletes files through `ProductImageStorage::deleteByUrl()`, which ignores external URLs. `replaceImages()` now deletes rows by `product_id` (the `images` relation carries an `ORDER BY`, which a `DELETE` statement does not accept on every database) and drops files that no longer appear in the payload. Test cases in `AdminProductImageTest` cover deletion with an inventory row and a cart line (all rows and the file gone), the order guard (`409 PRODUCT_HAS_ORDERS`, everything intact), and the `PUT` cleanup. Evidence: same run as CAT-B01 — 11 tests / 118 assertions / 0 failures; `AdminProductTest` (12 tests) still passes. Pending: independent tester stage and the owner's Git/PR step.
 
+## Phase 6 — Sales Reporting
+
+**Project phase gate:** this phase has no entry in the project roadmap; it is backend-owned reporting work requested directly by the owner on 2026-10-29, delivered together with the admin RPT-002 screen.
+
+### Step 1 — RPT-001 — Read-only admin sales report API
+
+**Status:** `[~]`
+
+**Depends on:** ORD-001, CAT-B02
+
+**Scope:** Serve the sales figures the admin dashboard charts from a single read-only endpoint over the immutable order snapshots, with a bounded UTC date range and no schema change.
+
+**Acceptance criteria:**
+- [x] **a.** `GET /admin/reports/sales` requires an admin session, defaults to the 30 UTC days ending today, accepts optional inclusive `from`/`to` dates and `topLimit` (1–10, default 5), rejects inverted ranges and spans over 366 days with `422 VALIDATION_ERROR`, and is documented in `docs/openapi.yaml`.
+- [x] **b.** Revenue counts only orders whose latest simulated payment is `completed` and that are not `cancelled`, uses the immutable snapshot totals including the flat shipping amount, and reports `totalOrders`, `paidOrders`, `itemsSold`, and a half-up `averageOrderValue`.
+- [x] **c.** The response carries a zero-filled daily series for every UTC day in the range, top products ranked by revenue then quantity then name using the snapshot product name, and the all-status order mix in lifecycle order.
+
+**Verification (2026-10-29, builder):** `AdminSalesReportController` loads the range's orders with their line items and latest payment, filters revenue orders in memory from the snapshots, and zero-fills the daily buckets before aggregating, so no date/timezone SQL differs between MySQL and PostgreSQL. `AdminSalesReportRequest` validates the query shape and the controller raises the documented range errors through the shared `ApiException` envelope. New `tests/Feature/Admin/AdminSalesReportTest.php` covers session/role enforcement, the default 30-day zero-filled range, revenue/status filtering, snapshot names, `topLimit`, invalid dates, inverted and over-long ranges, and the 366-day boundary; 6 tests / 107 assertions pass on the SQLite fallback. Pending: independent tester stage and the owner's Git step.
+
