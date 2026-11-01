@@ -749,20 +749,20 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 
 ### Step 2 — CART-003 — Guest Cart State & Decouple Auto-Auth Redirect
 
-**Status:** `[ ]`
+**Status:** `[x]`
 
 **Depends on:** NAV-001
 
 **Scope:** Remove automatic navigation to `nav_auth` in `CartFragment` on 401 unauthenticated load. Introduce an elegant guest empty state with Sign In and Explore CTAs. Require authentication only when attempting Checkout.
 
 **Acceptance criteria:**
-- [ ] **a.** `CartFragment` does not immediately redirect to `nav_auth` when unauthenticated.
-- [ ] **b.** `CartFragment` displays an engaging guest state with "Sign In" and "Explore Products" actions.
-- [ ] **c.** Pressing "Checkout" when unauthenticated directs to login with `returnToNavId = R.id.nav_checkout`.
-- [ ] **d.** Pressing Back from `SignInFragment` returns gracefully to `CartFragment` without re-triggering an auto-redirect.
-- [ ] **e.** All unit tests in `CartViewModelTest` and cart-related suites pass cleanly.
+- [x] **a.** `CartFragment` does not immediately redirect to `nav_auth` when unauthenticated.
+- [x] **b.** `CartFragment` displays an engaging guest state with "Sign In" and "Explore Products" actions.
+- [x] **c.** Pressing "Checkout" when unauthenticated directs to login with `returnToNavId = R.id.nav_checkout`.
+- [x] **d.** Pressing Back from `SignInFragment` returns gracefully to `CartFragment` without re-triggering an auto-redirect.
+- [x] **e.** All unit tests in `CartViewModelTest` and cart-related suites pass cleanly.
 
-**Verification:** Gradle `testDebugUnitTest` passes cleanly.
+**Verification:** Gradle `testDebugUnitTest` passes cleanly with 0 errors. Phase 12 complete!
 
 ## External dependencies owned by other components
 

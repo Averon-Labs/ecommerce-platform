@@ -22,5 +22,7 @@
     <string name="cart_error_insufficient_stock">Requested quantity exceeds available stock.</string>
     <string name="cart_error_item_not_found">Item was removed from the cart.</string>
     <string name="cart_action_retry">Retry</string>
+    <string name="cart_guest_title">Sign in to view your bag</string>
+    <string name="cart_action_sign_in">Sign In / Register</string>
     <string name="cart_badge_label">%d items in cart</string>
 </resources>

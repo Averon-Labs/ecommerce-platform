@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.averonlabs.eshopverse.MainActivity;
 import com.averonlabs.eshopverse.R;
+import com.averonlabs.eshopverse.auth.AuthViewModelFactory;
 import com.averonlabs.eshopverse.core.model.Cart;
 import com.averonlabs.eshopverse.core.model.CartItem;
 import com.averonlabs.eshopverse.core.money.MoneyFormat;
@@ -74,8 +75,15 @@ public class CartFragment extends Fragment {
 
     private void setupClickListeners() {
         binding.btnCartCheckout.setOnClickListener(v -> {
+            boolean signedIn = AuthViewModelFactory.getDefaultRepository(requireContext()).isSignedIn();
             NavController navController = NavHostFragment.findNavController(this);
-            navController.navigate(R.id.nav_checkout);
+            if (signedIn) {
+                navController.navigate(R.id.nav_checkout);
+            } else {
+                Bundle args = new Bundle();
+                args.putInt("returnToNavId", R.id.nav_checkout);
+                navController.navigate(R.id.nav_auth, args);
+            }
         });
     }
 
@@ -116,9 +124,9 @@ public class CartFragment extends Fragment {
         viewModel.getAuthRequiredEvent().observe(getViewLifecycleOwner(), event -> {
             Boolean authRequired = event.getContentIfNotHandled();
             if (Boolean.TRUE.equals(authRequired)) {
-                Bundle args = new Bundle();
-                args.putInt("returnToNavId", R.id.cartFragment);
-                NavHostFragment.findNavController(this).navigate(R.id.nav_auth, args);
+                // Do NOT auto-redirect to nav_auth here.
+                // Immediate auto-redirect upon page load creates an inescapable loop when guest presses Back.
+                // The guest empty state is rendered with an intentional Sign In action instead.
             }
         });
     }
@@ -156,13 +164,28 @@ public class CartFragment extends Fragment {
                 binding.btnCartCheckout.setEnabled(false);
                 break;
             case ERROR:
-                binding.stateContainerCart.setState(
-                        StateContainerView.State.ERROR,
-                        getString(state.getMessageRes() != 0 ? state.getMessageRes() : R.string.cart_error_loading),
-                        getString(R.string.cart_action_retry),
-                        viewModel::retry
-                );
-                binding.btnCartCheckout.setEnabled(false);
+                boolean isGuest = !AuthViewModelFactory.getDefaultRepository(requireContext()).isSignedIn();
+                if (isGuest) {
+                    binding.stateContainerCart.setState(
+                            StateContainerView.State.EMPTY,
+                            getString(R.string.cart_guest_title),
+                            getString(R.string.cart_action_sign_in),
+                            () -> {
+                                Bundle args = new Bundle();
+                                args.putInt("returnToNavId", R.id.cartFragment);
+                                NavHostFragment.findNavController(this).navigate(R.id.nav_auth, args);
+                            }
+                    );
+                    binding.btnCartCheckout.setEnabled(false);
+                } else {
+                    binding.stateContainerCart.setState(
+                            StateContainerView.State.ERROR,
+                            getString(state.getMessageRes() != 0 ? state.getMessageRes() : R.string.cart_error_loading),
+                            getString(R.string.cart_action_retry),
+                            viewModel::retry
+                    );
+                    binding.btnCartCheckout.setEnabled(false);
+                }
                 break;
         }
     }

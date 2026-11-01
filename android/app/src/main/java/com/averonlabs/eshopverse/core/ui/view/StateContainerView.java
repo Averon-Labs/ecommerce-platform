@@ -96,7 +96,7 @@ public final class StateContainerView extends FrameLayout {
         messagePanel.setVisibility(state == State.CONTENT ? GONE : VISIBLE);
         progress.setVisibility(state == State.LOADING ? VISIBLE : GONE);
         message.setVisibility(state == State.EMPTY || state == State.ERROR ? VISIBLE : GONE);
-        retry.setVisibility(state == State.ERROR && onRetry != null ? VISIBLE : GONE);
+        retry.setVisibility((state == State.ERROR || state == State.EMPTY) && onRetry != null ? VISIBLE : GONE);
         if (state != State.CONTENT) {
             messagePanel.bringToFront();
         }
