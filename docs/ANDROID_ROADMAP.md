@@ -726,7 +726,43 @@ All three steps in this phase may run concurrently: they own disjoint packages, 
 - [x] **b.** Thumbnail containers in admin table enforce fixed aspect ratios (`w-10 h-10` or `aspect-square`) with a skeleton shimmer pulse background during network loading.
 - [x] **c.** Product preview in `admin/src/pages/products/ProductFormPage.tsx` applies `decoding="async"` and smooth transition opacity.
 
-**Verification:** TypeScript type check and production build (`npm run build` in `admin/` producing bundle with 0 errors) and Vitest suite (`npm test` in `admin/` passing 86 of 86 unit tests). Phase 11 complete!
+**Verification:** TypeScript type check and production build (`npm run build` in `admin/` producing bundle with 0 errors) and Vitest suite (`npm test` in `admin/` passing 86 of 86 unit tests). 
+## Phase 12 — Navigation Stability & Guest Cart UX
+
+**Objective:** Eliminate infinite backstack ping-pong loops and guest authentication traps across bottom navigation, the customer cart, and sign-in flow.
+
+### Step 1 — NAV-001 — Fix Back Navigation Ping-Pong & Unify BackStack in `MainActivity`
+
+**Status:** `[x]`
+
+**Depends on:** none
+
+**Scope:** Fix `handleOnBackPressed` in `MainActivity.java` by replacing `navigate(R.id.homeFragment)` with `popBackStack(R.id.homeFragment, false)`, removing permanent `setEnabled(false)` lockup, and cleanly exiting the activity when already at Home.
+
+**Acceptance criteria:**
+- [x] **a.** `handleOnBackPressed` in `MainActivity` uses `navController.popBackStack(R.id.homeFragment, false)` instead of pushing a duplicate `homeFragment` with `navigate()`.
+- [x] **b.** Replace permanent `setEnabled(false)` with explicit activity finish or dynamic delegation so back press callback is never permanently dead.
+- [x] **c.** From any non-home top-level tab (Explore, Cart, Account), pressing Back smoothly pops to Home; pressing Back from Home exits the application.
+- [x] **d.** Unit and contract verification tests in `android/` pass without regressions.
+
+**Verification:** Gradle `testDebugUnitTest` passes cleanly with 0 errors.
+
+### Step 2 — CART-003 — Guest Cart State & Decouple Auto-Auth Redirect
+
+**Status:** `[x]`
+
+**Depends on:** NAV-001
+
+**Scope:** Remove automatic navigation to `nav_auth` in `CartFragment` on 401 unauthenticated load. Introduce an elegant guest empty state with Sign In and Explore CTAs. Require authentication only when attempting Checkout.
+
+**Acceptance criteria:**
+- [x] **a.** `CartFragment` does not immediately redirect to `nav_auth` when unauthenticated.
+- [x] **b.** `CartFragment` displays an engaging guest state with "Sign In" and "Explore Products" actions.
+- [x] **c.** Pressing "Checkout" when unauthenticated directs to login with `returnToNavId = R.id.nav_checkout`.
+- [x] **d.** Pressing Back from `SignInFragment` returns gracefully to `CartFragment` without re-triggering an auto-redirect.
+- [x] **e.** All unit tests in `CartViewModelTest` and cart-related suites pass cleanly.
+
+**Verification:** Gradle `testDebugUnitTest` passes cleanly with 0 errors. Phase 12 complete!
 
 ## External dependencies owned by other components
 

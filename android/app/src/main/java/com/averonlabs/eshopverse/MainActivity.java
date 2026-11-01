@@ -16,6 +16,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.navigation.NavController;
+import androidx.navigation.NavOptions;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -84,7 +85,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                     boolean popped = navController.popBackStack(R.id.homeFragment, false);
                     if (!popped) {
-                        navController.navigate(R.id.homeFragment);
+                        NavOptions options = new NavOptions.Builder()
+                                .setPopUpTo(R.id.homeFragment, true)
+                                .build();
+                        navController.navigate(R.id.homeFragment, null, options);
                     }
                     return true;
                 }
@@ -109,8 +113,8 @@ public class MainActivity extends AppCompatActivity {
         setCartBadgeCount(0);
 
         // Hierarchical back navigation adhering to Material 3 & UX principles:
-        // First pop child/sub-screens in current flow (e.g. Register -> SignIn -> Account).
-        // If at the root of a tab other than Home, Back returns to HomeFragment.
+        // First pop child/sub-screens in current flow (e.g. Register -> SignIn -> Account, Product Detail -> Home).
+        // If at the root of a tab other than Home, Back reliably pops to HomeFragment.
         // A subsequent Back press from HomeFragment exits the application directly.
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -121,12 +125,17 @@ public class MainActivity extends AppCompatActivity {
                     }
                     if (navController.getCurrentDestination() != null
                             && navController.getCurrentDestination().getId() != R.id.homeFragment) {
-                        navController.navigate(R.id.homeFragment);
+                        boolean popped = navController.popBackStack(R.id.homeFragment, false);
+                        if (!popped) {
+                            NavOptions options = new NavOptions.Builder()
+                                    .setPopUpTo(R.id.homeFragment, true)
+                                    .build();
+                            navController.navigate(R.id.homeFragment, null, options);
+                        }
                         return;
                     }
                 }
-                setEnabled(false);
-                getOnBackPressedDispatcher().onBackPressed();
+                finish();
             }
         });
     }
